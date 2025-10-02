@@ -34,7 +34,7 @@ export default function Chrome() {
         {...handleProfileInteraction}
       >
         <img 
-          src="/img/id_photo.png" 
+          src="/Greenwash/img/id_photo.png" 
           alt="Profile" 
           className="h-14 w-auto object-contain shrink-0" 
         />
@@ -80,7 +80,7 @@ export default function Chrome() {
         }}
       >
         <img 
-          src="/img/logo_with_seal.png" 
+          src="/Greenwash/img/logo_with_seal.png" 
           alt="Greenwash logo with seal" 
           className="h-16 md:h-16 sm:h-12 w-auto object-contain shrink-0 max-w-full" 
         />
