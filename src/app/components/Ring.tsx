@@ -8,6 +8,17 @@ const DOT = 60;            // Smaller dots for better mobile experience
 const BASE_SPEED = 0.0375; // 75% slower than 0.15 (0.15 * 0.25 = 0.0375)
 const GREEN = '#008F46';
 
+// Video sources - replace these paths with actual video files
+const VIDEO_SOURCES = [
+  null, // Ministry of Love (VR Room) - add video path here
+  null, // Compliance Manual - add video path here
+  null, // Scanner - add video path here
+  null, // Request Terminal - add video path here
+  null, // Files - add video path here
+  null, // Notes/Journal - add video path here
+  null, // Quiz - add video path here
+];
+
 export default function Ring({ hoverIdx, setHoverIdx, onDotClick }:{
   hoverIdx: number | null;
   setHoverIdx: (i:number|null)=>void;
@@ -112,23 +123,48 @@ export default function Ring({ hoverIdx, setHoverIdx, onDotClick }:{
           const inactive = hoverIdx !== null && hoverIdx !== i;
           
           return (
-            <button
+            <div
               key={i}
-              aria-label={`dot-${i}`}
-              {...handleSphereInteraction(i)}
-              onClick={() => onDotClick?.(i)}
-              className={`absolute rounded-full transition-all duration-200 cursor-pointer ${
+              className={`absolute rounded-full overflow-hidden transition-all duration-200 cursor-pointer ${
                 isHovered && !isMobile ? 'scale-110' : isHovered && isMobile ? 'scale-105' : inactive ? 'blur-[2px] opacity-60' : ''
               }`}
               style={{
                 width: DOT, 
                 height: DOT, 
-                background: GREEN,
                 left:`calc(50% + ${x}vmin - ${DOT/2}px)`,
                 top: `calc(50% + ${y}vmin - ${DOT/2}px)`,
-                transform: `rotate(-${rotation}deg)` // Counter-rotate to keep dots upright
+                transform: `rotate(-${rotation}deg)` // Counter-rotate to keep videos upright
               }}
-            />
+              {...handleSphereInteraction(i)}
+              onClick={() => onDotClick?.(i)}
+            >
+              {VIDEO_SOURCES[i] ? (
+                <video
+                  className="w-full h-full object-cover"
+                  autoPlay
+                  muted
+                  loop
+                  playsInline
+                >
+                  <source src={VIDEO_SOURCES[i]} type="video/mp4" />
+                  {/* Fallback if video fails to load */}
+                  <div 
+                    className="w-full h-full flex items-center justify-center text-white text-xs font-medium"
+                    style={{ backgroundColor: GREEN }}
+                  >
+                    {i + 1}
+                  </div>
+                </video>
+              ) : (
+                // Placeholder circle until video is added
+                <div 
+                  className="w-full h-full flex items-center justify-center text-white text-xs font-medium"
+                  style={{ backgroundColor: GREEN }}
+                >
+                  {i + 1}
+                </div>
+              )}
+            </div>
           );
         })}
       </div>

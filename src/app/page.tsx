@@ -7,13 +7,13 @@ import Ring from './components/Ring';
 import HoverLabel from './components/HoverLabel';
 
 const DOT_LABELS = [
-  'Ministry of Love',
-  'Compliance Manual', 
-  'Green Scanner',
-  'Request Terminal',
-  'Document Files',
-  'Compliance Journal',
-  'Knowledge Assessment'
+  'BreakRoom BRK-37',
+  'Protocol PRT-37', 
+  'HueScan HUE-37',
+  'Report RPT-37',
+  'Files FLS-37',
+  'Journal JNL-37',
+  'SelfTest STT-37'
 ];
 
 export default function Home() {
