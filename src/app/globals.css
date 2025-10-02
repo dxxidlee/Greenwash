@@ -1,0 +1,91 @@
+/* app/globals.css */
+@font-face {
+  font-family: 'PPNeueMontreal';
+  src: url('/fonts/PPNeueMontreal-Regular.otf') format('opentype');
+  font-weight: 400; font-style: normal; font-display: swap;
+}
+@font-face {
+  font-family: 'PPNeueMontreal';
+  src: url('/fonts/PPNeueMontreal-Medium.otf') format('opentype');
+  font-weight: 500; font-style: normal; font-display: swap;
+}
+@font-face {
+  font-family: 'PPNeueMontreal';
+  src: url('/fonts/PPNeueMontreal-Bold.otf') format('opentype');
+  font-weight: 700; font-style: normal; font-display: swap;
+}
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root { 
+  --gw-green: #008F46; 
+  --edge-margin: 12px; /* Standard margin from profile/clock positioning */
+}
+
+/* Ensure consistent margins on mobile */
+@media (max-width: 767px) {
+  :root {
+    --edge-margin: 12px; /* Keep same margin on mobile */
+  }
+}
+
+html, body {
+  background:#fff; color: var(--gw-green);
+  font-family: 'PPNeueMontreal', system-ui, -apple-system, Segoe UI, Roboto, sans-serif;
+  font-weight: 500; /* Use Medium weight by default */
+  margin: 0;
+  padding: 0;
+}
+
+/* iOS-style glass pill used for hover labels */
+.gw-glass {
+  color: #fff;
+  background: rgba(0, 0, 0, 0.6);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  border-radius: 9999px;
+  padding: 8px 14px;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3), inset 0 1px 0 rgba(255, 255, 255, 0.1);
+  backdrop-filter: blur(16px) saturate(180%);
+  -webkit-backdrop-filter: blur(16px) saturate(180%);
+  font-weight: 500;
+}
+
+/* Light silver glass for profile and circle hover labels */
+.gw-glass-light {
+  color: #008F46;
+  background: rgba(217, 217, 217, 0.3);
+  border: 1px solid rgba(217, 217, 217, 0.4);
+  border-radius: 9999px;
+  padding: 8px 14px;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1), inset 0 1px 0 rgba(255, 255, 255, 0.3);
+  backdrop-filter: blur(16px) saturate(180%);
+  -webkit-backdrop-filter: blur(16px) saturate(180%);
+  font-weight: 500;
+}
+
+/* Profile dropdown uses rectangular glass */
+.gw-glass-light.profile-dropdown {
+  border-radius: 12px;
+  padding: 12px 16px;
+}
+
+/* Dark glass for Ministry of Love and other dark modals */
+.gw-glass-dark {
+  color: var(--gw-green);
+  background: rgba(0, 0, 0, 0.8);
+  border: 1px solid rgba(0, 143, 70, 0.3);
+  border-radius: 12px;
+  padding: 12px 16px;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.5), inset 0 1px 0 rgba(0, 143, 70, 0.2);
+  backdrop-filter: blur(16px) saturate(180%);
+  -webkit-backdrop-filter: blur(16px) saturate(180%);
+  font-weight: 500;
+}
+
+@media (prefers-reduced-transparency: reduce) {
+  .gw-glass { backdrop-filter:none; -webkit-backdrop-filter:none; background:rgba(0,0,0,0.75); }
+  .gw-glass-light { backdrop-filter:none; -webkit-backdrop-filter:none; background:rgba(217,217,217,0.8); }
+  .gw-glass-dark { backdrop-filter:none; -webkit-backdrop-filter:none; background:rgba(0,0,0,0.9); }
+}
