@@ -4,19 +4,19 @@ import { useMemo, useEffect, useState, useRef } from 'react';
 
 const DOTS = 7;
 const RADIUS_VMIN = 28;    // Less tight radius for better mobile experience
-const DOT = 60;            // Smaller dots for better mobile experience
+const DOT = 140;            // Increased size for better video visibility
 const BASE_SPEED = 0.0375; // 75% slower than 0.15 (0.15 * 0.25 = 0.0375)
 const GREEN = '#008F46';
 
 // Video sources - replace these paths with actual video files
 const VIDEO_SOURCES = [
-  null, // Ministry of Love (VR Room) - add video path here
-  null, // Compliance Manual - add video path here
-  null, // Scanner - add video path here
-  null, // Request Terminal - add video path here
-  null, // Files - add video path here
-  null, // Notes/Journal - add video path here
-  null, // Quiz - add video path here
+  null, // BreakRoom BRK-37 - add video path here
+  null, // Protocol PRT-37 - add video path here
+  '/img/video-1.mp4', // HueScan HUE-37
+  null, // Report RPT-37 - add video path here
+  '/img/video-2.mp4', // Files FLS-37
+  '/img/video-3.mp4', // Journal JNL-37
+  null, // SelfTest STT-37 - add video path here
 ];
 
 export default function Ring({ hoverIdx, setHoverIdx, onDotClick }:{
@@ -77,7 +77,11 @@ export default function Ring({ hoverIdx, setHoverIdx, onDotClick }:{
   useEffect(() => {
     const animate = () => {
       if (!isPaused) {
-        setRotation(prev => prev + rotationSpeed);
+        setRotation(prev => {
+          const newRotation = prev + rotationSpeed;
+          // Keep rotation between 0 and 360 to prevent infinite growth
+          return newRotation >= 360 ? newRotation - 360 : newRotation;
+        });
       }
       animationRef.current = requestAnimationFrame(animate);
     };
@@ -111,12 +115,11 @@ export default function Ring({ hoverIdx, setHoverIdx, onDotClick }:{
         className="relative" 
         style={{ 
           width:`calc(${RADIUS_VMIN*2}vmin)`, 
-          height:`calc(${RADIUS_VMIN*2}vmin)`,
-          transform: `rotate(${rotation}deg)`
+          height:`calc(${RADIUS_VMIN*2}vmin)`
         }}
       >
         {dots.map((_, i) => {
-          const angle = (i/DOTS) * 2*Math.PI;
+          const angle = (i/DOTS) * 2*Math.PI + (rotation * Math.PI / 180); // Add rotation to angle
           const x = Math.cos(angle) * RADIUS_VMIN;
           const y = Math.sin(angle) * RADIUS_VMIN;
           const isHovered = hoverIdx === i;
@@ -125,7 +128,7 @@ export default function Ring({ hoverIdx, setHoverIdx, onDotClick }:{
           return (
             <div
               key={i}
-              className={`absolute rounded-full overflow-hidden transition-all duration-200 cursor-pointer ${
+              className={`absolute transition-all duration-200 cursor-pointer ${
                 isHovered && !isMobile ? 'scale-110' : isHovered && isMobile ? 'scale-105' : inactive ? 'blur-[2px] opacity-60' : ''
               }`}
               style={{
@@ -133,33 +136,45 @@ export default function Ring({ hoverIdx, setHoverIdx, onDotClick }:{
                 height: DOT, 
                 left:`calc(50% + ${x}vmin - ${DOT/2}px)`,
                 top: `calc(50% + ${y}vmin - ${DOT/2}px)`,
-                transform: `rotate(-${rotation}deg)` // Counter-rotate to keep videos upright
+                boxShadow: 'none', // Remove any shadows
+                outline: 'none' // Remove focus outline
               }}
               {...handleSphereInteraction(i)}
               onClick={() => onDotClick?.(i)}
             >
               {VIDEO_SOURCES[i] ? (
                 <video
-                  className="w-full h-full object-cover"
+                  className="w-full h-full object-contain"
                   autoPlay
                   muted
                   loop
                   playsInline
+                  preload="auto"
+                  onLoadedData={(e) => {
+                    console.log('Video loaded successfully:', VIDEO_SOURCES[i]);
+                    const video = e.target as HTMLVideoElement;
+                    // Set playback speed to 0.75x (75% of normal speed)
+                    video.playbackRate = 0.75;
+                    // Ensure smooth looping by seeking to a frame slightly before the end
+                    video.addEventListener('timeupdate', () => {
+                      if (video.currentTime >= video.duration - 0.1) {
+                        video.currentTime = 0.05; // Start slightly after beginning to avoid duplicate frames
+                      }
+                    });
+                  }}
+                  onError={(e) => {
+                    console.error('Video failed to load:', VIDEO_SOURCES[i], e);
+                  }}
                 >
                   <source src={VIDEO_SOURCES[i]} type="video/mp4" />
                   {/* Fallback if video fails to load */}
-                  <div 
-                    className="w-full h-full flex items-center justify-center text-white text-xs font-medium"
-                    style={{ backgroundColor: GREEN }}
-                  >
-                    {i + 1}
-                  </div>
+                  Your browser does not support the video tag.
                 </video>
               ) : (
                 // Placeholder circle until video is added
                 <div 
-                  className="w-full h-full flex items-center justify-center text-white text-xs font-medium"
-                  style={{ backgroundColor: GREEN }}
+                  className="w-full h-full flex items-center justify-center text-gray-400 text-xs font-medium"
+                  style={{ backgroundColor: 'white', border: '1px solid #f0f0f0' }}
                 >
                   {i + 1}
                 </div>
