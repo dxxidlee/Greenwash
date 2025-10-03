@@ -40,3 +40,7 @@ next-env.d.ts
 
 # OS
 Thumbs.db
+
+# External projects (deployed separately)
+/breakroom-vr/
+/huescan-camera/

@@ -5,6 +5,7 @@ Build a WebXR VR “endless backroom” with a monochrome green, clinical vibe. 
 
 **Non-Negotiables**
 - **Palette:** brand green `#008F46` bias; **all UI/text** = `#008F46` or **white only**.
+
 - **Font:** PPNeueMontreal for all HUD/2D text.
 - **Performance:** 72–90 FPS on Meta Quest (Quest Browser/Chromium); provide a smooth **non-VR fallback** (WASD + mouse-look).
 - **Spec contains no code. Implement behavior exactly.**
