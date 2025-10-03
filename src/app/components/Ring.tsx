@@ -11,12 +11,12 @@ const GREEN = '#008F46';
 // Video sources - replace these paths with actual video files
 const VIDEO_SOURCES = [
   '/img/video-4.mp4', // BreakRoom BRK-37
-  null, // Protocol PRT-37 - add video path here
+  '/img/video-6.mp4', // Protocol PRT-37
   '/img/video-1.mp4', // HueScan HUE-37
-  null, // Report RPT-37 - add video path here
+  '/img/video-7.mp4', // Report RPT-37
   '/img/video-2.mp4', // Files FLS-37
   '/img/video-3.mp4', // Journal JNL-37
-  null, // SelfTest STT-37 - add video path here
+  '/img/video-5.mp4', // SelfTest STT-37
 ];
 
 export default function Ring({ hoverIdx, setHoverIdx, onDotClick }:{
