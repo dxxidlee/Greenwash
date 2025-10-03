@@ -36,6 +36,15 @@ Then visit: `http://localhost:3001`
 - No build process required
 - Static file serving only
 
+## Vercel Deployment
+
+This is configured as a static site for Vercel:
+
+- **Framework**: Static HTML (no build process)
+- **Output Directory**: `public/` or root `index.html`
+- **Build Command**: None required
+- **Install Command**: None required
+
 ## Integration
 
-Links back to main homepage: `http://localhost:3000`
+Links back to main homepage: `/` (relative path for deployment)
