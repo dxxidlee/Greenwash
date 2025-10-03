@@ -10,7 +10,7 @@ const GREEN = '#008F46';
 
 // Video sources - replace these paths with actual video files
 const VIDEO_SOURCES = [
-  null, // BreakRoom BRK-37 - add video path here
+  '/img/video-4.mp4', // BreakRoom BRK-37
   null, // Protocol PRT-37 - add video path here
   '/img/video-1.mp4', // HueScan HUE-37
   null, // Report RPT-37 - add video path here
