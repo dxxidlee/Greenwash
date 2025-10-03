@@ -33,8 +33,18 @@ export default function Home() {
   }, [hoverIdx]);
 
   const handleDotClick = (index: number) => {
-    // TODO: Implement individual features
-    console.log(`Clicked: ${DOT_LABELS[index]}`);
+    const label = DOT_LABELS[index];
+    
+    // Navigate to external sites for specific features
+    if (label === 'BreakRoom BRK-37') {
+      window.open('http://localhost:3001', '_blank');
+    } else if (label === 'HueScan HUE-37') {
+      window.open('http://localhost:3002', '_blank');
+    } else {
+      // For other features, show placeholder
+      console.log(`Clicked: ${label} - Feature coming soon`);
+      alert(`${label} - Feature coming soon!`);
+    }
   };
 
   return (
