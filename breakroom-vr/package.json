@@ -2,10 +2,10 @@
   "name": "breakroom-vr",
   "version": "1.0.0",
   "description": "Greenwash BreakRoom VR Experience",
-  "main": "public/index.html",
+  "main": "index.html",
   "scripts": {
-    "start": "python3 -m http.server 3001 --directory public",
-    "dev": "python3 -m http.server 3001 --directory public"
+    "start": "python3 -m http.server 3001",
+    "dev": "python3 -m http.server 3001"
   },
   "keywords": ["vr", "threejs", "greenwash", "compliance"],
   "author": "Greenwash Team",

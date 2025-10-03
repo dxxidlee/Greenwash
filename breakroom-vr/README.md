@@ -41,9 +41,10 @@ Then visit: `http://localhost:3001`
 This is configured as a static site for Vercel:
 
 - **Framework**: Static HTML (no build process)
-- **Output Directory**: `public/` or root `index.html`
+- **Output Directory**: `.` (root directory)
 - **Build Command**: None required
 - **Install Command**: None required
+- **Main File**: `index.html` in root
 
 ## Integration
 
