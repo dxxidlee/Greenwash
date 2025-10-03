@@ -1,0 +1,12 @@
+{
+  "rewrites": [
+    {
+      "source": "/breakroom",
+      "destination": "https://breakroom-vr.vercel.app"
+    },
+    {
+      "source": "/huescan",
+      "destination": "https://huescan-camera.vercel.app"
+    }
+  ]
+}

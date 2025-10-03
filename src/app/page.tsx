@@ -35,11 +35,11 @@ export default function Home() {
   const handleDotClick = (index: number) => {
     const label = DOT_LABELS[index];
     
-    // Navigate to external sites for specific features
+    // Navigate to internal routes for specific features
     if (label === 'BreakRoom BRK-37') {
-      window.open('http://localhost:3001', '_blank');
+      window.open('/breakroom', '_blank');
     } else if (label === 'HueScan HUE-37') {
-      window.open('http://localhost:3002', '_blank');
+      window.open('/huescan', '_blank');
     } else {
       // For other features, show placeholder
       console.log(`Clicked: ${label} - Feature coming soon`);
