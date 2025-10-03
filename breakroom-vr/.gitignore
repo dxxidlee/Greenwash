@@ -1,9 +1,24 @@
 # Vercel
 .vercel
 
+# Netlify
+.netlify
+
+# Build artifacts
+out/
+dist/
+build/
+
 # Logs
 *.log
 
 # OS
 .DS_Store
 Thumbs.db
+
+# Node modules (if any)
+node_modules/
+
+# Next.js (shouldn't exist but just in case)
+.next/
+.next/
