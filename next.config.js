@@ -6,8 +6,6 @@ const nextConfig = {
   experimental: {
     externalDir: true
   },
-  output: 'export',
-  trailingSlash: true,
   webpack: (config) => {
     config.watchOptions = {
       ...config.watchOptions,

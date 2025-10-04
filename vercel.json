@@ -1,36 +1,8 @@
 {
   "rewrites": [
     {
-      "source": "/breakroom-vr",
-      "destination": "/breakroom-vr/index.html"
-    },
-    {
-      "source": "/breakroom-vr/index.html",
-      "destination": "/breakroom-vr/index.html"
-    },
-    {
       "source": "/breakroom-vr/:path*",
       "destination": "/breakroom-vr/:path*"
-    }
-  ],
-  "headers": [
-    {
-      "source": "/breakroom-vr/index.html",
-      "headers": [
-        {
-          "key": "Cache-Control",
-          "value": "no-cache, no-store, must-revalidate"
-        }
-      ]
-    },
-    {
-      "source": "/breakroom-vr/:path*",
-      "headers": [
-        {
-          "key": "Cache-Control",
-          "value": "public, max-age=31536000, immutable"
-        }
-      ]
     }
   ]
 }
