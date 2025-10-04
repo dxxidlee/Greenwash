@@ -153,7 +153,7 @@
     #fadeOverlay.active {
       opacity: 1;
     }
-    
+
     #loading {
       position: fixed;
       top: 50%;
@@ -164,24 +164,11 @@
       z-index: 5000;
       letter-spacing: 2px;
     }
-    
-    #vignette {
-      position: fixed;
-      top: 0;
-      left: 0;
-      width: 100%;
-      height: 100%;
-      pointer-events: none;
-      background: radial-gradient(circle at center, transparent 0%, rgba(0, 0, 0, 0.7) 100%);
-      z-index: 1;
-    }
-    
   </style>
 </head>
 <body>
   <div id="loading">INITIALIZING...</div>
   <canvas id="canvas"></canvas>
-  <div id="vignette"></div>
   
   <div id="hud">
     <div class="hud-title">Compliance Recital</div>
@@ -199,7 +186,7 @@
   <div id="fadeOverlay"></div>
 
   <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
-
+  
   <script>
     console.log('Starting Greenwash Backroom...');
 
@@ -213,314 +200,465 @@
       holdStart: 0,
       started: false
     };
-
+    
     console.log('Target attempts:', state.targetAttempts);
 
-    // Scene setup
+    // Scene setup with proper PBR settings
     const scene = new THREE.Scene();
-    scene.background = new THREE.Color(0x000000);
-    scene.fog = new THREE.FogExp2(0x0a1508, 0.08);
-
-    const camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 100);
-    camera.position.set(0, 1.6, 5);
-    camera.lookAt(0, 1.6, 0);
-
+    scene.background = new THREE.Color(0x0a0f0a);
+    scene.fog = new THREE.Fog(0x3a4a2a, 2, 35);
+    
+    const camera = new THREE.PerspectiveCamera(70, window.innerWidth / window.innerHeight, 0.1, 100);
+    camera.position.set(0, 1.6, 0);
+    camera.lookAt(0, 1.6, -10);
+    
     const canvas = document.getElementById('canvas');
-    const renderer = new THREE.WebGLRenderer({ canvas: canvas, antialias: true });
+    const renderer = new THREE.WebGLRenderer({ 
+      canvas: canvas, 
+      antialias: true,
+      powerPreference: "high-performance"
+    });
     renderer.setSize(window.innerWidth, window.innerHeight);
     renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+    
+    // Enable shadows with soft quality
     renderer.shadowMap.enabled = true;
     renderer.shadowMap.type = THREE.PCFSoftShadowMap;
+    
+    // PBR rendering settings - CRITICAL for realism
+    renderer.outputEncoding = THREE.sRGBEncoding;
     renderer.toneMapping = THREE.ACESFilmicToneMapping;
-    renderer.toneMappingExposure = 0.6;
+    renderer.toneMappingExposure = 0.7;
+    renderer.physicallyCorrectLights = true;
+    
+    console.log('Renderer initialized with PBR settings');
 
-    console.log('Renderer initialized');
-
-    // Create procedural textures for realism
-    function createWallTexture() {
+    // Create highly detailed PBR textures
+    function createDetailedCarpetTexture() {
+      const canvas = document.createElement('canvas');
+      canvas.width = 1024;
+      canvas.height = 1024;
+      const ctx = canvas.getContext('2d');
+      
+      // Base olive-tan carpet color
+      const gradient = ctx.createLinearGradient(0, 0, 1024, 1024);
+      gradient.addColorStop(0, '#726b4a');
+      gradient.addColorStop(0.5, '#6b6445');
+      gradient.addColorStop(1, '#655e40');
+      ctx.fillStyle = gradient;
+      ctx.fillRect(0, 0, 1024, 1024);
+      
+      // Carpet fiber texture - very dense
+      for (let i = 0; i < 30000; i++) {
+        const x = Math.random() * 1024;
+        const y = Math.random() * 1024;
+        const brightness = Math.random() * 35 - 18;
+        const alpha = 0.3 + Math.random() * 0.4;
+        ctx.fillStyle = `rgba(${114 + brightness}, ${107 + brightness}, ${74 + brightness}, ${alpha})`;
+        ctx.fillRect(x, y, 1, Math.random() * 2);
+      }
+      
+      // Add directional wear patterns
+      ctx.globalAlpha = 0.15;
+      for (let i = 0; i < 40; i++) {
+        const x = Math.random() * 1024;
+        const y = Math.random() * 1024;
+        ctx.fillStyle = '#3a3525';
+        ctx.fillRect(x, y, Math.random() * 150 + 50, Math.random() * 30 + 10);
+      }
+      
+      // Add random dirt spots
+      ctx.globalAlpha = 0.2;
+      for (let i = 0; i < 50; i++) {
+        const x = Math.random() * 1024;
+        const y = Math.random() * 1024;
+        const size = Math.random() * 20 + 5;
+        ctx.fillStyle = '#2a2515';
+        ctx.beginPath();
+        ctx.arc(x, y, size, 0, Math.PI * 2);
+        ctx.fill();
+      }
+      
+      const texture = new THREE.CanvasTexture(canvas);
+      texture.encoding = THREE.sRGBEncoding;
+      return texture;
+    }
+    
+    function createCarpetNormalMap() {
+      const canvas = document.createElement('canvas');
+      canvas.width = 1024;
+      canvas.height = 1024;
+      const ctx = canvas.getContext('2d');
+      
+      // Base normal color (pointing up)
+      ctx.fillStyle = '#8080ff';
+      ctx.fillRect(0, 0, 1024, 1024);
+      
+      // Add subtle fiber bumps
+      for (let i = 0; i < 15000; i++) {
+        const x = Math.random() * 1024;
+        const y = Math.random() * 1024;
+        const variation = Math.random() * 60 - 30;
+        ctx.fillStyle = `rgb(${128 + variation}, ${128 + variation}, ${200 + Math.random() * 40})`;
+        ctx.fillRect(x, y, 1, 2);
+      }
+      
+      const texture = new THREE.CanvasTexture(canvas);
+      texture.encoding = THREE.LinearEncoding;
+      return texture;
+    }
+    
+    function createCarpetRoughnessMap() {
       const canvas = document.createElement('canvas');
       canvas.width = 512;
       canvas.height = 512;
       const ctx = canvas.getContext('2d');
       
-      // Base color
-      ctx.fillStyle = '#a8b8a0';
+      // Base roughness (carpet is very rough)
+      ctx.fillStyle = '#e0e0e0';
       ctx.fillRect(0, 0, 512, 512);
       
-      // Add noise and grime
+      // Variation in roughness
       for (let i = 0; i < 8000; i++) {
         const x = Math.random() * 512;
         const y = Math.random() * 512;
-        const size = Math.random() * 3;
-        const darkness = Math.random() * 30;
-        ctx.fillStyle = `rgba(0, 0, 0, ${darkness / 255})`;
-        ctx.fillRect(x, y, size, size);
+        const darkness = Math.random() * 40;
+        ctx.fillStyle = `rgb(${224 - darkness}, ${224 - darkness}, ${224 - darkness})`;
+        ctx.fillRect(x, y, 2, 2);
       }
       
-      // Add subtle streaks
-      ctx.strokeStyle = 'rgba(0, 0, 0, 0.1)';
-      for (let i = 0; i < 20; i++) {
-        ctx.beginPath();
-        ctx.moveTo(Math.random() * 512, 0);
-        ctx.lineTo(Math.random() * 512, 512);
-        ctx.lineWidth = Math.random() * 2;
-        ctx.stroke();
-      }
-      
-      return new THREE.CanvasTexture(canvas);
+      const texture = new THREE.CanvasTexture(canvas);
+      texture.encoding = THREE.LinearEncoding;
+      return texture;
     }
     
-    function createFloorTexture() {
+    function createWallTexture() {
+      const canvas = document.createElement('canvas');
+      canvas.width = 1024;
+      canvas.height = 1024;
+      const ctx = canvas.getContext('2d');
+      
+      // Yellowish-green institutional wall color
+      ctx.fillStyle = '#8a9468';
+      ctx.fillRect(0, 0, 1024, 1024);
+      
+      // Paint texture with subtle variations
+      for (let i = 0; i < 20000; i++) {
+        const x = Math.random() * 1024;
+        const y = Math.random() * 1024;
+        const brightness = Math.random() * 30 - 15;
+        const alpha = 0.3 + Math.random() * 0.3;
+        ctx.fillStyle = `rgba(${138 + brightness}, ${148 + brightness}, ${104 + brightness}, ${alpha})`;
+        ctx.fillRect(x, y, 2, 2);
+      }
+      
+      // Vertical streaks from moisture/age
+      ctx.globalAlpha = 0.12;
+      for (let i = 0; i < 50; i++) {
+        ctx.fillStyle = '#5a6448';
+        const x = Math.random() * 1024;
+        ctx.fillRect(x, 0, Math.random() * 3 + 1, 1024);
+      }
+      
+      // Dirt accumulation near floor
+      const dirtGradient = ctx.createLinearGradient(0, 800, 0, 1024);
+      dirtGradient.addColorStop(0, 'rgba(40, 45, 30, 0)');
+      dirtGradient.addColorStop(1, 'rgba(40, 45, 30, 0.2)');
+      ctx.fillStyle = dirtGradient;
+      ctx.fillRect(0, 800, 1024, 224);
+      
+      const texture = new THREE.CanvasTexture(canvas);
+      texture.encoding = THREE.sRGBEncoding;
+      return texture;
+    }
+    
+    function createWallNormalMap() {
+      const canvas = document.createElement('canvas');
+      canvas.width = 1024;
+      canvas.height = 1024;
+      const ctx = canvas.getContext('2d');
+      
+      ctx.fillStyle = '#8080ff';
+      ctx.fillRect(0, 0, 1024, 1024);
+      
+      // Paint texture bumps
+      for (let i = 0; i < 10000; i++) {
+        const x = Math.random() * 1024;
+        const y = Math.random() * 1024;
+        const variation = Math.random() * 30 - 15;
+        ctx.fillStyle = `rgb(${128 + variation}, ${128 + variation}, ${220 + Math.random() * 20})`;
+        ctx.fillRect(x, y, 2, 2);
+      }
+      
+      const texture = new THREE.CanvasTexture(canvas);
+      texture.encoding = THREE.LinearEncoding;
+      return texture;
+    }
+    
+    function createCeilingTexture() {
       const canvas = document.createElement('canvas');
       canvas.width = 512;
       canvas.height = 512;
       const ctx = canvas.getContext('2d');
       
-      ctx.fillStyle = '#8a9a85';
+      // Aged ceiling tile color
+      ctx.fillStyle = '#9aa684';
       ctx.fillRect(0, 0, 512, 512);
       
-      // Add heavy noise for concrete look
-      for (let i = 0; i < 12000; i++) {
+      // Water stains and age spots
+      ctx.globalAlpha = 0.3;
+      for (let i = 0; i < 30; i++) {
         const x = Math.random() * 512;
         const y = Math.random() * 512;
-        const size = Math.random() * 2;s
-        const darkness = Math.random() * 40;
-        ctx.fillStyle = `rgba(0, 0, 0, ${darkness / 255})`;
-        ctx.fillRect(x, y, size, size);
+        const size = Math.random() * 80 + 30;
+        const gradient = ctx.createRadialGradient(x, y, 0, x, y, size);
+        gradient.addColorStop(0, '#6a6a50');
+        gradient.addColorStop(1, 'rgba(106, 106, 80, 0)');
+        ctx.fillStyle = gradient;
+        ctx.fillRect(x - size, y - size, size * 2, size * 2);
       }
       
-      // Add wear marks
-      ctx.fillStyle = 'rgba(50, 50, 50, 0.15)';
-      for (let i = 0; i < 15; i++) {
+      // Fine texture
+      ctx.globalAlpha = 0.5;
+      for (let i = 0; i < 8000; i++) {
         const x = Math.random() * 512;
         const y = Math.random() * 512;
-        ctx.fillRect(x, y, Math.random() * 80 + 20, Math.random() * 80 + 20);
+        const brightness = Math.random() * 40 - 20;
+        ctx.fillStyle = `rgb(${154 + brightness}, ${166 + brightness}, ${132 + brightness})`;
+        ctx.fillRect(x, y, 1, 1);
       }
       
-      return new THREE.CanvasTexture(canvas);
+      const texture = new THREE.CanvasTexture(canvas);
+      texture.encoding = THREE.sRGBEncoding;
+      return texture;
     }
     
-    const wallTexture = createWallTexture();
-    wallTexture.wrapS = wallTexture.wrapT = THREE.RepeatWrapping;
-    wallTexture.repeat.set(2, 2);
+    function createAOMap() {
+      const canvas = document.createElement('canvas');
+      canvas.width = 512;
+      canvas.height = 512;
+      const ctx = canvas.getContext('2d');
+      
+      // Base white
+      ctx.fillStyle = '#ffffff';
+      ctx.fillRect(0, 0, 512, 512);
+      
+      // Darken corners and edges
+      const gradient = ctx.createRadialGradient(256, 256, 50, 256, 256, 300);
+      gradient.addColorStop(0, 'rgba(0, 0, 0, 0)');
+      gradient.addColorStop(1, 'rgba(0, 0, 0, 0.5)');
+      ctx.fillStyle = gradient;
+      ctx.fillRect(0, 0, 512, 512);
+      
+      const texture = new THREE.CanvasTexture(canvas);
+      texture.encoding = THREE.LinearEncoding;
+      return texture;
+    }
     
-    const floorTexture = createFloorTexture();
-    floorTexture.wrapS = floorTexture.wrapT = THREE.RepeatWrapping;
-    floorTexture.repeat.set(4, 4);
+    // Generate all textures
+    const carpetColor = createDetailedCarpetTexture();
+    carpetColor.wrapS = carpetColor.wrapT = THREE.RepeatWrapping;
+    carpetColor.repeat.set(10, 10);
     
-    // Materials with textures
-    const wallMaterial = new THREE.MeshStandardMaterial({
-      map: wallTexture,
-      roughness: 0.95,
-      metalness: 0.02
-    });
+    const carpetNormal = createCarpetNormalMap();
+    carpetNormal.wrapS = carpetNormal.wrapT = THREE.RepeatWrapping;
+    carpetNormal.repeat.set(10, 10);
     
+    const carpetRoughness = createCarpetRoughnessMap();
+    carpetRoughness.wrapS = carpetRoughness.wrapT = THREE.RepeatWrapping;
+    carpetRoughness.repeat.set(10, 10);
+    
+    const wallColor = createWallTexture();
+    wallColor.wrapS = wallColor.wrapT = THREE.RepeatWrapping;
+    wallColor.repeat.set(4, 2);
+    
+    const wallNormal = createWallNormalMap();
+    wallNormal.wrapS = wallNormal.wrapT = THREE.RepeatWrapping;
+    wallNormal.repeat.set(4, 2);
+    
+    const ceilingColor = createCeilingTexture();
+    ceilingColor.wrapS = ceilingColor.wrapT = THREE.RepeatWrapping;
+    ceilingColor.repeat.set(8, 8);
+    
+    const aoMap = createAOMap();
+    
+    console.log('PBR textures generated');
+    
+    // PBR Materials with physically accurate properties
     const floorMaterial = new THREE.MeshStandardMaterial({
-      map: floorTexture,
-      roughness: 0.9,
-      metalness: 0.02
+      map: carpetColor,
+      normalMap: carpetNormal,
+      normalScale: new THREE.Vector2(0.3, 0.3),
+      roughnessMap: carpetRoughness,
+      roughness: 0.95,
+      metalness: 0,
+      aoMap: aoMap,
+      aoMapIntensity: 1.2
     });
     
-    const columnMaterial = new THREE.MeshStandardMaterial({
-      map: wallTexture,
-      roughness: 0.92,
-      metalness: 0.03
+    const wallMaterial = new THREE.MeshStandardMaterial({
+      map: wallColor,
+      normalMap: wallNormal,
+      normalScale: new THREE.Vector2(0.2, 0.2),
+      roughness: 0.85,
+      metalness: 0,
+      aoMap: aoMap,
+      aoMapIntensity: 1.0
     });
     
     const ceilingMaterial = new THREE.MeshStandardMaterial({
-      color: 0x95a590,
-      roughness: 0.95,
-      metalness: 0.01
+      map: ceilingColor,
+      roughness: 0.9,
+      metalness: 0,
+      aoMap: aoMap,
+      aoMapIntensity: 0.8
     });
     
     const panelMaterial = new THREE.MeshStandardMaterial({
-      color: 0xc0ffc0,
-      emissive: 0x40a040,
-      emissiveIntensity: 4,
+      color: 0xffffff,
+      emissive: 0xc8d4b8,
+      emissiveIntensity: 2.5,
       roughness: 0.3,
-      metalness: 0.1
+      metalness: 0.05
     });
 
-    // Create endless backroom with collision data
+    // Collision system
     const collisionWalls = [];
     
-    function createRoomSection(offsetX, offsetZ) {
+    function createCorridorSection(offsetZ) {
       const group = new THREE.Group();
-      const size = 20;
-
-      // Floor
-      const floorGeo = new THREE.PlaneGeometry(size, size, 10, 10);
+      const width = 3;
+      const height = 2.7;
+      const length = 20;
+      
+      // Floor with proper UV mapping
+      const floorGeo = new THREE.PlaneGeometry(width, length, 20, 20);
       const floor = new THREE.Mesh(floorGeo, floorMaterial);
       floor.rotation.x = -Math.PI / 2;
-      floor.position.set(offsetX, 0, offsetZ);
+      floor.position.set(0, 0, offsetZ);
       floor.receiveShadow = true;
-
-      // Add slight random height variations for realism
-      const posAttr = floorGeo.attributes.position;
-      for (let i = 0; i < posAttr.count; i++) {
-        posAttr.setZ(i, posAttr.getZ(i) + (Math.random() - 0.5) * 0.02);
-      }
-      floorGeo.computeVertexNormals();
-
+      
+      // Add second UV channel for AO
+      const uvs = floorGeo.attributes.uv.array;
+      floorGeo.setAttribute('uv2', new THREE.BufferAttribute(uvs, 2));
+      
       group.add(floor);
-
-      // Ceiling with tiles
-      const ceilingY = 2.7;
-      const ceilingGeo = new THREE.PlaneGeometry(size, size);
+      
+      // Ceiling
+      const ceilingGeo = new THREE.PlaneGeometry(width, length, 10, 10);
       const ceiling = new THREE.Mesh(ceilingGeo, ceilingMaterial);
       ceiling.rotation.x = Math.PI / 2;
-      ceiling.position.set(offsetX, ceilingY, offsetZ);
+      ceiling.position.set(0, height, offsetZ);
       ceiling.receiveShadow = true;
+      
+      const ceilingUvs = ceilingGeo.attributes.uv.array;
+      ceilingGeo.setAttribute('uv2', new THREE.BufferAttribute(ceilingUvs, 2));
+      
       group.add(ceiling);
-
-      // Walls - create maze-like structure with collision
-      const wallHeight = 2.7;
-      const wallConfigs = [
-        // Outer walls
-        { x: -size/2, z: 0, w: 0.15, d: size, rot: 0 },
-        { x: size/2, z: 0, w: 0.15, d: size, rot: 0 },
-        { x: 0, z: -size/2, w: size, d: 0.15, rot: 0 },
-        { x: 0, z: size/2, w: size, d: 0.15, rot: 0 },
-      ];
       
-      // Add some internal walls randomly with openings
-      for (let i = 0; i < 3; i++) {
-        const rx = (Math.random() - 0.5) * size * 0.6;
-        const rz = (Math.random() - 0.5) * size * 0.6;
-        const isHorizontal = Math.random() > 0.5;
-        
-        wallConfigs.push({
-          x: rx,
-          z: rz,
-          w: isHorizontal ? 8 : 0.15,
-          d: isHorizontal ? 0.15 : 8,
-          rot: 0
-        });
-      }
+      // Left wall
+      const leftWallGeo = new THREE.PlaneGeometry(length, height, 10, 10);
+      const leftWall = new THREE.Mesh(leftWallGeo, wallMaterial);
+      leftWall.rotation.y = Math.PI / 2;
+      leftWall.position.set(-width / 2, height / 2, offsetZ);
+      leftWall.receiveShadow = true;
+      leftWall.castShadow = true;
       
-      wallConfigs.forEach(config => {
-        const wall = new THREE.Mesh(
-          new THREE.BoxGeometry(config.w, wallHeight, config.d),
-          wallMaterial
-        );
-        wall.position.set(offsetX + config.x, wallHeight / 2, offsetZ + config.z);
-        wall.castShadow = true;
-        wall.receiveShadow = true;
-        group.add(wall);
-        
-        // Store collision box
-        collisionWalls.push({
-          minX: offsetX + config.x - config.w / 2,
-          maxX: offsetX + config.x + config.w / 2,
-          minZ: offsetZ + config.z - config.d / 2,
-          maxZ: offsetZ + config.z + config.d / 2
-        });
+      const leftUvs = leftWallGeo.attributes.uv.array;
+      leftWallGeo.setAttribute('uv2', new THREE.BufferAttribute(leftUvs, 2));
+      
+      group.add(leftWall);
+      
+      // Right wall
+      const rightWallGeo = new THREE.PlaneGeometry(length, height, 10, 10);
+      const rightWall = new THREE.Mesh(rightWallGeo, wallMaterial);
+      rightWall.rotation.y = -Math.PI / 2;
+      rightWall.position.set(width / 2, height / 2, offsetZ);
+      rightWall.receiveShadow = true;
+      rightWall.castShadow = true;
+      
+      const rightUvs = rightWallGeo.attributes.uv.array;
+      rightWallGeo.setAttribute('uv2', new THREE.BufferAttribute(rightUvs, 2));
+      
+      group.add(rightWall);
+      
+      // Collision boundaries
+      collisionWalls.push({
+        minX: -width / 2 - 0.1,
+        maxX: -width / 2 + 0.1,
+        minZ: offsetZ - length / 2,
+        maxZ: offsetZ + length / 2
       });
-
-      // Columns - irregular placement with collision
-      const columnPositions = [
-        [-6, -6], [-6, 0], [-6, 6],
-        [0, -6], [0, 6],
-        [6, -6], [6, 0], [6, 6]
-      ];
       
-      columnPositions.forEach(([x, z]) => {
-        const column = new THREE.Mesh(
-          new THREE.BoxGeometry(0.5, wallHeight, 0.5),
-          columnMaterial
-        );
-        column.position.set(offsetX + x, wallHeight / 2, offsetZ + z);
-        column.castShadow = true;
-        column.receiveShadow = true;
-        group.add(column);
-        
-        // Store collision box for column
-        collisionWalls.push({
-          minX: offsetX + x - 0.25,
-          maxX: offsetX + x + 0.25,
-          minZ: offsetZ + z - 0.25,
-          maxZ: offsetZ + z + 0.25
-        });
+      collisionWalls.push({
+        minX: width / 2 - 0.1,
+        maxX: width / 2 + 0.1,
+        minZ: offsetZ - length / 2,
+        maxZ: offsetZ + length / 2
       });
-
-      // Ceiling panels - flickering effect will be added in animation
-      const panelPositions = [
-        [-7, -7], [-7, 0], [-7, 7],
-        [0, -7], [0, 7],
-        [7, -7], [7, 0], [7, 7]
-      ];
-
-      panelPositions.forEach(([x, z]) => {
+      
+      // Ceiling panels with realistic lighting
+      for (let z = -length / 2 + 3; z < length / 2; z += 4) {
         const panel = new THREE.Mesh(
-          new THREE.BoxGeometry(1.8, 0.08, 0.9),
+          new THREE.BoxGeometry(1.3, 0.04, 0.65),
           panelMaterial.clone()
         );
-        panel.position.set(offsetX + x, ceilingY - 0.15, offsetZ + z);
+        panel.position.set(0, height - 0.04, offsetZ + z);
         panel.userData.isPanel = true;
-        panel.userData.flickerOffset = Math.random() * 100;
+        panel.userData.baseIntensity = 2.5 + Math.random() * 0.4;
+        panel.userData.flickerPhase = Math.random() * Math.PI * 2;
+        panel.castShadow = false;
         group.add(panel);
-      });
-
+        
+        // Physically accurate light
+        const light = new THREE.RectAreaLight(0xc8d4b8, 4, 1.3, 0.65);
+        light.position.set(0, height - 0.15, offsetZ + z);
+        light.rotation.x = Math.PI;
+        group.add(light);
+      }
+      
       return group;
     }
-
-    // Create 3x3 grid of rooms
-    const rooms = [];
-    for (let x = -1; x <= 1; x++) {
-      for (let z = -1; z <= 1; z++) {
-        const room = createRoomSection(x * 20, z * 20);
-        rooms.push({
-          mesh: room,
-          gridX: x,
-          gridZ: z
-        });
-        scene.add(room);
-      }
-    }
-    console.log('Rooms created');
-    console.log('Total collision walls:', collisionWalls.length);
     
-    // Lighting - more dramatic with additional lights
-    const ambientLight = new THREE.AmbientLight(0x304030, 0.2);
+    // Create corridor segments
+    const corridors = [];
+    for (let i = -3; i <= 3; i++) {
+      const corridor = createCorridorSection(i * 20);
+      corridors.push({
+        mesh: corridor,
+        index: i
+      });
+      scene.add(corridor);
+    }
+    
+    console.log('Corridors created with PBR materials');
+    console.log('Collision walls:', collisionWalls.length);
+    
+    // Realistic lighting setup
+    const ambientLight = new THREE.AmbientLight(0x8a9a6a, 0.4);
     scene.add(ambientLight);
     
-    // Multiple key lights for better illumination
-    const lights = [];
-    const lightPositions = [
-      [0, 2.5, 0],
-      [8, 2.5, 8],
-      [-8, 2.5, -8],
-      [8, 2.5, -8],
-      [-8, 2.5, 8],
-      [0, 2.5, 12],
-      [12, 2.5, 0]
-    ];
+    const hemiLight = new THREE.HemisphereLight(0xa0b080, 0x60704a, 0.6);
+    scene.add(hemiLight);
     
-    lightPositions.forEach(([x, y, z]) => {
-      const light = new THREE.PointLight(0x60b060, 1.8, 22);
-      light.position.set(x, y, z);
-      light.castShadow = true;
-      light.shadow.mapSize.width = 512;
-      light.shadow.mapSize.height = 512;
-      light.shadow.camera.near = 0.5;
-      light.shadow.camera.far = 25;
-      lights.push(light);
-      scene.add(light);
-    });
+    // Add subtle directional light for depth
+    const dirLight = new THREE.DirectionalLight(0x9aaa7a, 0.3);
+    dirLight.position.set(0, 5, -10);
+    dirLight.castShadow = true;
+    dirLight.shadow.mapSize.width = 1024;
+    dirLight.shadow.mapSize.height = 1024;
+    dirLight.shadow.camera.near = 0.5;
+    dirLight.shadow.camera.far = 50;
+    scene.add(dirLight);
     
-    // Dim fill light for subtle ambient
-    const fillLight = new THREE.DirectionalLight(0x405040, 0.3);
-    fillLight.position.set(5, 10, 5);
-    scene.add(fillLight);
+    console.log('Physically correct lighting added');
     
-    console.log('Lighting added');
-
     // Controls
     const keys = {};
     let mouseX = 0;
     let mouseY = 0;
     let pointerLocked = false;
-
+    
     window.addEventListener('keydown', (e) => {
       keys[e.code] = true;
       if (e.code === 'Escape' && state.started) {
@@ -528,11 +666,11 @@
         document.getElementById('hud').classList.toggle('show', state.hudVisible);
       }
     });
-
+    
     window.addEventListener('keyup', (e) => {
       keys[e.code] = false;
     });
-
+    
     canvas.addEventListener('click', () => {
       if (!state.started) {
         state.started = true;
@@ -541,11 +679,11 @@
       }
       canvas.requestPointerLock();
     });
-
+    
     document.addEventListener('pointerlockchange', () => {
       pointerLocked = document.pointerLockElement === canvas;
     });
-
+    
     document.addEventListener('mousemove', (e) => {
       if (pointerLocked) {
         mouseX -= e.movementX * 0.002;
@@ -553,19 +691,19 @@
         mouseY = Math.max(-Math.PI / 2 + 0.1, Math.min(Math.PI / 2 - 0.1, mouseY));
       }
     });
-
+    
     // HUD Controls
     const recordBtn = document.getElementById('recordBtn');
     const attemptCounter = document.getElementById('attemptCounter');
     const feedback = document.getElementById('feedback');
-
+    
     recordBtn.addEventListener('mousedown', () => {
       state.holding = true;
       state.holdStart = Date.now();
       recordBtn.classList.add('holding');
       recordBtn.textContent = 'RECORDING...';
     });
-
+    
     function handleRecordEnd() {
       if (!state.holding) return;
       
@@ -587,10 +725,10 @@
         }
       }
     }
-
+    
     recordBtn.addEventListener('mouseup', handleRecordEnd);
     recordBtn.addEventListener('mouseleave', handleRecordEnd);
-
+    
     function showFeedback(message, success = false) {
       feedback.textContent = message;
       feedback.style.display = 'block';
@@ -609,28 +747,25 @@
       }, 500);
     }
     
-    // Collision detection function
+    // Collision detection
     function checkCollision(x, z, radius) {
       for (let wall of collisionWalls) {
-        // Check if circle intersects with rectangle
-        const closestX = Math.max(wall.minX, Math.min(x, wall.maxX));
-        const closestZ = Math.max(wall.minZ, Math.min(z, wall.maxZ));
+        const expandedMinX = wall.minX - radius;
+        const expandedMaxX = wall.maxX + radius;
+        const expandedMinZ = wall.minZ - radius;
+        const expandedMaxZ = wall.maxZ + radius;
         
-        const distanceX = x - closestX;
-        const distanceZ = z - closestZ;
-        const distanceSquared = (distanceX * distanceX) + (distanceZ * distanceZ);
-        
-        if (distanceSquared < (radius * radius)) {
-          return true; // Collision detected
+        if (x >= expandedMinX && x <= expandedMaxX && z >= expandedMinZ && z <= expandedMaxZ) {
+          return true;
         }
       }
       return false;
     }
-
-    // Movement with head bob and collision detection
-    const moveSpeed = 3.5;
+    
+    // Movement with collision
+    const moveSpeed = 4;
     let bobPhase = 0;
-    const playerRadius = 0.3; // Collision radius for player
+    const playerRadius = 0.3;
     
     function updateMovement(delta) {
       if (!state.started) return;
@@ -654,127 +789,96 @@
         const right = new THREE.Vector3();
         right.crossVectors(camera.up, direction).normalize();
         
-        // Calculate new position
         const moveZ = direction.clone().multiplyScalar(velocity.z * moveSpeed * delta);
         const moveX = right.clone().multiplyScalar(-velocity.x * moveSpeed * delta);
         
-        const newX = camera.position.x + moveX.x + moveZ.x;
-        const newZ = camera.position.z + moveX.z + moveZ.z;
+        const oldX = camera.position.x;
+        const oldZ = camera.position.z;
+        const newX = oldX + moveX.x + moveZ.x;
+        const newZ = oldZ + moveX.z + moveZ.z;
         
-        // Check collision before moving
         if (!checkCollision(newX, newZ, playerRadius)) {
-          camera.position.add(moveZ);
-          camera.position.add(moveX);
+          camera.position.x = newX;
+          camera.position.z = newZ;
         } else {
-          // Try sliding along walls
-          // Try X movement only
-          const slideX = camera.position.x + moveX.x;
-          if (!checkCollision(slideX, camera.position.z, playerRadius)) {
-            camera.position.add(moveX);
+          const tryX = oldX + moveX.x;
+          if (!checkCollision(tryX, oldZ, playerRadius)) {
+            camera.position.x = tryX;
           }
           
-          // Try Z movement only
-          const slideZ = camera.position.z + moveZ.z;
-          if (!checkCollision(camera.position.x, slideZ, playerRadius)) {
-            camera.position.add(moveZ);
+          const tryZ = oldZ + moveZ.z;
+          if (!checkCollision(oldX, tryZ, playerRadius)) {
+            camera.position.z = tryZ;
           }
         }
         
-        // Head bob
-        bobPhase += delta * 8;
-        camera.position.y = 1.6 + Math.sin(bobPhase) * 0.03;
+        // Realistic head bob
+        bobPhase += delta * 6;
+        camera.position.y = 1.6 + Math.sin(bobPhase) * 0.015;
       } else {
-        // Return to normal height
         camera.position.y += (1.6 - camera.position.y) * delta * 5;
       }
       
-      // Update camera rotation
       camera.rotation.order = 'YXZ';
       camera.rotation.y = mouseX;
       camera.rotation.x = mouseY;
       
-      // Room recycling for endless effect
-      const playerTileX = Math.round(camera.position.x / 20);
-      const playerTileZ = Math.round(camera.position.z / 20);
+      // Corridor recycling for endless effect
+      const playerSection = Math.round(camera.position.z / 20);
       
-      rooms.forEach(room => {
-        const dx = room.gridX - playerTileX;
-        const dz = room.gridZ - playerTileZ;
+      corridors.forEach(corridor => {
+        const diff = corridor.index - playerSection;
         
-        if (Math.abs(dx) > 1 || Math.abs(dz) > 1) {
-          // Recycle this room
-          if (Math.abs(dx) > 1) {
-            room.gridX = playerTileX + (dx > 0 ? 1 : -1);
-          }
-          if (Math.abs(dz) > 1) {
-            room.gridZ = playerTileZ + (dz > 0 ? 1 : -1);
-          }
-          
-          room.mesh.position.x = room.gridX * 20;
-          room.mesh.position.z = room.gridZ * 20;
+        if (Math.abs(diff) > 3) {
+          corridor.index = playerSection + (diff > 0 ? 3 : -3);
+          corridor.mesh.position.z = corridor.index * 20;
         }
-      });
-      
-      // Move lights with player for better illumination
-      lights.forEach((light, i) => {
-        const offset = lightPositions[i];
-        light.position.set(
-          camera.position.x + offset[0],
-          offset[1],
-          camera.position.z + offset[2]
-        );
       });
     }
-
-    // Animation loop with flickering panels
+    
+    // Animation loop
     const clock = new THREE.Clock();
     let frameCount = 0;
-
+    
     function animate() {
       requestAnimationFrame(animate);
-
+      
       const delta = clock.getDelta();
       const time = clock.getElapsedTime();
-
+      
       updateMovement(delta);
-
-      // Flicker ceiling panels
+      
+      // Realistic subtle panel flicker
       scene.traverse((obj) => {
         if (obj.userData.isPanel) {
-          const flicker = Math.sin(time * 3 + obj.userData.flickerOffset) * 0.5 + 0.5;
-          const noise = Math.random() * 0.1;
-          obj.material.emissiveIntensity = 3 + flicker * 1.5 + noise;
+          const flicker = Math.sin(time * 0.4 + obj.userData.flickerPhase) * 0.15;
+          const randomNoise = (Math.random() - 0.5) * 0.05;
+          obj.material.emissiveIntensity = obj.userData.baseIntensity + flicker + randomNoise;
         }
       });
-
+      
       renderer.render(scene, camera);
-
+      
       frameCount++;
       if (frameCount === 1) {
-        console.log('First frame rendered!');
+        console.log('First frame rendered with PBR!');
         document.getElementById('loading').textContent = 'CLICK TO START';
       }
     }
-
-    console.log('Starting animation loop...');
+    
     animate();
-
-    // Handle window resize
+    
     window.addEventListener('resize', () => {
       camera.aspect = window.innerWidth / window.innerHeight;
       camera.updateProjectionMatrix();
       renderer.setSize(window.innerWidth, window.innerHeight);
     });
-
-    // Show HUD after exploring
+    
     setTimeout(() => {
       if (state.started) {
         state.hudVisible = true;
         document.getElementById('hud').classList.add('show');
       }
     }, 8000);
-
-    console.log('Setup complete!');
-  </script>
-</body>
-</html>
+    
+    console.log('Setup complete with full PBR pipeline!');
