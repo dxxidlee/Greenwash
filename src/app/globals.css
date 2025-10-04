@@ -89,3 +89,68 @@ html, body {
   .gw-glass-light { backdrop-filter:none; -webkit-backdrop-filter:none; background:rgba(217,217,217,0.8); }
   .gw-glass-dark { backdrop-filter:none; -webkit-backdrop-filter:none; background:rgba(0,0,0,0.9); }
 }
+
+/* CCTV Mode Styles */
+.cctv-fallback {
+  filter: grayscale(1) contrast(1.35) brightness(0.9) saturate(0.8);
+  background: #000;
+}
+
+.cctv-quad {
+  position: relative;
+  border: 1px solid rgba(17, 17, 17, 0.6);
+  background: #000;
+  overflow: hidden;
+}
+
+.cctv-quad-1 {
+  transform: translate(1px, 1px) rotate(1deg);
+}
+
+.cctv-quad-2 {
+  transform: translate(-1px, 1px) rotate(-1deg);
+}
+
+.cctv-quad-3 {
+  transform: translate(1px, -1px) rotate(-1deg);
+}
+
+.cctv-quad-4 {
+  transform: translate(-1px, -1px) rotate(1deg);
+}
+
+.cctv-scanlines {
+  background: repeating-linear-gradient(
+    0deg,
+    transparent,
+    transparent 1px,
+    rgba(0, 0, 0, 0.25) 1px,
+    rgba(0, 0, 0, 0.25) 2px
+  );
+  animation: cctv-roll 5s linear infinite;
+}
+
+.cctv-vignette {
+  background: radial-gradient(
+    ellipse at center,
+    transparent 0%,
+    transparent 60%,
+    rgba(0, 0, 0, 0.3) 100%
+  );
+}
+
+@keyframes cctv-roll {
+  0% { background-position: 0 0; }
+  100% { background-position: 0 100px; }
+}
+
+/* Reduced motion support */
+@media (prefers-reduced-motion: reduce) {
+  .cctv-scanlines {
+    animation-duration: 10s;
+  }
+  
+  .cctv-quad-1, .cctv-quad-2, .cctv-quad-3, .cctv-quad-4 {
+    transform: none;
+  }
+}
