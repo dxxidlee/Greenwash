@@ -11,6 +11,8 @@ export default function HueScan() {
   const [facingMode, setFacingMode] = useState<'environment' | 'user'>('environment');
   const [rgbValues, setRgbValues] = useState({ r: 0, g: 0, b: 0 });
   const [coordinates, setCoordinates] = useState({ x: 0, y: 0 });
+  const [isLoading, setIsLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
   
   const videoRef = useRef<HTMLVideoElement>(null);
   const canvasRef = useRef<HTMLCanvasElement>(null);
@@ -21,6 +23,9 @@ export default function HueScan() {
 
   const startCamera = useCallback(async () => {
     try {
+      setIsLoading(true);
+      setError(null);
+      
       const constraints = {
         video: {
           facingMode: facingMode,
@@ -34,11 +39,25 @@ export default function HueScan() {
       
       if (videoRef.current) {
         videoRef.current.srcObject = mediaStream;
+        videoRef.current.onloadedmetadata = () => {
+          console.log('Camera loaded successfully');
+          setIsLoading(false);
+          setScanning(true);
+        };
+        
+        // Fallback timeout in case onloadedmetadata doesn't fire
+        setTimeout(() => {
+          if (isLoading) {
+            console.log('Camera fallback timeout triggered');
+            setIsLoading(false);
+            setScanning(true);
+          }
+        }, 3000);
       }
-      
-      setScanning(true);
     } catch (err) {
       console.error('Camera error:', err);
+      setError('Failed to access camera. Please allow camera permissions.');
+      setIsLoading(false);
     }
   }, [facingMode]);
 
@@ -244,6 +263,40 @@ export default function HueScan() {
 
   return (
     <div className="fixed inset-0 bg-black overflow-hidden">
+      {/* Loading Screen */}
+      {isLoading && (
+        <div className="absolute inset-0 bg-black z-50 flex items-center justify-center">
+          <div className="text-center">
+            <div className="text-green-500 text-xl font-medium mb-4 tracking-wider">
+              INITIALIZING HUE SCANNER...
+            </div>
+            <div className="w-64 h-1 bg-gray-800 rounded-full overflow-hidden">
+              <div className="h-full bg-green-500 rounded-full animate-pulse"></div>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Error Screen */}
+      {error && (
+        <div className="absolute inset-0 bg-black z-50 flex items-center justify-center">
+          <div className="text-center max-w-md mx-auto p-6">
+            <div className="text-red-500 text-xl font-medium mb-4 tracking-wider">
+              CAMERA ERROR
+            </div>
+            <div className="text-gray-300 text-sm mb-6">
+              {error}
+          </div>
+            <button
+              onClick={startCamera}
+              className="bg-green-600 hover:bg-green-700 text-white px-6 py-2 rounded text-sm font-medium transition-colors"
+            >
+              RETRY
+            </button>
+          </div>
+        </div>
+      )}
+
       {/* Video Feed */}
       <video
         ref={videoRef}
@@ -260,7 +313,7 @@ export default function HueScan() {
       />
       
       {/* HUD Overlay */}
-      {scanning && (
+      {!isLoading && !error && (
         <div className="absolute inset-0 pointer-events-none select-none font-mono">
           {/* Top Left Info */}
           <div className="absolute top-4 left-4 text-green-400 text-xs tracking-wider space-y-1">
@@ -331,14 +384,28 @@ export default function HueScan() {
       )}
       
       {/* Controls */}
-      <div className="absolute top-4 left-1/2 transform -translate-x-1/2 pointer-events-auto z-50">
-        <button
-          onClick={switchCamera}
-          className="bg-black/60 backdrop-blur-sm border border-green-400/30 text-green-400 p-3 rounded-full hover:bg-green-400/20 transition-all"
-        >
-          <RotateCcw size={20} />
-        </button>
-      </div>
+      {!isLoading && !error && (
+        <>
+          <div className="absolute top-4 left-1/2 transform -translate-x-1/2 pointer-events-auto z-50">
+            <button
+              onClick={switchCamera}
+              className="bg-black/60 backdrop-blur-sm border border-green-400/30 text-green-400 p-3 rounded-full hover:bg-green-400/20 transition-all"
+            >
+              <RotateCcw size={20} />
+            </button>
+          </div>
+          
+          {/* Back Button */}
+          <div className="absolute top-4 right-4 pointer-events-auto z-50">
+            <a
+              href="/"
+              className="bg-green-600 hover:bg-green-700 text-white px-4 py-2 rounded text-sm font-medium transition-colors tracking-wider"
+            >
+              ← BACK TO HOME
+            </a>
+          </div>
+        </>
+      )}
       
       <canvas ref={canvasRef} className="hidden" />
     </div>
