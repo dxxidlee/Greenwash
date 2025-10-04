@@ -100,15 +100,34 @@ export default function HueScan() {
   };
 
   const applyCreativeEffects = useCallback(() => {
-    if (!effectsCanvasRef.current || !videoRef.current) return;
+    if (!effectsCanvasRef.current || !videoRef.current) {
+      console.log('Canvas or video not ready');
+      return;
+    }
     
     const canvas = effectsCanvasRef.current;
     const ctx = canvas.getContext('2d');
-    if (!ctx) return;
+    if (!ctx) {
+      console.log('Canvas context not available');
+      return;
+    }
     
     const video = videoRef.current;
+    
+    // Check if video is ready
+    if (video.readyState < video.HAVE_ENOUGH_DATA) {
+      console.log('Video not ready, readyState:', video.readyState);
+      return;
+    }
+    
+    // Set canvas size to match video
+    canvas.width = video.videoWidth || video.clientWidth;
+    canvas.height = video.videoHeight || video.clientHeight;
+    
     const width = canvas.width;
     const height = canvas.height;
+    
+    console.log('Drawing video:', width, 'x', height);
     
     // Clear canvas
     ctx.clearRect(0, 0, width, height);
@@ -382,19 +401,21 @@ export default function HueScan() {
         </div>
       )}
 
-      {/* Video Feed (Hidden) */}
+      {/* Video Feed */}
       <video
         ref={videoRef}
         autoPlay
         playsInline
         muted
-        className="hidden"
+        className={`absolute inset-0 w-full h-full object-cover ${
+          isFlipped ? 'scale-x-[-1]' : ''
+        }`}
       />
       
       {/* Effects Canvas */}
       <canvas
         ref={effectsCanvasRef}
-        className="absolute inset-0 w-full h-full object-cover"
+        className="absolute inset-0 w-full h-full object-cover pointer-events-none"
       />
       
       {/* Overlay Canvas */}
