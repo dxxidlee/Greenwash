@@ -259,13 +259,6 @@ export default function HueScan() {
           // Apply noise
           color += (noise(uv * 100.0, uTime) - 0.5) * 0.2;
           
-          // Apply vignette
-          color *= vignette(uv);
-          
-          // Apply contrast and gamma
-          color = pow(color, vec3(0.95));
-          color = (color - 0.5) * 1.35 + 0.5;
-          
           gl_FragColor = vec4(color, 1.0);
         }
       `
