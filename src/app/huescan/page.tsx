@@ -14,11 +14,13 @@ export default function HueScan() {
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [isFlipped, setIsFlipped] = useState(true); // Default to flipped for rear camera
+  const [effectsEnabled, setEffectsEnabled] = useState(true);
   
   const videoRef = useRef<HTMLVideoElement>(null);
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const animationRef = useRef<number | null>(null);
   const overlayCanvasRef = useRef<HTMLCanvasElement>(null);
+  const effectsCanvasRef = useRef<HTMLCanvasElement>(null);
 
   const targetColor = { r: 0, g: 143, b: 70 }; // #008f46
 
@@ -92,6 +94,72 @@ export default function HueScan() {
   const toggleFlip = () => {
     setIsFlipped(prev => !prev);
   };
+
+  const toggleEffects = () => {
+    setEffectsEnabled(prev => !prev);
+  };
+
+  const applyCreativeEffects = useCallback(() => {
+    if (!effectsCanvasRef.current || !videoRef.current || !effectsEnabled) return;
+    
+    const canvas = effectsCanvasRef.current;
+    const ctx = canvas.getContext('2d');
+    if (!ctx) return;
+    
+    const video = videoRef.current;
+    const width = canvas.width;
+    const height = canvas.height;
+    
+    // Clear canvas
+    ctx.clearRect(0, 0, width, height);
+    
+    // Draw video with effects
+    ctx.save();
+    
+    // Apply flip if needed
+    if (isFlipped) {
+      ctx.scale(-1, 1);
+      ctx.translate(-width, 0);
+    }
+    
+    // Draw the video
+    ctx.drawImage(video, 0, 0, width, height);
+    
+    // Apply creative effects
+    const time = Date.now() * 0.001;
+    
+    // Chromatic aberration effect
+    ctx.globalCompositeOperation = 'screen';
+    ctx.filter = 'hue-rotate(120deg) blur(1px)';
+    ctx.globalAlpha = 0.3;
+    ctx.drawImage(video, -2, 0, width, height);
+    
+    ctx.filter = 'hue-rotate(240deg) blur(1px)';
+    ctx.globalAlpha = 0.3;
+    ctx.drawImage(video, 2, 0, width, height);
+    
+    ctx.restore();
+    
+    // Add scanlines
+    ctx.globalCompositeOperation = 'multiply';
+    ctx.fillStyle = 'rgba(0, 0, 0, 0.1)';
+    for (let i = 0; i < height; i += 4) {
+      ctx.fillRect(0, i, width, 1);
+    }
+    
+    // Add glitch effect
+    if (Math.random() < 0.1) {
+      ctx.globalCompositeOperation = 'difference';
+      ctx.fillStyle = `hsl(${Math.random() * 360}, 100%, 50%)`;
+      ctx.fillRect(Math.random() * width, 0, Math.random() * 50, height);
+    }
+    
+    // Add noise
+    ctx.globalCompositeOperation = 'overlay';
+    ctx.fillStyle = `rgba(${Math.random() * 255}, ${Math.random() * 255}, ${Math.random() * 255}, 0.1)`;
+    ctx.fillRect(0, 0, width, height);
+    
+  }, [isFlipped, effectsEnabled]);
 
   const colorDistance = (c1: { r: number; g: number; b: number }, c2: { r: number; g: number; b: number }) => {
     return Math.sqrt(
@@ -250,11 +318,18 @@ export default function HueScan() {
         overlayCanvasRef.current.height = video.videoHeight;
       }
       
+      // Update effects canvas size
+      if (effectsCanvasRef.current) {
+        effectsCanvasRef.current.width = video.videoWidth;
+        effectsCanvasRef.current.height = video.videoHeight;
+      }
+      
       drawOverlay();
+      applyCreativeEffects();
     }
     
     animationRef.current = requestAnimationFrame(analyzeFrame);
-  }, [scanning, targetColor, drawOverlay]);
+  }, [scanning, targetColor, drawOverlay, applyCreativeEffects]);
 
   useEffect(() => {
     if (scanning && videoRef.current) {
@@ -302,15 +377,19 @@ export default function HueScan() {
         </div>
       )}
 
-      {/* Video Feed */}
+      {/* Video Feed (Hidden) */}
       <video
         ref={videoRef}
         autoPlay
         playsInline
         muted
-        className={`absolute inset-0 w-full h-full object-cover ${
-          isFlipped ? 'scale-x-[-1]' : ''
-        }`}
+        className="hidden"
+      />
+      
+      {/* Effects Canvas */}
+      <canvas
+        ref={effectsCanvasRef}
+        className="absolute inset-0 w-full h-full object-cover"
       />
       
       {/* Overlay Canvas */}
@@ -339,6 +418,11 @@ export default function HueScan() {
             <div className="flex items-center gap-2">
               <span className="text-green-500">FLIP:</span>
               <span className="text-white">{isFlipped ? 'ON' : 'OFF'}</span>
+            </div>
+            
+            <div className="flex items-center gap-2">
+              <span className="text-green-500">EFFECTS:</span>
+              <span className="text-white">{effectsEnabled ? 'ON' : 'OFF'}</span>
             </div>
           </div>
           
@@ -413,6 +497,20 @@ export default function HueScan() {
               title={isFlipped ? 'Unflip Camera' : 'Flip Camera'}
             >
               <Camera size={20} className={isFlipped ? 'scale-x-[-1]' : ''} />
+            </button>
+            
+            <button
+              onClick={toggleEffects}
+              className={`bg-black/60 backdrop-blur-sm border border-green-400/30 text-green-400 p-3 rounded-full hover:bg-green-400/20 transition-all ${
+                effectsEnabled ? 'bg-green-400/20 border-green-400' : ''
+              }`}
+              title={effectsEnabled ? 'Disable Effects' : 'Enable Effects'}
+            >
+              <div className="w-5 h-5 flex items-center justify-center">
+                <div className={`w-2 h-2 rounded-full transition-all ${
+                  effectsEnabled ? 'bg-green-400 animate-pulse' : 'bg-gray-400'
+                }`} />
+              </div>
             </button>
           </div>
 
