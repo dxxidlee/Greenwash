@@ -13,7 +13,7 @@ export default function HueScan() {
   const [coordinates, setCoordinates] = useState({ x: 0, y: 0 });
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
-  const [isFlipped, setIsFlipped] = useState(false);
+  const [isFlipped, setIsFlipped] = useState(true); // Default to flipped for rear camera
   
   const videoRef = useRef<HTMLVideoElement>(null);
   const canvasRef = useRef<HTMLCanvasElement>(null);
@@ -309,7 +309,7 @@ export default function HueScan() {
         playsInline
         muted
         className={`absolute inset-0 w-full h-full object-cover ${
-          facingMode === 'user' && isFlipped ? 'scale-x-[-1]' : ''
+          isFlipped ? 'scale-x-[-1]' : ''
         }`}
       />
       
@@ -336,12 +336,10 @@ export default function HueScan() {
               <span className="text-green-500">MODE:</span>
               <span className="text-white">{facingMode === 'environment' ? 'REAR' : 'FRONT'}</span>
             </div>
-            {facingMode === 'user' && (
-              <div className="flex items-center gap-2">
-                <span className="text-green-500">FLIP:</span>
-                <span className="text-white">{isFlipped ? 'ON' : 'OFF'}</span>
-              </div>
-            )}
+            <div className="flex items-center gap-2">
+              <span className="text-green-500">FLIP:</span>
+              <span className="text-white">{isFlipped ? 'ON' : 'OFF'}</span>
+            </div>
           </div>
           
           {/* Top Right Status */}
@@ -407,17 +405,15 @@ export default function HueScan() {
             >
               <RotateCcw size={20} />
             </button>
-            {facingMode === 'user' && (
-              <button
-                onClick={toggleFlip}
-                className={`bg-black/60 backdrop-blur-sm border border-green-400/30 text-green-400 p-3 rounded-full hover:bg-green-400/20 transition-all ${
-                  isFlipped ? 'bg-green-400/20 border-green-400' : ''
-                }`}
-                title={isFlipped ? 'Unflip Camera' : 'Flip Camera'}
-              >
-                <Camera size={20} className={isFlipped ? 'scale-x-[-1]' : ''} />
-              </button>
-            )}
+            <button
+              onClick={toggleFlip}
+              className={`bg-black/60 backdrop-blur-sm border border-green-400/30 text-green-400 p-3 rounded-full hover:bg-green-400/20 transition-all ${
+                isFlipped ? 'bg-green-400/20 border-green-400' : ''
+              }`}
+              title={isFlipped ? 'Unflip Camera' : 'Flip Camera'}
+            >
+              <Camera size={20} className={isFlipped ? 'scale-x-[-1]' : ''} />
+            </button>
           </div>
 
       {/* Back Button */}
