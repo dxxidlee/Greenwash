@@ -1,8 +1,11 @@
 'use client';
 
 import React, { useState, useRef, useEffect, useCallback } from 'react';
-import { Camera, RotateCcw, Monitor } from 'lucide-react';
+import { Camera, RotateCcw, Monitor, Eye } from 'lucide-react';
 import * as THREE from 'three';
+import { ObjectDetector, FilesetResolver } from '@mediapipe/tasks-vision';
+import * as tf from '@tensorflow/tfjs';
+import '@tensorflow/tfjs-backend-webgl';
 
 export default function HueScan() {
   const [stream, setStream] = useState<MediaStream | null>(null);
@@ -19,6 +22,12 @@ export default function HueScan() {
   const [cctvMode, setCctvMode] = useState(false);
   const [webglSupported, setWebglSupported] = useState(false);
   const [fps, setFps] = useState(0);
+  const [detectMode, setDetectMode] = useState(false);
+  const [detectionEngine, setDetectionEngine] = useState<'mediapipe' | 'tensorflow' | null>(null);
+  const [detectionFps, setDetectionFps] = useState(0);
+  const [inferenceTime, setInferenceTime] = useState(0);
+  const [confidenceThreshold, setConfidenceThreshold] = useState(0.45);
+  const [devMode, setDevMode] = useState(false);
   
   const videoRef = useRef<HTMLVideoElement>(null);
   const canvasRef = useRef<HTMLCanvasElement>(null);
@@ -26,21 +35,31 @@ export default function HueScan() {
   const overlayCanvasRef = useRef<HTMLCanvasElement>(null);
   const effectsCanvasRef = useRef<HTMLCanvasElement>(null);
   const webglCanvasRef = useRef<HTMLCanvasElement>(null);
+  const detectionCanvasRef = useRef<HTMLCanvasElement>(null);
   const sceneRef = useRef<THREE.Scene | null>(null);
   const rendererRef = useRef<THREE.WebGLRenderer | null>(null);
   const composerRef = useRef<any>(null);
   const lastFrameTimeRef = useRef<number>(0);
   const frameCountRef = useRef<number>(0);
+  const objectDetectorRef = useRef<ObjectDetector | null>(null);
+  const cocoModelRef = useRef<tf.LayersModel | null>(null);
+  const detectionWorkerRef = useRef<Worker | null>(null);
+  const detectionBoxesRef = useRef<Map<string, any>>(new Map());
+  const lastDetectionTimeRef = useRef<number>(0);
 
   const targetColor = { r: 0, g: 143, b: 70 }; // #008f46
 
-  // Initialize CCTV mode from localStorage and URL params
+  // Initialize CCTV and Detect modes from localStorage and URL params
   useEffect(() => {
     const urlParams = new URLSearchParams(window.location.search);
     const cctvParam = urlParams.get('cctv') === '1';
+    const detectParam = urlParams.get('detect') === '1';
     const savedCctvMode = localStorage.getItem('huescan-cctv-mode') === 'true';
+    const savedDetectMode = localStorage.getItem('huescan-detect-mode') === 'true';
     const initialCctvMode = cctvParam || savedCctvMode;
+    const initialDetectMode = detectParam || savedDetectMode;
     setCctvMode(initialCctvMode);
+    setDetectMode(initialDetectMode);
     
     // Check WebGL support
     const canvas = document.createElement('canvas');
@@ -48,10 +67,14 @@ export default function HueScan() {
     setWebglSupported(!!gl);
   }, []);
 
-  // Save CCTV mode to localStorage
+  // Save modes to localStorage
   useEffect(() => {
     localStorage.setItem('huescan-cctv-mode', cctvMode.toString());
   }, [cctvMode]);
+
+  useEffect(() => {
+    localStorage.setItem('huescan-detect-mode', detectMode.toString());
+  }, [detectMode]);
 
   const startCamera = useCallback(async () => {
     try {
@@ -130,6 +153,10 @@ export default function HueScan() {
 
   const toggleCctvMode = () => {
     setCctvMode(prev => !prev);
+  };
+
+  const toggleDetectMode = () => {
+    setDetectMode(prev => !prev);
   };
 
   // Initialize WebGL scene for CCTV mode
@@ -278,6 +305,325 @@ export default function HueScan() {
       initWebGLScene();
     }
   }, [cctvMode, webglSupported, initWebGLScene]);
+
+  // Initialize detection engine
+  const initDetectionEngine = useCallback(async () => {
+    if (!detectMode) return;
+    
+    try {
+      // Try MediaPipe first
+      const vision = await FilesetResolver.forVisionTasks(
+        "https://cdn.jsdelivr.net/npm/@mediapipe/tasks-vision@0.10.0/wasm"
+      );
+      
+      const objectDetector = await ObjectDetector.createFromOptions(vision, {
+        baseOptions: {
+          modelAssetPath: "https://storage.googleapis.com/mediapipe-models/object_detector/efficientdet_lite0/float16/1/efficientdet_lite0.tflite",
+          delegate: "GPU"
+        },
+        scoreThreshold: confidenceThreshold,
+        categoryAllowlist: ["person", "chair", "bottle", "cup", "book", "laptop", "mouse", "keyboard", "cell phone", "tv", "car", "truck", "bus", "motorcycle", "bicycle"]
+      });
+      
+      objectDetectorRef.current = objectDetector;
+      setDetectionEngine('mediapipe');
+      console.log('MediaPipe ObjectDetector initialized');
+      
+    } catch (error) {
+      console.log('MediaPipe failed, falling back to TensorFlow.js:', error);
+      
+      try {
+        // Fallback to TensorFlow.js COCO-SSD
+        await tf.ready();
+        const model = await tf.loadLayersModel('https://tfhub.dev/tensorflow/tfjs-model/ssd_mobilenet_v2/1/default/1');
+        cocoModelRef.current = model;
+        setDetectionEngine('tensorflow');
+        console.log('TensorFlow.js COCO-SSD initialized');
+        
+      } catch (tfError) {
+        console.error('Both detection engines failed:', tfError);
+        setDetectionEngine(null);
+      }
+    }
+  }, [detectMode, confidenceThreshold]);
+
+  // Initialize detection engine when Detect Mode is enabled
+  useEffect(() => {
+    if (detectMode) {
+      initDetectionEngine();
+    }
+  }, [detectMode, initDetectionEngine]);
+
+  // Hotkey handlers
+  useEffect(() => {
+    const handleKeyPress = (event: KeyboardEvent) => {
+      if (event.target instanceof HTMLInputElement || event.target instanceof HTMLTextAreaElement) {
+        return; // Don't trigger hotkeys when typing
+      }
+      
+      switch (event.key.toLowerCase()) {
+        case 'd':
+          toggleDetectMode();
+          break;
+        case 'c':
+          toggleCctvMode();
+          break;
+        case 'g':
+          // Toggle quad-view (future feature)
+          break;
+        case 'f':
+          toggleFlip();
+          break;
+        case 'e':
+          toggleEffects();
+          break;
+      }
+    };
+    
+    window.addEventListener('keydown', handleKeyPress);
+    return () => window.removeEventListener('keydown', handleKeyPress);
+  }, [toggleDetectMode, toggleCctvMode, toggleFlip, toggleEffects]);
+
+  // Draw detection boxes with animations
+  const drawDetectionBoxes = useCallback((ctx: CanvasRenderingContext2D, width: number, height: number) => {
+    ctx.clearRect(0, 0, width, height);
+    
+    const time = performance.now() * 0.001;
+    const devicePixelRatio = window.devicePixelRatio || 1;
+    
+    // Set canvas size to match video
+    ctx.canvas.width = width;
+    ctx.canvas.height = height;
+    
+    detectionBoxesRef.current.forEach((box, id) => {
+      if (box.opacity <= 0) return;
+      
+      const { bbox, score, class: className } = box;
+      const x = bbox.originX;
+      const y = bbox.originY;
+      const w = bbox.width;
+      const h = bbox.height;
+      
+      // Entry animation
+      const scale = Math.min(box.opacity, 1);
+      const centerX = x + w / 2;
+      const centerY = y + h / 2;
+      
+      ctx.save();
+      ctx.globalAlpha = box.opacity;
+      ctx.translate(centerX, centerY);
+      ctx.scale(scale, scale);
+      ctx.translate(-centerX, -centerY);
+      
+      // Box styling
+      ctx.strokeStyle = '#008F46';
+      ctx.lineWidth = 2 * devicePixelRatio;
+      ctx.lineCap = 'square';
+      
+      // Draw corner brackets
+      const bracketLength = 16;
+      const bracketThickness = 2 * devicePixelRatio;
+      
+      // Top-left
+      ctx.beginPath();
+      ctx.moveTo(x, y + bracketLength);
+      ctx.lineTo(x, y);
+      ctx.lineTo(x + bracketLength, y);
+      ctx.stroke();
+      
+      // Top-right
+      ctx.beginPath();
+      ctx.moveTo(x + w - bracketLength, y);
+      ctx.lineTo(x + w, y);
+      ctx.lineTo(x + w, y + bracketLength);
+      ctx.stroke();
+      
+      // Bottom-left
+      ctx.beginPath();
+      ctx.moveTo(x, y + h - bracketLength);
+      ctx.lineTo(x, y + h);
+      ctx.lineTo(x + bracketLength, y + h);
+      ctx.stroke();
+      
+      // Bottom-right
+      ctx.beginPath();
+      ctx.moveTo(x + w - bracketLength, y + h);
+      ctx.lineTo(x + w, y + h);
+      ctx.lineTo(x + w, y + h - bracketLength);
+      ctx.stroke();
+      
+      // Marching ants animation
+      const dashOffset = (time * 40) % 20; // 40px/s animation
+      ctx.setLineDash([8, 8]);
+      ctx.lineDashOffset = dashOffset;
+      ctx.strokeStyle = '#008F46';
+      ctx.lineWidth = 1 * devicePixelRatio;
+      
+      ctx.strokeRect(x, y, w, h);
+      
+      // Draw label
+      const labelText = `${className.toUpperCase()} ${Math.round(score * 100)}%`;
+      ctx.font = `12px PPNeueMontreal, monospace`;
+      ctx.fillStyle = '#008F46';
+      ctx.strokeStyle = 'rgba(0, 0, 0, 0.8)';
+      ctx.lineWidth = 2;
+      
+      const labelWidth = Math.min(ctx.measureText(labelText).width, w - 8);
+      const labelHeight = 20;
+      const labelX = x;
+      const labelY = y - 5;
+      
+      // Label background (pill shape)
+      ctx.fillStyle = 'rgba(255, 255, 255, 0.9)';
+      ctx.beginPath();
+      ctx.roundRect(labelX, labelY - labelHeight, labelWidth + 8, labelHeight, labelHeight / 2);
+      ctx.fill();
+      
+      // Label text
+      ctx.fillStyle = '#008F46';
+      ctx.fillText(labelText, labelX + 4, labelY - 2);
+      
+      ctx.restore();
+    });
+  }, []);
+
+  // Process detection frame
+  const processDetection = useCallback(async () => {
+    if (!detectMode || !videoRef.current || !detectionCanvasRef.current) return;
+    
+    const video = videoRef.current;
+    const canvas = detectionCanvasRef.current;
+    const ctx = canvas.getContext('2d');
+    
+    if (!ctx || video.readyState !== video.HAVE_ENOUGH_DATA) return;
+    
+    const startTime = performance.now();
+    
+    try {
+      let detections: any[] = [];
+      
+      if (detectionEngine === 'mediapipe' && objectDetectorRef.current) {
+        // MediaPipe detection
+        const results = objectDetectorRef.current.detect(video);
+        detections = results.detections.map((detection: any) => ({
+          bbox: detection.boundingBox,
+          score: detection.categories[0]?.score || 0,
+          class: detection.categories[0]?.categoryName || 'unknown'
+        }));
+        
+      } else if (detectionEngine === 'tensorflow' && cocoModelRef.current) {
+        // TensorFlow.js detection
+        const tensor = tf.browser.fromPixels(video);
+        const resized = tf.image.resizeBilinear(tensor, [300, 300]);
+        const batched = resized.expandDims(0);
+        
+        const predictions = await cocoModelRef.current.predict(batched) as tf.Tensor[];
+        const boxes = await predictions[0].data();
+        const scores = await predictions[1].data();
+        const classes = await predictions[2].data();
+        
+        // Process predictions
+        for (let i = 0; i < scores.length; i++) {
+          if (scores[i] > confidenceThreshold) {
+            const boxStart = i * 4;
+            const y1 = boxes[boxStart];
+            const x1 = boxes[boxStart + 1];
+            const y2 = boxes[boxStart + 2];
+            const x2 = boxes[boxStart + 3];
+            detections.push({
+              bbox: {
+                originX: x1 * video.videoWidth,
+                originY: y1 * video.videoHeight,
+                width: (x2 - x1) * video.videoWidth,
+                height: (y2 - y1) * video.videoHeight
+              },
+              score: scores[i],
+              class: classes[i]
+            });
+          }
+        }
+        
+        // Cleanup tensors
+        tensor.dispose();
+        resized.dispose();
+        batched.dispose();
+        predictions.forEach(p => p.dispose());
+      }
+      
+      // Update detection boxes with smoothing
+      const currentTime = performance.now();
+      const smoothingFactor = 0.4; // EMA smoothing factor
+      
+      detections.forEach((detection, index) => {
+        const id = `${detection.class}_${index}`;
+        const existing = detectionBoxesRef.current.get(id);
+        
+        if (existing) {
+          // Smooth the bounding box
+          detection.bbox.originX = existing.bbox.originX * (1 - smoothingFactor) + detection.bbox.originX * smoothingFactor;
+          detection.bbox.originY = existing.bbox.originY * (1 - smoothingFactor) + detection.bbox.originY * smoothingFactor;
+          detection.bbox.width = existing.bbox.width * (1 - smoothingFactor) + detection.bbox.width * smoothingFactor;
+          detection.bbox.height = existing.bbox.height * (1 - smoothingFactor) + detection.bbox.height * smoothingFactor;
+        }
+        
+        detectionBoxesRef.current.set(id, {
+          ...detection,
+          lastSeen: currentTime,
+          opacity: existing ? Math.min(existing.opacity + 0.1, 1) : 0.1
+        });
+      });
+      
+      // Remove old detections
+      detectionBoxesRef.current.forEach((box, id) => {
+        if (currentTime - box.lastSeen > 300) {
+          box.opacity -= 0.05;
+          if (box.opacity <= 0) {
+            detectionBoxesRef.current.delete(id);
+          }
+        }
+      });
+      
+      // Draw detection boxes
+      drawDetectionBoxes(ctx, video.videoWidth, video.videoHeight);
+      
+      // Update performance metrics
+      const inferenceTime = performance.now() - startTime;
+      setInferenceTime(Math.round(inferenceTime));
+      
+    } catch (error) {
+      console.error('Detection processing error:', error);
+    }
+  }, [detectMode, detectionEngine, confidenceThreshold]);
+
+  // Detection loop
+  useEffect(() => {
+    if (!detectMode || !detectionEngine) return;
+    
+    let detectionFrameCount = 0;
+    let lastDetectionTime = performance.now();
+    
+    const detectionLoop = () => {
+      const now = performance.now();
+      
+      // Run detection at 10-15 Hz (every 66-100ms)
+      if (now - lastDetectionTime >= 80) {
+        processDetection();
+        lastDetectionTime = now;
+        detectionFrameCount++;
+        
+        // Update detection FPS every second
+        if (now - lastDetectionTime >= 1000) {
+          setDetectionFps(Math.round((detectionFrameCount * 1000) / (now - lastDetectionTime)));
+          detectionFrameCount = 0;
+          lastDetectionTime = now;
+        }
+      }
+      
+      requestAnimationFrame(detectionLoop);
+    };
+    
+    detectionLoop();
+  }, [detectMode, detectionEngine, processDetection]);
 
   // FPS Counter
   useEffect(() => {
@@ -654,6 +1000,14 @@ export default function HueScan() {
         className="absolute inset-0 w-full h-full object-cover pointer-events-none"
       />
       
+      {/* Detection Canvas */}
+      {detectMode && (
+        <canvas
+          ref={detectionCanvasRef}
+          className="absolute inset-0 w-full h-full object-cover pointer-events-none"
+        />
+      )}
+      
       {/* HUD Overlay */}
       {!isLoading && !error && (
         <div className="absolute inset-0 pointer-events-none select-none font-mono">
@@ -686,10 +1040,22 @@ export default function HueScan() {
               <span className="text-white">{cctvMode ? 'ON' : 'OFF'}</span>
             </div>
             
-            {cctvMode && (
+            <div className="flex items-center gap-2">
+              <span className="text-green-500">DETECT:</span>
+              <span className="text-white">{detectMode ? 'ON' : 'OFF'}</span>
+            </div>
+            
+            {detectMode && (
               <div className="flex items-center gap-2">
-                <span className="text-green-500">FPS:</span>
-                <span className="text-white">{fps}</span>
+                <span className="text-green-500">ENGINE:</span>
+                <span className="text-white">{detectionEngine?.toUpperCase() || 'LOADING'}</span>
+              </div>
+            )}
+            
+            {detectMode && (
+              <div className="flex items-center gap-2">
+                <span className="text-green-500">DETECT_FPS:</span>
+                <span className="text-white">{detectionFps}</span>
               </div>
             )}
           </div>
@@ -743,6 +1109,38 @@ export default function HueScan() {
               }}
             />
           </div>
+          
+          {/* Dev Controls Panel */}
+          {devMode && (
+            <div className="absolute bottom-4 left-4 bg-black/80 backdrop-blur-sm border border-green-400/30 p-3 rounded text-xs font-mono">
+              <div className="text-green-400 mb-2">DEV PANEL</div>
+              <div className="space-y-1 text-white">
+                <div>FPS: {fps}</div>
+                {detectMode && (
+                  <>
+                    <div>Detect FPS: {detectionFps}</div>
+                    <div>Inference: {inferenceTime}ms</div>
+                    <div>Confidence: {Math.round(confidenceThreshold * 100)}%</div>
+                    <div>Engine: {detectionEngine?.toUpperCase() || 'NONE'}</div>
+                  </>
+                )}
+                <div className="mt-2 text-green-400">
+                  <div>Hotkeys:</div>
+                  <div>D - Detect Mode</div>
+                  <div>C - CCTV Mode</div>
+                  <div>F - Flip Camera</div>
+                  <div>E - Effects</div>
+                </div>
+              </div>
+            </div>
+          )}
+          
+          {/* Privacy Notice */}
+          {detectMode && (
+            <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 bg-black/80 backdrop-blur-sm border border-green-400/30 p-2 rounded text-xs text-green-400 font-mono">
+              On-device detection. No data sent.
+            </div>
+          )}
         </div>
       )}
       
@@ -789,6 +1187,26 @@ export default function HueScan() {
               title={cctvMode ? 'Disable CCTV Mode' : 'Enable CCTV Mode'}
             >
               <Monitor size={20} />
+            </button>
+            
+            <button
+              onClick={toggleDetectMode}
+              className={`bg-black/60 backdrop-blur-sm border border-green-400/30 text-green-400 p-3 rounded-full hover:bg-green-400/20 transition-all ${
+                detectMode ? 'bg-green-400/20 border-green-400' : ''
+              }`}
+              title={detectMode ? 'Disable Detect Mode' : 'Enable Detect Mode'}
+            >
+              <Eye size={20} />
+            </button>
+            
+            <button
+              onClick={() => setDevMode(prev => !prev)}
+              className={`bg-black/60 backdrop-blur-sm border border-green-400/30 text-green-400 p-3 rounded-full hover:bg-green-400/20 transition-all ${
+                devMode ? 'bg-green-400/20 border-green-400' : ''
+              }`}
+              title={devMode ? 'Hide Dev Panel' : 'Show Dev Panel'}
+            >
+              <span className="text-xs font-mono">DEV</span>
             </button>
           </div>
 
