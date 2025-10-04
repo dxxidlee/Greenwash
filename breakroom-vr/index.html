@@ -233,6 +233,15 @@
       z-index: 10;
       letter-spacing: 2px;
       text-transform: uppercase;
+      max-width: 90%;
+    }
+    
+    .mobile-instructions {
+      display: none;
+    }
+    
+    .desktop-instructions {
+      display: none;
     }
     
     #fadeOverlay {
@@ -304,6 +313,122 @@
     #doorPrompt.show {
       display: block;
     }
+    
+    #exitButton {
+      position: fixed;
+      top: 20px;
+      right: 20px;
+      width: 44px;
+      height: 44px;
+      background: rgba(20, 20, 20, 0.85);
+      border: 2px solid rgba(255, 255, 255, 0.3);
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      z-index: 150;
+      transition: all 0.3s;
+      backdrop-filter: blur(16px);
+      -webkit-backdrop-filter: blur(16px);
+      box-shadow: 0 2px 10px rgba(0, 0, 0, 0.5);
+    }
+    
+    #exitButton:hover {
+      background: rgba(40, 40, 40, 0.95);
+      border-color: rgba(255, 255, 255, 0.6);
+      transform: scale(1.05);
+    }
+    
+    #exitButton::before,
+    #exitButton::after {
+      content: '';
+      position: absolute;
+      width: 18px;
+      height: 2px;
+      background: #ffffff;
+      border-radius: 2px;
+    }
+    
+    #exitButton::before {
+      transform: rotate(45deg);
+    }
+    
+    #exitButton::after {
+      transform: rotate(-45deg);
+    }
+    
+    #exitWarning {
+      position: fixed;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      background: rgba(0, 0, 0, 0.9);
+      backdrop-filter: blur(16px);
+      padding: 30px 40px;
+      border-radius: 12px;
+      border: 1px solid rgba(143, 0, 0, 0.5);
+      text-align: center;
+      max-width: 450px;
+      display: none;
+      z-index: 200;
+      box-shadow: 0 4px 20px rgba(0, 0, 0, 0.5), inset 0 1px 0 rgba(143, 0, 0, 0.2);
+    }
+    
+    #exitWarning.show {
+      display: block;
+    }
+    
+    .warning-title {
+      color: #ff4444;
+      font-size: 12px;
+      font-weight: 500;
+      margin-bottom: 20px;
+      letter-spacing: 3px;
+      text-transform: uppercase;
+    }
+    
+    .warning-message {
+      color: #ff6666;
+      font-size: 16px;
+      line-height: 1.8;
+      margin-bottom: 25px;
+      font-weight: 300;
+    }
+    
+    .warning-buttons {
+      display: flex;
+      gap: 15px;
+      justify-content: center;
+    }
+    
+    .warning-btn {
+      background: transparent;
+      color: white;
+      border: 1px solid rgba(255, 255, 255, 0.3);
+      padding: 10px 25px;
+      border-radius: 8px;
+      cursor: pointer;
+      font-family: 'PPNeueMontreal', sans-serif;
+      font-size: 11px;
+      font-weight: 500;
+      transition: all 0.3s;
+      letter-spacing: 2px;
+      text-transform: uppercase;
+    }
+    
+    .warning-btn.proceed {
+      background: #8f0000;
+      border-color: #8f0000;
+    }
+    
+    .warning-btn:hover {
+      background: rgba(255, 255, 255, 0.1);
+    }
+    
+    .warning-btn.proceed:hover {
+      background: #a00000;
+    }
   </style>
 </head>
 <body>
@@ -314,6 +439,19 @@
   
   <div id="doorPrompt" class="gw-glass-dark">
     Press E to approach the door
+  </div>
+  
+  <div id="exitButton" title="Exit Backroom"></div>
+  
+  <div id="exitWarning">
+    <div class="warning-title">⚠ Warning</div>
+    <div class="warning-message">
+      Leaving the Backroom without completing the Compliance Recital will result in penalties. Your progress will not be saved.
+    </div>
+    <div class="warning-buttons">
+      <button class="warning-btn cancel" id="cancelExit">Cancel</button>
+      <button class="warning-btn proceed" id="proceedExit">Leave Anyway</button>
+    </div>
   </div>
   
   <div id="hud">
@@ -331,12 +469,26 @@
   </div>
 
   <div id="feedback"></div>
-  <div id="instructions" class="gw-glass-light">Click to start • WASD to move • Mouse to look • E to interact with door</div>
+  <div id="instructions" class="gw-glass-light">
+    <span class="desktop-instructions">Click to start • WASD to move • Mouse to look • E to interact with door</span>
+    <span class="mobile-instructions">Tap to start • Tap to move forward • Tap door to interact</span>
+  </div>
   <div id="fadeOverlay"></div>
 
   <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
 
   <script>
+    // Detect mobile
+    const isMobile = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent) || window.innerWidth < 768;
+    
+    // Show appropriate instructions
+    if (isMobile) {
+      document.querySelector('.desktop-instructions').style.display = 'none';
+      document.querySelector('.mobile-instructions').style.display = 'inline';
+    } else {
+      document.querySelector('.desktop-instructions').style.display = 'inline';
+      document.querySelector('.mobile-instructions').style.display = 'none';
+    }
     // Game state
     const state = {
       attempts: 0,
@@ -858,21 +1010,49 @@
       requestAnimationFrame(animateWaveform);
     }
 
+    // Exit button functionality
+    const exitButton = document.getElementById('exitButton');
+    const exitWarning = document.getElementById('exitWarning');
+    const cancelExit = document.getElementById('cancelExit');
+    const proceedExit = document.getElementById('proceedExit');
+
+    exitButton.addEventListener('click', (e) => {
+      e.stopPropagation();
+      exitWarning.classList.add('show');
+      canvas.classList.add('hud-active');
+      document.exitPointerLock();
+    });
+
+    cancelExit.addEventListener('click', (e) => {
+      e.stopPropagation();
+      exitWarning.classList.remove('show');
+      canvas.classList.remove('hud-active');
+    });
+
+    proceedExit.addEventListener('click', (e) => {
+      e.stopPropagation();
+      const overlay = document.getElementById('fadeOverlay');
+      overlay.classList.add('active');
+      setTimeout(() => {
+        window.location.href = '/';
+      }, 500);
+    });
+
     // Controls
     const keys = {};
     let mouseX = 0;
     let mouseY = 0;
     let pointerLocked = false;
+    let autoMoveForward = false;
 
     window.addEventListener('keydown', (e) => {
       keys[e.code] = true;
       
-      if (e.code === 'KeyE' && state.nearDoor && !state.hudVisible) {
+      if (e.code === 'KeyE' && state.nearDoor && !state.hudVisible && !isMobile) {
         state.hudVisible = true;
         document.getElementById('hud').classList.add('show');
         document.getElementById('doorPrompt').classList.remove('show');
         canvas.classList.add('hud-active');
-        // Release pointer lock when HUD opens
         document.exitPointerLock();
       }
     });
@@ -881,15 +1061,78 @@
       keys[e.code] = false;
     });
 
-    canvas.addEventListener('click', () => {
+    canvas.addEventListener('click', (e) => {
       if (!state.started) {
         state.started = true;
         document.getElementById('loading').style.display = 'none';
       }
-      // Only request pointer lock if HUD is not visible
-      if (!state.hudVisible) {
+      
+      if (isMobile && state.started) {
+        // On mobile, check if clicking near door
+        if (state.nearDoor && !state.hudVisible) {
+          state.hudVisible = true;
+          document.getElementById('hud').classList.add('show');
+          document.getElementById('doorPrompt').classList.remove('show');
+          canvas.classList.add('hud-active');
+        } else if (!state.hudVisible) {
+          // Toggle auto-move forward on tap
+          autoMoveForward = !autoMoveForward;
+        }
+      } else if (!isMobile && !state.hudVisible) {
+        // Desktop: request pointer lock
         canvas.requestPointerLock();
       }
+    });
+
+    // Touch controls for mobile
+    let touchStartX = 0;
+    let touchStartY = 0;
+
+    canvas.addEventListener('touchstart', (e) => {
+      if (!state.started) {
+        state.started = true;
+        document.getElementById('loading').style.display = 'none';
+      }
+      
+      if (e.touches.length > 0) {
+        touchStartX = e.touches[0].clientX;
+        touchStartY = e.touches[0].clientY;
+      }
+      
+      // Check if near door
+      if (state.nearDoor && !state.hudVisible) {
+        state.hudVisible = true;
+        document.getElementById('hud').classList.add('show');
+        document.getElementById('doorPrompt').classList.remove('show');
+        canvas.classList.add('hud-active');
+      } else if (!state.hudVisible) {
+        autoMoveForward = true;
+      }
+    });
+
+    canvas.addEventListener('touchmove', (e) => {
+      if (!isMobile || state.hudVisible) return;
+      e.preventDefault();
+      
+      if (e.touches.length > 0) {
+        const touchX = e.touches[0].clientX;
+        const touchY = e.touches[0].clientY;
+        
+        const deltaX = touchX - touchStartX;
+        const deltaY = touchY - touchStartY;
+        
+        // Rotate camera based on touch drag
+        mouseX -= deltaX * 0.005;
+        mouseY -= deltaY * 0.005;
+        mouseY = Math.max(-Math.PI / 2 + 0.1, Math.min(Math.PI / 2 - 0.1, mouseY));
+        
+        touchStartX = touchX;
+        touchStartY = touchY;
+      }
+    }, { passive: false });
+
+    canvas.addEventListener('touchend', (e) => {
+      autoMoveForward = false;
     });
 
     document.addEventListener('pointerlockchange', () => {
@@ -897,7 +1140,7 @@
     });
 
     document.addEventListener('mousemove', (e) => {
-      if (pointerLocked) {
+      if (pointerLocked && !isMobile) {
         mouseX -= e.movementX * 0.002;
         mouseY -= e.movementY * 0.002;
         mouseY = Math.max(-Math.PI / 2 + 0.1, Math.min(Math.PI / 2 - 0.1, mouseY));
@@ -1063,10 +1306,18 @@
 
       const velocity = new THREE.Vector3();
       
-      if (keys['KeyW']) velocity.z = 1;
-      if (keys['KeyS']) velocity.z = -1;
-      if (keys['KeyA']) velocity.x = -1;
-      if (keys['KeyD']) velocity.x = 1;
+      if (isMobile) {
+        // Mobile: auto-move forward when tapping
+        if (autoMoveForward) {
+          velocity.z = 1;
+        }
+      } else {
+        // Desktop: WASD controls
+        if (keys['KeyW']) velocity.z = 1;
+        if (keys['KeyS']) velocity.z = -1;
+        if (keys['KeyA']) velocity.x = -1;
+        if (keys['KeyD']) velocity.x = 1;
+      }
 
       if (velocity.length() > 0) {
         velocity.normalize();
@@ -1120,7 +1371,12 @@
         
         if (distance < 3 && !state.nearDoor) {
           state.nearDoor = true;
-          document.getElementById('doorPrompt').classList.add('show');
+          if (!isMobile) {
+            document.getElementById('doorPrompt').classList.add('show');
+          } else {
+            document.getElementById('doorPrompt').textContent = 'Tap to approach the door';
+            document.getElementById('doorPrompt').classList.add('show');
+          }
         } else if (distance >= 3 && state.nearDoor) {
           state.nearDoor = false;
           document.getElementById('doorPrompt').classList.remove('show');
