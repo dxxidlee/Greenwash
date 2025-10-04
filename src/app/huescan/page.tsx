@@ -13,6 +13,7 @@ export default function HueScan() {
   const [coordinates, setCoordinates] = useState({ x: 0, y: 0 });
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [isFlipped, setIsFlipped] = useState(false);
   
   const videoRef = useRef<HTMLVideoElement>(null);
   const canvasRef = useRef<HTMLCanvasElement>(null);
@@ -86,6 +87,10 @@ export default function HueScan() {
     stopCamera();
     setFacingMode(prev => prev === 'user' ? 'environment' : 'user');
     setTimeout(() => startCamera(), 100);
+  };
+
+  const toggleFlip = () => {
+    setIsFlipped(prev => !prev);
   };
 
   const colorDistance = (c1: { r: number; g: number; b: number }, c2: { r: number; g: number; b: number }) => {
@@ -303,7 +308,9 @@ export default function HueScan() {
         autoPlay
         playsInline
         muted
-        className="absolute inset-0 w-full h-full object-cover"
+        className={`absolute inset-0 w-full h-full object-cover ${
+          facingMode === 'user' && isFlipped ? 'scale-x-[-1]' : ''
+        }`}
       />
       
       {/* Overlay Canvas */}
@@ -329,6 +336,12 @@ export default function HueScan() {
               <span className="text-green-500">MODE:</span>
               <span className="text-white">{facingMode === 'environment' ? 'REAR' : 'FRONT'}</span>
             </div>
+            {facingMode === 'user' && (
+              <div className="flex items-center gap-2">
+                <span className="text-green-500">FLIP:</span>
+                <span className="text-white">{isFlipped ? 'ON' : 'OFF'}</span>
+              </div>
+            )}
           </div>
           
           {/* Top Right Status */}
@@ -386,24 +399,36 @@ export default function HueScan() {
       {/* Controls */}
       {!isLoading && !error && (
         <>
-          <div className="absolute top-4 left-1/2 transform -translate-x-1/2 pointer-events-auto z-50">
+          <div className="absolute top-4 left-1/2 transform -translate-x-1/2 pointer-events-auto z-50 flex gap-2">
             <button
               onClick={switchCamera}
               className="bg-black/60 backdrop-blur-sm border border-green-400/30 text-green-400 p-3 rounded-full hover:bg-green-400/20 transition-all"
+              title="Switch Camera"
             >
               <RotateCcw size={20} />
             </button>
+            {facingMode === 'user' && (
+              <button
+                onClick={toggleFlip}
+                className={`bg-black/60 backdrop-blur-sm border border-green-400/30 text-green-400 p-3 rounded-full hover:bg-green-400/20 transition-all ${
+                  isFlipped ? 'bg-green-400/20 border-green-400' : ''
+                }`}
+                title={isFlipped ? 'Unflip Camera' : 'Flip Camera'}
+              >
+                <Camera size={20} className={isFlipped ? 'scale-x-[-1]' : ''} />
+              </button>
+            )}
           </div>
-          
-          {/* Back Button */}
+
+      {/* Back Button */}
           <div className="absolute top-4 right-4 pointer-events-auto z-50">
-            <a
-              href="/"
-              className="bg-green-600 hover:bg-green-700 text-white px-4 py-2 rounded text-sm font-medium transition-colors tracking-wider"
-            >
-              ← BACK TO HOME
-            </a>
-          </div>
+        <a
+          href="/"
+          className="bg-green-600 hover:bg-green-700 text-white px-4 py-2 rounded text-sm font-medium transition-colors tracking-wider"
+        >
+          ← BACK TO HOME
+        </a>
+      </div>
         </>
       )}
       
