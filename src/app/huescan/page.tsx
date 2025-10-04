@@ -26,8 +26,7 @@ export default function HueScan() {
   const [detectionEngine, setDetectionEngine] = useState<'mediapipe' | 'tensorflow' | null>(null);
   const [detectionFps, setDetectionFps] = useState(0);
   const [inferenceTime, setInferenceTime] = useState(0);
-  const [confidenceThreshold, setConfidenceThreshold] = useState(0.45);
-  const [devMode, setDevMode] = useState(false);
+  const [confidenceThreshold, setConfidenceThreshold] = useState(0.6);
   
   const videoRef = useRef<HTMLVideoElement>(null);
   const canvasRef = useRef<HTMLCanvasElement>(null);
@@ -251,12 +250,8 @@ export default function HueScan() {
           // Apply barrel distortion
           uv = barrelDistortion(uv, 0.12);
           
-          // Apply chromatic aberration
-          vec3 color = chromaticAberration(uTexture, uv, 0.001);
-          
-          // Convert to grayscale with green bias
-          float gray = dot(color, vec3(0.299, 0.587, 0.114));
-          color = vec3(gray) * 0.9 + vec3(0.0, 0.56, 0.28) * 0.1;
+                        // Apply chromatic aberration
+                        vec3 color = chromaticAberration(uTexture, uv, 0.001);
           
           // Apply scanlines
           color += scanlines(uv, uTime);
@@ -367,9 +362,6 @@ export default function HueScan() {
           break;
         case 'c':
           toggleCctvMode();
-          break;
-        case 'g':
-          // Toggle quad-view (future feature)
           break;
         case 'f':
           toggleFlip();
@@ -552,7 +544,7 @@ export default function HueScan() {
       
       // Update detection boxes with smoothing
       const currentTime = performance.now();
-      const smoothingFactor = 0.4; // EMA smoothing factor
+      const smoothingFactor = 0.25; // Reduced smoothing for more accuracy
       
       detections.forEach((detection, index) => {
         const id = `${detection.class}_${index}`;
@@ -605,8 +597,8 @@ export default function HueScan() {
     const detectionLoop = () => {
       const now = performance.now();
       
-      // Run detection at 10-15 Hz (every 66-100ms)
-      if (now - lastDetectionTime >= 80) {
+      // Run detection at 15-20 Hz (every 50-66ms) for better accuracy
+      if (now - lastDetectionTime >= 60) {
         processDetection();
         lastDetectionTime = now;
         detectionFrameCount++;
@@ -1051,13 +1043,6 @@ export default function HueScan() {
                 <span className="text-white">{detectionEngine?.toUpperCase() || 'LOADING'}</span>
               </div>
             )}
-            
-            {detectMode && (
-              <div className="flex items-center gap-2">
-                <span className="text-green-500">DETECT_FPS:</span>
-                <span className="text-white">{detectionFps}</span>
-              </div>
-            )}
           </div>
           
           {/* Top Right Status */}
@@ -1109,31 +1094,6 @@ export default function HueScan() {
               }}
             />
           </div>
-          
-          {/* Dev Controls Panel */}
-          {devMode && (
-            <div className="absolute bottom-4 left-4 bg-black/80 backdrop-blur-sm border border-green-400/30 p-3 rounded text-xs font-mono">
-              <div className="text-green-400 mb-2">DEV PANEL</div>
-              <div className="space-y-1 text-white">
-                <div>FPS: {fps}</div>
-                {detectMode && (
-                  <>
-                    <div>Detect FPS: {detectionFps}</div>
-                    <div>Inference: {inferenceTime}ms</div>
-                    <div>Confidence: {Math.round(confidenceThreshold * 100)}%</div>
-                    <div>Engine: {detectionEngine?.toUpperCase() || 'NONE'}</div>
-                  </>
-                )}
-                <div className="mt-2 text-green-400">
-                  <div>Hotkeys:</div>
-                  <div>D - Detect Mode</div>
-                  <div>C - CCTV Mode</div>
-                  <div>F - Flip Camera</div>
-                  <div>E - Effects</div>
-                </div>
-              </div>
-            </div>
-          )}
           
           {/* Privacy Notice */}
           {detectMode && (
@@ -1197,16 +1157,6 @@ export default function HueScan() {
               title={detectMode ? 'Disable Detect Mode' : 'Enable Detect Mode'}
             >
               <Eye size={20} />
-            </button>
-            
-            <button
-              onClick={() => setDevMode(prev => !prev)}
-              className={`bg-black/60 backdrop-blur-sm border border-green-400/30 text-green-400 p-3 rounded-full hover:bg-green-400/20 transition-all ${
-                devMode ? 'bg-green-400/20 border-green-400' : ''
-              }`}
-              title={devMode ? 'Hide Dev Panel' : 'Show Dev Panel'}
-            >
-              <span className="text-xs font-mono">DEV</span>
             </button>
           </div>
 
