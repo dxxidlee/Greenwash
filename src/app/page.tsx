@@ -40,6 +40,8 @@ export default function Home() {
       window.location.href = '/breakroom';
     } else if (label === 'HueScan HUE-37') {
       window.location.href = '/huescan';
+    } else if (label === 'Report RPT-37') {
+      window.location.href = '/report';
     } else {
       // For other features, show placeholder
       console.log(`Clicked: ${label} - Feature coming soon`);
