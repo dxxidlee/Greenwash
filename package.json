@@ -6,7 +6,8 @@
     "dev": "next dev",
     "build": "next build",
     "start": "next start",
-    "lint": "next lint"
+    "lint": "next lint",
+    "deploy": "rm -rf public/breakroom-vr && cp -r breakroom-vr public/ && next build"
   },
   "dependencies": {
     "@types/node": "^20.0.0",

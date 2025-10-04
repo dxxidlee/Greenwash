@@ -31,6 +31,56 @@
       position: fixed;
       top: 0;
       left: 0;
+      filter: contrast(1.08) saturate(0.85) brightness(0.95);
+    }
+    
+    /* iOS-style glass pill used for hover labels */
+    .gw-glass {
+      color: #fff;
+      background: rgba(0, 0, 0, 0.6);
+      border: 1px solid rgba(255, 255, 255, 0.2);
+      border-radius: 9999px;
+      padding: 8px 14px;
+      box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3), inset 0 1px 0 rgba(255, 255, 255, 0.1);
+      backdrop-filter: blur(16px) saturate(180%);
+      -webkit-backdrop-filter: blur(16px) saturate(180%);
+      font-weight: 500;
+    }
+
+    /* Light silver glass for profile and circle hover labels */
+    .gw-glass-light {
+      color: #008F46;
+      background: rgba(217, 217, 217, 0.3);
+      border: 1px solid rgba(217, 217, 217, 0.4);
+      border-radius: 9999px;
+      padding: 8px 14px;
+      box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1), inset 0 1px 0 rgba(255, 255, 255, 0.3);
+      backdrop-filter: blur(16px) saturate(180%);
+      -webkit-backdrop-filter: blur(16px) saturate(180%);
+      font-weight: 500;
+    }
+
+    /* Profile dropdown uses rectangular glass */
+    .gw-glass-light.profile-dropdown {
+      border-radius: 12px;
+      padding: 12px 16px;
+    }
+
+    /* Dark glass for Ministry of Love and other dark modals */
+    .gw-glass-dark {
+      color: var(--gw-green);
+      background: rgba(0, 0, 0, 0.8);
+      border: 1px solid rgba(0, 143, 70, 0.3);
+      border-radius: 12px;
+      padding: 12px 16px;
+      box-shadow: 0 4px 20px rgba(0, 0, 0, 0.5), inset 0 1px 0 rgba(0, 143, 70, 0.2);
+      backdrop-filter: blur(16px) saturate(180%);
+      -webkit-backdrop-filter: blur(16px) saturate(180%);
+      font-weight: 500;
+    }
+
+    :root { 
+      --gw-green: #008F46; 
     }
     
     #hud {
@@ -38,16 +88,16 @@
       top: 50%;
       left: 50%;
       transform: translate(-50%, -50%);
-      background: rgba(0, 20, 10, 0.85);
-      backdrop-filter: blur(10px);
+      background: rgba(0, 0, 0, 0.8);
+      backdrop-filter: blur(16px);
       padding: 30px 40px;
-      border-radius: 2px;
+      border-radius: 12px;
       border: 1px solid rgba(0, 143, 70, 0.3);
       text-align: center;
       max-width: 500px;
       display: none;
       z-index: 100;
-      box-shadow: 0 0 30px rgba(0, 143, 70, 0.2);
+      box-shadow: 0 4px 20px rgba(0, 0, 0, 0.5), inset 0 1px 0 rgba(0, 143, 70, 0.2);
     }
     
     #hud.show {
@@ -84,14 +134,15 @@
       color: white;
       border: none;
       padding: 12px 30px;
-      border-radius: 2px;
+      border-radius: 8px;
       cursor: pointer;
       font-family: 'PPNeueMontreal', sans-serif;
       font-size: 12px;
       font-weight: 500;
       transition: all 0.3s;
-      letter-spacing: 1px;
+      letter-spacing: 2px;
       text-transform: uppercase;
+      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
     }
     
     #recordBtn:hover {
@@ -114,16 +165,17 @@
       top: 50px;
       left: 50%;
       transform: translateX(-50%);
-      background: rgba(0, 0, 0, 0.9);
       color: #008F46;
       padding: 15px 30px;
-      border-radius: 2px;
       font-size: 14px;
       font-weight: 500;
       display: none;
       z-index: 1000;
-      border: 1px solid #008F46;
       letter-spacing: 2px;
+    }
+    
+    #feedback.gw-glass-dark {
+      border-radius: 8px;
     }
     
     #instructions {
@@ -131,14 +183,11 @@
       bottom: 30px;
       left: 50%;
       transform: translateX(-50%);
-      color: rgba(0, 143, 70, 0.6);
+      color: rgba(0, 143, 70, 0.8);
       font-size: 11px;
       text-align: center;
       z-index: 10;
-      background: rgba(0, 0, 0, 0.7);
-      padding: 10px 20px;
-      border-radius: 2px;
-      letter-spacing: 1px;
+      letter-spacing: 2px;
       text-transform: uppercase;
     }
     
@@ -177,40 +226,51 @@
       width: 100%;
       height: 100%;
       pointer-events: none;
-      background: radial-gradient(circle at center, transparent 0%, rgba(0, 0, 0, 0.7) 100%);
+      background: radial-gradient(ellipse at center, transparent 20%, rgba(0, 0, 0, 0.3) 70%, rgba(0, 0, 0, 0.6) 100%);
       z-index: 1;
+      mix-blend-mode: multiply;
     }
     
-    #homeButton {
+    #filmGrain {
       position: fixed;
-      top: 20px;
-      left: 20px;
-      background: rgba(0, 143, 70, 0.8);
-      color: white;
-      border: none;
-      padding: 10px 20px;
-      border-radius: 2px;
-      cursor: pointer;
-      font-family: 'PPNeueMontreal', sans-serif;
-      font-size: 12px;
-      font-weight: 500;
-      letter-spacing: 1px;
-      text-transform: uppercase;
-      z-index: 1000;
-      transition: all 0.3s;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      pointer-events: none;
+      z-index: 2;
+      opacity: 0.08;
+      background-image: url('data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSIzMDAiIGhlaWdodD0iMzAwIj48ZmlsdGVyIGlkPSJhIj48ZmVUdXJidWxlbmNlIGJhc2VGcmVxdWVuY3k9Ii43NSIgc3RpdGNoVGlsZXM9InN0aXRjaCIgdHlwZT0iZnJhY3RhbE5vaXNlIi8+PGZlQ29sb3JNYXRyaXggdHlwZT0ic2F0dXJhdGUiIHZhbHVlcz0iMCIvPjwvZmlsdGVyPjxwYXRoIGQ9Ik0wIDBoMzAwdjMwMEgweiIgZmlsdGVyPSJ1cmwoI2EpIiBvcGFjaXR5PSIuNSIvPjwvc3ZnPg==');
+    }
+
+    #doorPrompt {
+      position: fixed;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      color: #008F46;
+      font-size: 18px;
+      text-align: center;
+      z-index: 50;
+      padding: 20px 30px;
+      display: none;
+      letter-spacing: 2px;
     }
     
-    #homeButton:hover {
-      background: rgba(0, 143, 70, 1);
+    #doorPrompt.show {
+      display: block;
     }
   </style>
 </head>
 <body>
-  <div id="loading">INITIALIZING...</div>
+  <div id="loading">Loading...</div>
   <canvas id="canvas"></canvas>
   <div id="vignette"></div>
+  <div id="filmGrain"></div>
   
-  <button id="homeButton" onclick="window.location.href='/'">← Home</button>
+  <div id="doorPrompt" class="gw-glass-dark">
+    Press E to approach the door
+  </div>
   
   <div id="hud">
     <div class="hud-title">Compliance Recital</div>
@@ -224,14 +284,12 @@
   </div>
 
   <div id="feedback"></div>
-  <div id="instructions">Click to start • WASD to move • Mouse to look • ESC for interface</div>
+  <div id="instructions" class="gw-glass-light">Click to start • WASD to move • Mouse to look • E to interact with door</div>
   <div id="fadeOverlay"></div>
 
   <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
 
   <script>
-    console.log('Starting Greenwash Backroom...');
-
     // Game state
     const state = {
       attempts: 0,
@@ -240,19 +298,20 @@
       hudVisible: false,
       holding: false,
       holdStart: 0,
-      started: false
+      started: false,
+      nearDoor: false,
+      hallwaysPassed: 0
     };
 
     console.log('Target attempts:', state.targetAttempts);
 
     // Scene setup
     const scene = new THREE.Scene();
-    scene.background = new THREE.Color(0x000000);
-    scene.fog = new THREE.FogExp2(0x0a1508, 0.08);
+    scene.background = new THREE.Color(0x0f140f);
+    scene.fog = new THREE.Fog(0x2a3520, 3, 35);
 
     const camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 100);
-    camera.position.set(0, 1.6, 5);
-    camera.lookAt(0, 1.6, 0);
+    camera.position.set(0, 1.6, 0);
 
     const canvas = document.getElementById('canvas');
     const renderer = new THREE.WebGLRenderer({ canvas: canvas, antialias: true });
@@ -260,188 +319,398 @@
     renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
     renderer.shadowMap.enabled = true;
     renderer.shadowMap.type = THREE.PCFSoftShadowMap;
+    
+    renderer.outputEncoding = THREE.sRGBEncoding;
     renderer.toneMapping = THREE.ACESFilmicToneMapping;
-    renderer.toneMappingExposure = 0.6;
+    renderer.toneMappingExposure = 0.5;
+    renderer.physicallyCorrectLights = true;
 
-    console.log('Renderer initialized');
+    // Textures (simplified for performance)
+    function createCarpetTexture() {
+      const canvas = document.createElement('canvas');
+      canvas.width = 512;
+      canvas.height = 512;
+      const ctx = canvas.getContext('2d');
+      
+      for (let y = 0; y < 512; y += 4) {
+        for (let x = 0; x < 512; x += 4) {
+          const baseR = 74 + Math.random() * 20 - 10;
+          const baseG = 72 + Math.random() * 18 - 9;
+          const baseB = 53 + Math.random() * 15 - 7;
+          ctx.fillStyle = `rgb(${baseR}, ${baseG}, ${baseB})`;
+          ctx.fillRect(x, y, 4, 4);
+        }
+      }
+      
+      for (let i = 0; i < 4000; i++) {
+        const x = Math.random() * 512;
+        const y = Math.random() * 512;
+        const brightness = Math.random() * 40 - 20;
+        ctx.fillStyle = `rgba(${80 + brightness}, ${75 + brightness}, ${55 + brightness}, 0.5)`;
+        ctx.fillRect(x, y, 1, 2);
+      }
+      
+      const texture = new THREE.CanvasTexture(canvas);
+      texture.wrapS = texture.wrapT = THREE.RepeatWrapping;
+      texture.encoding = THREE.sRGBEncoding;
+      return texture;
+    }
+    
+    function createWallTexture() {
+      const canvas = document.createElement('canvas');
+      canvas.width = 512;
+      canvas.height = 512;
+      const ctx = canvas.getContext('2d');
+      
+      for (let y = 0; y < 512; y += 2) {
+        for (let x = 0; x < 512; x += 2) {
+          const baseR = 122 + Math.random() * 16 - 8;
+          const baseG = 133 + Math.random() * 14 - 7;
+          const baseB = 96 + Math.random() * 12 - 6;
+          ctx.fillStyle = `rgb(${baseR}, ${baseG}, ${baseB})`;
+          ctx.fillRect(x, y, 2, 2);
+        }
+      }
+      
+      const texture = new THREE.CanvasTexture(canvas);
+      texture.wrapS = texture.wrapT = THREE.RepeatWrapping;
+      texture.encoding = THREE.sRGBEncoding;
+      return texture;
+    }
+    
+    function createCeilingTexture() {
+      const canvas = document.createElement('canvas');
+      canvas.width = 512;
+      canvas.height = 512;
+      const ctx = canvas.getContext('2d');
+      
+      // Base painted ceiling color
+      for (let y = 0; y < 512; y += 2) {
+        for (let x = 0; x < 512; x += 2) {
+          const baseR = 138 + Math.random() * 16 - 8;
+          const baseG = 148 + Math.random() * 14 - 7;
+          const baseB = 117 + Math.random() * 12 - 6;
+          ctx.fillStyle = `rgb(${baseR}, ${baseG}, ${baseB})`;
+          ctx.fillRect(x, y, 2, 2);
+        }
+      }
+      
+      // Water stains
+      ctx.globalAlpha = 0.25;
+      for (let i = 0; i < 8; i++) {
+        const x = Math.random() * 512;
+        const y = Math.random() * 512;
+        const size = Math.random() * 50 + 30;
+        const gradient = ctx.createRadialGradient(x, y, 0, x, y, size);
+        gradient.addColorStop(0, '#5a5d48');
+        gradient.addColorStop(1, 'rgba(90, 93, 72, 0)');
+        ctx.fillStyle = gradient;
+        ctx.fillRect(x - size, y - size, size * 2, size * 2);
+      }
+      
+      // Paint texture details
+      ctx.globalAlpha = 0.4;
+      for (let i = 0; i < 1500; i++) {
+        const brightness = Math.random() * 30 - 15;
+        ctx.fillStyle = `rgb(${138 + brightness}, ${148 + brightness}, ${117 + brightness})`;
+        ctx.fillRect(Math.random() * 512, Math.random() * 512, 1, 1);
+      }
+      
+      const texture = new THREE.CanvasTexture(canvas);
+      texture.wrapS = texture.wrapT = THREE.RepeatWrapping;
+      texture.encoding = THREE.sRGBEncoding;
+      return texture;
+    }
 
-    // Materials with more texture and grime
-    const wallMaterial = new THREE.MeshStandardMaterial({
-      color: 0xa8b8a0,
-      roughness: 0.95,
-      metalness: 0.02
-    });
+    const carpetColor = createCarpetTexture();
+    carpetColor.repeat.set(12, 12);
+    
+    const wallColor = createWallTexture();
+    wallColor.repeat.set(2, 1);
+    
+    const ceilingColor = createCeilingTexture();
+    ceilingColor.repeat.set(4, 4);
 
+    // Materials
     const floorMaterial = new THREE.MeshStandardMaterial({
-      color: 0x8a9a85,
-      roughness: 0.9,
-      metalness: 0.02
+      map: carpetColor,
+      roughness: 0.98,
+      metalness: 0
     });
-
-    const columnMaterial = new THREE.MeshStandardMaterial({
-      color: 0xb0c0a8,
-      roughness: 0.92,
-      metalness: 0.03
+    
+    const wallMaterial = new THREE.MeshStandardMaterial({
+      map: wallColor,
+      roughness: 0.88,
+      metalness: 0
     });
 
     const ceilingMaterial = new THREE.MeshStandardMaterial({
-      color: 0x95a590,
-      roughness: 0.95,
-      metalness: 0.01
+      map: ceilingColor,
+      roughness: 0.92,
+      metalness: 0
     });
 
     const panelMaterial = new THREE.MeshStandardMaterial({
-      color: 0xc0ffc0,
-      emissive: 0x40a040,
-      emissiveIntensity: 4,
-      roughness: 0.3,
+      color: 0xffffff,
+      emissive: 0xb8c4a8,
+      emissiveIntensity: 3.5,
+      roughness: 0.25,
+      metalness: 0.08
+    });
+
+    const doorMaterial = new THREE.MeshStandardMaterial({
+      color: 0x3a4a2a,
+      roughness: 0.7,
       metalness: 0.1
     });
 
-    // Create endless backroom
-    function createRoomSection(offsetX, offsetZ) {
+    // Collision system
+    const collisionWalls = [];
+    let doorMesh = null;
+    
+    function createCorridor() {
       const group = new THREE.Group();
-      const size = 20;
+      const width = 3;
+      const height = 2.7;
+      const length = 40; // Longer hallway
 
       // Floor
-      const floorGeo = new THREE.PlaneGeometry(size, size, 10, 10);
-      const floor = new THREE.Mesh(floorGeo, floorMaterial);
+      const floor = new THREE.Mesh(
+        new THREE.PlaneGeometry(width, length),
+        floorMaterial
+      );
       floor.rotation.x = -Math.PI / 2;
-      floor.position.set(offsetX, 0, offsetZ);
       floor.receiveShadow = true;
-
-      // Add slight random height variations for realism
-      const posAttr = floorGeo.attributes.position;
-      for (let i = 0; i < posAttr.count; i++) {
-        posAttr.setZ(i, posAttr.getZ(i) + (Math.random() - 0.5) * 0.02);
-      }
-      floorGeo.computeVertexNormals();
-
       group.add(floor);
 
-      // Ceiling with tiles
-      const ceilingY = 2.7;
-      const ceilingGeo = new THREE.PlaneGeometry(size, size);
-      const ceiling = new THREE.Mesh(ceilingGeo, ceilingMaterial);
-      ceiling.rotation.x = Math.PI / 2;
-      ceiling.position.set(offsetX, ceilingY, offsetZ);
-      ceiling.receiveShadow = true;
-      group.add(ceiling);
-
-      // Walls - create maze-like structure
-      const wallHeight = 2.7;
-      const wallConfigs = [
-        // Create irregular corridors
-        { x: -size/2, z: 0, w: 0.15, d: size, rot: 0 },
-        { x: size/2, z: 0, w: 0.15, d: size, rot: 0 },
-        { x: 0, z: -size/2, w: size, d: 0.15, rot: 0 },
-        { x: 0, z: size/2, w: size, d: 0.15, rot: 0 },
-      ];
-
-      // Add some internal walls randomly
-      for (let i = 0; i < 3; i++) {
-        const rx = (Math.random() - 0.5) * size * 0.6;
-        const rz = (Math.random() - 0.5) * size * 0.6;
-        const isHorizontal = Math.random() > 0.5;
-
-        wallConfigs.push({
-          x: rx,
-          z: rz,
-          w: isHorizontal ? 8 : 0.15,
-          d: isHorizontal ? 0.15 : 8,
-          rot: 0
-        });
+      // Ceiling with realistic drop ceiling tiles
+      const tileSize = 0.6;
+      const numTilesWidth = Math.ceil(width / tileSize);
+      const numTilesLength = Math.ceil(length / tileSize);
+      
+      // Create individual ceiling tiles
+      for (let x = 0; x < numTilesWidth; x++) {
+        for (let z = 0; z < numTilesLength; z++) {
+          const tile = new THREE.Mesh(
+            new THREE.PlaneGeometry(tileSize - 0.01, tileSize - 0.01),
+            ceilingMaterial.clone()
+          );
+          tile.rotation.x = Math.PI / 2;
+          const posX = (x - numTilesWidth / 2) * tileSize + tileSize / 2;
+          const posZ = (z - numTilesLength / 2) * tileSize + tileSize / 2;
+          tile.position.set(posX, height - 0.01, posZ);
+          tile.receiveShadow = true;
+          group.add(tile);
+        }
       }
-
-      wallConfigs.forEach(config => {
-        const wall = new THREE.Mesh(
-          new THREE.BoxGeometry(config.w, wallHeight, config.d),
-          wallMaterial
-        );
-        wall.position.set(offsetX + config.x, wallHeight / 2, offsetZ + config.z);
-        wall.castShadow = true;
-        wall.receiveShadow = true;
-        group.add(wall);
+      
+      // Ceiling grid framework (dark green metal)
+      const gridMaterial = new THREE.MeshStandardMaterial({
+        color: 0x4a5a3a,
+        roughness: 0.7,
+        metalness: 0.3
       });
-
-      // Columns - irregular placement
-      const columnPositions = [
-        [-6, -6], [-6, 0], [-6, 6],
-        [0, -6], [0, 6],
-        [6, -6], [6, 0], [6, 6]
-      ];
-
-      columnPositions.forEach(([x, z]) => {
-        const column = new THREE.Mesh(
-          new THREE.BoxGeometry(0.5, wallHeight, 0.5),
-          columnMaterial
+      
+      const gridThickness = 0.02;
+      const gridDepth = 0.03;
+      
+      // Horizontal grid lines
+      for (let z = -length / 2; z <= length / 2; z += tileSize) {
+        const grid = new THREE.Mesh(
+          new THREE.BoxGeometry(width, gridDepth, gridThickness),
+          gridMaterial
         );
-        column.position.set(offsetX + x, wallHeight / 2, offsetZ + z);
-        column.castShadow = true;
-        column.receiveShadow = true;
-        group.add(column);
+        grid.position.set(0, height - gridDepth / 2, z);
+        grid.castShadow = true;
+        group.add(grid);
+      }
+      
+      // Vertical grid lines
+      for (let x = -width / 2; x <= width / 2; x += tileSize) {
+        const grid = new THREE.Mesh(
+          new THREE.BoxGeometry(gridThickness, gridDepth, length),
+          gridMaterial
+        );
+        grid.position.set(x, height - gridDepth / 2, 0);
+        grid.castShadow = true;
+        group.add(grid);
+      }
+      
+      // Walls
+      const leftWall = new THREE.Mesh(
+        new THREE.PlaneGeometry(length, height),
+        wallMaterial
+      );
+      leftWall.rotation.y = Math.PI / 2;
+      leftWall.position.set(-width / 2, height / 2, 0);
+      leftWall.receiveShadow = true;
+      leftWall.castShadow = true;
+      group.add(leftWall);
+      
+      const rightWall = new THREE.Mesh(
+        new THREE.PlaneGeometry(length, height),
+        wallMaterial
+      );
+      rightWall.rotation.y = -Math.PI / 2;
+      rightWall.position.set(width / 2, height / 2, 0);
+      rightWall.receiveShadow = true;
+      rightWall.castShadow = true;
+      group.add(rightWall);
+      
+      // Baseboards
+      const baseboardMaterial = new THREE.MeshStandardMaterial({
+        color: 0x3a3d28,
+        roughness: 0.8,
+        metalness: 0
       });
-
-      // Ceiling panels - flickering effect will be added in animation
-      const panelPositions = [
-        [-7, -7], [-7, 0], [-7, 7],
-        [0, -7], [0, 7],
-        [7, -7], [7, 0], [7, 7]
-      ];
-
-      panelPositions.forEach(([x, z]) => {
+      
+      const baseboardHeight = 0.08;
+      const baseboardDepth = 0.02;
+      
+      const leftBaseboard = new THREE.Mesh(
+        new THREE.BoxGeometry(length, baseboardHeight, baseboardDepth),
+        baseboardMaterial
+      );
+      leftBaseboard.position.set(-width / 2 + baseboardDepth / 2, baseboardHeight / 2, 0);
+      leftBaseboard.rotation.y = Math.PI / 2;
+      leftBaseboard.receiveShadow = true;
+      group.add(leftBaseboard);
+      
+      const rightBaseboard = new THREE.Mesh(
+        new THREE.BoxGeometry(length, baseboardHeight, baseboardDepth),
+        baseboardMaterial
+      );
+      rightBaseboard.position.set(width / 2 - baseboardDepth / 2, baseboardHeight / 2, 0);
+      rightBaseboard.rotation.y = Math.PI / 2;
+      rightBaseboard.receiveShadow = true;
+      group.add(rightBaseboard);
+      
+      // Door at the end
+      const door = new THREE.Mesh(
+        new THREE.BoxGeometry(1.2, 2.2, 0.1),
+        doorMaterial
+      );
+      door.position.set(0, 1.1, -length / 2 + 0.05);
+      door.castShadow = true;
+      door.receiveShadow = true;
+      door.userData.isDoor = true;
+      group.add(door);
+      doorMesh = door;
+      
+      // Door frame
+      const frameMaterial = new THREE.MeshStandardMaterial({ color: 0x2a2d1a, roughness: 0.8 });
+      const frameThickness = 0.1;
+      
+      const topFrame = new THREE.Mesh(
+        new THREE.BoxGeometry(1.4, frameThickness, frameThickness),
+        frameMaterial
+      );
+      topFrame.position.set(0, 2.2, -length / 2);
+      group.add(topFrame);
+      
+      const leftFrame = new THREE.Mesh(
+        new THREE.BoxGeometry(frameThickness, 2.4, frameThickness),
+        frameMaterial
+      );
+      leftFrame.position.set(-0.7, 1.2, -length / 2);
+      group.add(leftFrame);
+      
+      const rightFrame = new THREE.Mesh(
+        new THREE.BoxGeometry(frameThickness, 2.4, frameThickness),
+        frameMaterial
+      );
+      rightFrame.position.set(0.7, 1.2, -length / 2);
+      group.add(rightFrame);
+      
+      // Realistic ceiling panels - recessed fixtures
+      for (let z = -length / 2 + 4; z < length / 2 - 4; z += 3.6) {
+        // Recessed housing/frame
+        const housingMaterial = new THREE.MeshStandardMaterial({
+          color: 0x5a6550,
+          roughness: 0.85,
+          metalness: 0.1
+        });
+        
+        const housing = new THREE.Mesh(
+          new THREE.BoxGeometry(1.3, 0.08, 0.65),
+          housingMaterial
+        );
+        housing.position.set(0, height - 0.08, z);
+        housing.receiveShadow = true;
+        group.add(housing);
+        
+        // Light diffuser panel (translucent)
+        const diffuserMaterial = new THREE.MeshStandardMaterial({
+          color: 0xf5f5e8,
+          emissive: 0xc8d4b8,
+          emissiveIntensity: 4.5,
+          roughness: 0.4,
+          metalness: 0,
+          opacity: 0.9,
+          transparent: true
+        });
+        
         const panel = new THREE.Mesh(
-          new THREE.BoxGeometry(1.8, 0.08, 0.9),
-          panelMaterial.clone()
+          new THREE.BoxGeometry(1.2, 0.02, 0.6),
+          diffuserMaterial
         );
-        panel.position.set(offsetX + x, ceilingY - 0.15, offsetZ + z);
+        panel.position.set(0, height - 0.04, z);
         panel.userData.isPanel = true;
-        panel.userData.flickerOffset = Math.random() * 100;
+        panel.userData.baseIntensity = 4.5;
+        panel.castShadow = false;
         group.add(panel);
+        
+        // Bright point light from inside fixture
+        const light = new THREE.PointLight(0xc8d4b8, 6, 20);
+        light.position.set(0, height - 0.1, z);
+        light.decay = 2;
+        light.castShadow = false;
+        group.add(light);
+      }
+      
+      // Collision walls
+      collisionWalls.push({
+        minX: -width / 2 - 0.1,
+        maxX: -width / 2 + 0.1,
+        minZ: -length / 2,
+        maxZ: length / 2
+      });
+      
+      collisionWalls.push({
+        minX: width / 2 - 0.1,
+        maxX: width / 2 + 0.1,
+        minZ: -length / 2,
+        maxZ: length / 2
+      });
+      
+      // Back wall collision (door wall)
+      collisionWalls.push({
+        minX: -width / 2,
+        maxX: width / 2,
+        minZ: -length / 2 - 0.1,
+        maxZ: -length / 2 + 0.1
       });
 
       return group;
     }
 
-    // Create 3x3 grid of rooms
-    const rooms = [];
-    for (let x = -1; x <= 1; x++) {
-      for (let z = -1; z <= 1; z++) {
-        const room = createRoomSection(x * 20, z * 20);
-        rooms.push({
-          mesh: room,
-          gridX: x,
-          gridZ: z
-        });
-        scene.add(room);
-      }
-    }
-    console.log('Rooms created');
-
-    // Lighting - fewer lights, more dramatic
-    const ambientLight = new THREE.AmbientLight(0x304030, 0.15);
+    // Create initial corridor
+    const corridor = createCorridor();
+    scene.add(corridor);
+    
+    // Lighting
+    const ambientLight = new THREE.AmbientLight(0x6a7a5a, 0.4);
     scene.add(ambientLight);
 
-    // Key lights positioned for dramatic effect
-    const keyLight1 = new THREE.PointLight(0x60a060, 2, 20);
-    keyLight1.position.set(0, 2.5, 0);
-    keyLight1.castShadow = true;
-    scene.add(keyLight1);
-
-    const keyLight2 = new THREE.PointLight(0x50a050, 1.5, 18);
-    keyLight2.position.set(8, 2.5, 8);
-    scene.add(keyLight2);
-
-    const keyLight3 = new THREE.PointLight(0x50a050, 1.5, 18);
-    keyLight3.position.set(-8, 2.5, -8);
-    scene.add(keyLight3);
-
-    // Dim fill light
-    const fillLight = new THREE.DirectionalLight(0x405040, 0.2);
-    fillLight.position.set(5, 10, 5);
-    scene.add(fillLight);
-
-    console.log('Lighting added');
+    const hemiLight = new THREE.HemisphereLight(0x808a60, 0x4a5438, 0.5);
+    scene.add(hemiLight);
+    
+    const dirLight = new THREE.DirectionalLight(0x7a8a6a, 0.3);
+    dirLight.position.set(0, 10, -10);
+    dirLight.castShadow = true;
+    dirLight.shadow.mapSize.width = 1024;
+    dirLight.shadow.mapSize.height = 1024;
+    scene.add(dirLight);
 
     // Controls
     const keys = {};
@@ -451,9 +720,18 @@
 
     window.addEventListener('keydown', (e) => {
       keys[e.code] = true;
+      
+      if (e.code === 'KeyE' && state.nearDoor && !state.hudVisible) {
+        state.hudVisible = true;
+        document.getElementById('hud').classList.add('show');
+        document.getElementById('doorPrompt').classList.remove('show');
+      }
+      
       if (e.code === 'Escape' && state.started) {
-        state.hudVisible = !state.hudVisible;
-        document.getElementById('hud').classList.toggle('show', state.hudVisible);
+        if (state.hudVisible && !state.nearDoor) {
+          state.hudVisible = false;
+          document.getElementById('hud').classList.remove('show');
+        }
       }
     });
 
@@ -465,7 +743,6 @@
       if (!state.started) {
         state.started = true;
         document.getElementById('loading').style.display = 'none';
-        console.log('Game started');
       }
       canvas.requestPointerLock();
     });
@@ -482,7 +759,7 @@
       }
     });
 
-    // HUD Controls
+    // HUD
     const recordBtn = document.getElementById('recordBtn');
     const attemptCounter = document.getElementById('attemptCounter');
     const feedback = document.getElementById('feedback');
@@ -508,10 +785,19 @@
 
         if (state.attempts >= state.targetAttempts) {
           state.exitAuthorized = true;
-          showFeedback('EXIT AUTHORIZED', true);
-          setTimeout(exitExperience, 2000);
+          showFeedback('COMPLIANCE ACCEPTED', true);
+          setTimeout(() => {
+            document.getElementById('hud').classList.remove('show');
+            state.hudVisible = false;
+            openDoor();
+          }, 1500);
         } else {
-          showFeedback('NONCOMPLIANT — BEGIN AGAIN.');
+          showFeedback('NONCOMPLIANT — DOOR REMAINS LOCKED');
+          setTimeout(() => {
+            document.getElementById('hud').classList.remove('show');
+            state.hudVisible = false;
+            resetToStart();
+          }, 2000);
         }
       }
     }
@@ -521,6 +807,7 @@
 
     function showFeedback(message, success = false) {
       feedback.textContent = message;
+      feedback.className = 'gw-glass-dark';
       feedback.style.display = 'block';
       feedback.style.borderColor = success ? '#008F46' : '#a03030';
       feedback.style.color = success ? '#008F46' : '#ff6060';
@@ -529,7 +816,8 @@
       }, 2000);
     }
     
-    function exitExperience() {
+    function openDoor() {
+      // Exit to homepage
       const overlay = document.getElementById('fadeOverlay');
       overlay.classList.add('active');
       setTimeout(() => {
@@ -537,20 +825,44 @@
       }, 1000);
     }
 
-    // Movement with head bob
-    const moveSpeed = 3.5;
+    function resetToStart() {
+      // Reset player to start of hallway
+      camera.position.set(0, 1.6, 18);
+      state.nearDoor = false;
+      state.hallwaysPassed++;
+      
+      // Generate new random target
+      state.targetAttempts = Math.floor(Math.random() * 100) + 1;
+      state.attempts = 0;
+      attemptCounter.textContent = 'Attempts: 0';
+      console.log('New target attempts:', state.targetAttempts);
+    }
+    
+    // Collision
+    function checkCollision(x, z, radius) {
+      for (let wall of collisionWalls) {
+        if (x >= wall.minX - radius && x <= wall.maxX + radius && 
+            z >= wall.minZ - radius && z <= wall.maxZ + radius) {
+          return true;
+        }
+      }
+      return false;
+    }
+    
+    // Movement
+    const moveSpeed = 4;
     let bobPhase = 0;
+    const playerRadius = 0.3;
 
     function updateMovement(delta) {
-      if (!state.started) return;
+      if (!state.started || state.hudVisible) return;
 
       const velocity = new THREE.Vector3();
-      let isMoving = false;
-
-      if (keys['KeyW']) { velocity.z = -1; isMoving = true; }
-      if (keys['KeyS']) { velocity.z = 1; isMoving = true; }
-      if (keys['KeyA']) { velocity.x = -1; isMoving = true; }
-      if (keys['KeyD']) { velocity.x = 1; isMoving = true; }
+      
+      if (keys['KeyW']) velocity.z = 1;
+      if (keys['KeyS']) velocity.z = -1;
+      if (keys['KeyA']) velocity.x = -1;
+      if (keys['KeyD']) velocity.x = 1;
 
       if (velocity.length() > 0) {
         velocity.normalize();
@@ -563,48 +875,57 @@
         const right = new THREE.Vector3();
         right.crossVectors(camera.up, direction).normalize();
 
-        camera.position.add(direction.multiplyScalar(velocity.z * moveSpeed * delta));
-        camera.position.add(right.multiplyScalar(-velocity.x * moveSpeed * delta));
-
-        // Head bob
-        bobPhase += delta * 8;
-        camera.position.y = 1.6 + Math.sin(bobPhase) * 0.03;
+        const moveZ = direction.clone().multiplyScalar(velocity.z * moveSpeed * delta);
+        const moveX = right.clone().multiplyScalar(-velocity.x * moveSpeed * delta);
+        
+        const oldX = camera.position.x;
+        const oldZ = camera.position.z;
+        const newX = oldX + moveX.x + moveZ.x;
+        const newZ = oldZ + moveX.z + moveZ.z;
+        
+        if (!checkCollision(newX, newZ, playerRadius)) {
+          camera.position.x = newX;
+          camera.position.z = newZ;
+        } else {
+          const tryX = oldX + moveX.x;
+          if (!checkCollision(tryX, oldZ, playerRadius)) {
+            camera.position.x = tryX;
+          }
+          
+          const tryZ = oldZ + moveZ.z;
+          if (!checkCollision(oldX, tryZ, playerRadius)) {
+            camera.position.z = tryZ;
+          }
+        }
+        
+        bobPhase += delta * 6;
+        camera.position.y = 1.6 + Math.sin(bobPhase) * 0.015;
       } else {
-        // Return to normal height
         camera.position.y += (1.6 - camera.position.y) * delta * 5;
       }
 
-      // Update camera rotation
       camera.rotation.order = 'YXZ';
       camera.rotation.y = mouseX;
       camera.rotation.x = mouseY;
 
-      // Room recycling for endless effect
-      const playerTileX = Math.round(camera.position.x / 20);
-      const playerTileZ = Math.round(camera.position.z / 20);
-
-      rooms.forEach(room => {
-        const dx = room.gridX - playerTileX;
-        const dz = room.gridZ - playerTileZ;
-
-        if (Math.abs(dx) > 1 || Math.abs(dz) > 1) {
-          // Recycle this room
-          if (Math.abs(dx) > 1) {
-            room.gridX = playerTileX + (dx > 0 ? 1 : -1);
-          }
-          if (Math.abs(dz) > 1) {
-            room.gridZ = playerTileZ + (dz > 0 ? 1 : -1);
-          }
-
-          room.mesh.position.x = room.gridX * 20;
-          room.mesh.position.z = room.gridZ * 20;
+      // Check if near door
+      if (doorMesh) {
+        const doorPos = new THREE.Vector3();
+        doorMesh.getWorldPosition(doorPos);
+        const distance = camera.position.distanceTo(doorPos);
+        
+        if (distance < 3 && !state.nearDoor) {
+          state.nearDoor = true;
+          document.getElementById('doorPrompt').classList.add('show');
+        } else if (distance >= 3 && state.nearDoor) {
+          state.nearDoor = false;
+          document.getElementById('doorPrompt').classList.remove('show');
         }
-      });
+      }
     }
-
-    // Animation loop with flickering panels
+    
+    // Animation
     const clock = new THREE.Clock();
-    let frameCount = 0;
 
     function animate() {
       requestAnimationFrame(animate);
@@ -614,43 +935,28 @@
 
       updateMovement(delta);
 
-      // Flicker ceiling panels
+      // Panel flicker
       scene.traverse((obj) => {
         if (obj.userData.isPanel) {
-          const flicker = Math.sin(time * 3 + obj.userData.flickerOffset) * 0.5 + 0.5;
-          const noise = Math.random() * 0.1;
-          obj.material.emissiveIntensity = 3 + flicker * 1.5 + noise;
+          const flicker = Math.sin(time * 0.3) * 0.15 + (Math.random() - 0.5) * 0.05;
+          obj.material.emissiveIntensity = obj.userData.baseIntensity + flicker;
         }
       });
 
       renderer.render(scene, camera);
-
-      frameCount++;
-      if (frameCount === 1) {
-        console.log('First frame rendered!');
-        document.getElementById('loading').textContent = 'CLICK TO START';
-      }
     }
-
-    console.log('Starting animation loop...');
+    
     animate();
 
-    // Handle window resize
     window.addEventListener('resize', () => {
       camera.aspect = window.innerWidth / window.innerHeight;
       camera.updateProjectionMatrix();
       renderer.setSize(window.innerWidth, window.innerHeight);
     });
 
-    // Show HUD after exploring
     setTimeout(() => {
-      if (state.started) {
-        state.hudVisible = true;
-        document.getElementById('hud').classList.add('show');
-      }
-    }, 8000);
-
-    console.log('Setup complete!');
+      document.getElementById('loading').textContent = 'CLICK TO START';
+    }, 100);
   </script>
 </body>
 </html>

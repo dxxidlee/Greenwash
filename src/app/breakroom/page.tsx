@@ -3,8 +3,9 @@ import { useEffect } from 'react';
 
 export default function BreakRoomPage() {
   useEffect(() => {
-    // Redirect to the local breakroom-vr index.html
-    window.location.href = '/breakroom-vr/index.html';
+    // Redirect to the local breakroom-vr index.html with cache busting
+    const timestamp = Date.now();
+    window.location.href = `/breakroom-vr/index.html?v=${timestamp}`;
   }, []);
 
   return (
