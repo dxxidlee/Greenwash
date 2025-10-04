@@ -34,6 +34,10 @@
       filter: contrast(1.08) saturate(0.85) brightness(0.95);
     }
     
+    #canvas.hud-active {
+      pointer-events: none;
+    }
+    
     /* iOS-style glass pill used for hover labels */
     .gw-glass {
       color: #fff;
@@ -98,10 +102,16 @@
       display: none;
       z-index: 100;
       box-shadow: 0 4px 20px rgba(0, 0, 0, 0.5), inset 0 1px 0 rgba(0, 143, 70, 0.2);
+      pointer-events: none;
     }
     
     #hud.show {
       display: block;
+      pointer-events: auto;
+    }
+    
+    #hud * {
+      pointer-events: auto;
     }
     
     .hud-title {
@@ -123,6 +133,7 @@
     
     .hud-controls {
       display: flex;
+      flex-direction: column;
       align-items: center;
       justify-content: center;
       gap: 15px;
@@ -143,6 +154,8 @@
       letter-spacing: 2px;
       text-transform: uppercase;
       box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
+      user-select: none;
+      -webkit-user-select: none;
     }
     
     #recordBtn:hover {
@@ -152,6 +165,37 @@
     #recordBtn.holding {
       background: #005a2b;
       box-shadow: 0 0 20px rgba(0, 143, 70, 0.5);
+    }
+    
+    #voiceMemoVisualizer {
+      display: none;
+      width: 300px;
+      height: 80px;
+      margin: 15px auto;
+      background: rgba(0, 0, 0, 0.4);
+      border-radius: 8px;
+      padding: 10px;
+      position: relative;
+      overflow: hidden;
+    }
+    
+    #voiceMemoVisualizer.active {
+      display: block;
+    }
+    
+    .waveform-container {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      height: 100%;
+      gap: 3px;
+    }
+    
+    .waveform-bar {
+      width: 4px;
+      background: #008F46;
+      border-radius: 2px;
+      transition: height 0.1s ease;
     }
     
     #attemptCounter {
@@ -279,6 +323,9 @@
     </div>
     <div class="hud-controls">
       <button id="recordBtn">Hold to Record</button>
+      <div id="voiceMemoVisualizer">
+        <div class="waveform-container" id="waveformContainer"></div>
+      </div>
       <div id="attemptCounter">Attempts: 0</div>
     </div>
   </div>
@@ -325,7 +372,7 @@
     renderer.toneMappingExposure = 0.5;
     renderer.physicallyCorrectLights = true;
 
-    // Textures (simplified for performance)
+    // Textures
     function createCarpetTexture() {
       const canvas = document.createElement('canvas');
       canvas.width = 512;
@@ -384,7 +431,6 @@
       canvas.height = 512;
       const ctx = canvas.getContext('2d');
       
-      // Base painted ceiling color
       for (let y = 0; y < 512; y += 2) {
         for (let x = 0; x < 512; x += 2) {
           const baseR = 138 + Math.random() * 16 - 8;
@@ -395,7 +441,6 @@
         }
       }
       
-      // Water stains
       ctx.globalAlpha = 0.25;
       for (let i = 0; i < 8; i++) {
         const x = Math.random() * 512;
@@ -408,12 +453,52 @@
         ctx.fillRect(x - size, y - size, size * 2, size * 2);
       }
       
-      // Paint texture details
       ctx.globalAlpha = 0.4;
       for (let i = 0; i < 1500; i++) {
         const brightness = Math.random() * 30 - 15;
         ctx.fillStyle = `rgb(${138 + brightness}, ${148 + brightness}, ${117 + brightness})`;
         ctx.fillRect(Math.random() * 512, Math.random() * 512, 1, 1);
+      }
+      
+      const texture = new THREE.CanvasTexture(canvas);
+      texture.wrapS = texture.wrapT = THREE.RepeatWrapping;
+      texture.encoding = THREE.sRGBEncoding;
+      return texture;
+    }
+
+    function createWoodTexture() {
+      const canvas = document.createElement('canvas');
+      canvas.width = 512;
+      canvas.height = 512;
+      const ctx = canvas.getContext('2d');
+      
+      // Base wood color
+      const gradient = ctx.createLinearGradient(0, 0, 512, 0);
+      gradient.addColorStop(0, '#3a4a2a');
+      gradient.addColorStop(0.5, '#445530');
+      gradient.addColorStop(1, '#3a4a2a');
+      ctx.fillStyle = gradient;
+      ctx.fillRect(0, 0, 512, 512);
+      
+      // Wood grain lines
+      ctx.strokeStyle = 'rgba(30, 40, 20, 0.3)';
+      for (let i = 0; i < 40; i++) {
+        ctx.beginPath();
+        ctx.lineWidth = Math.random() * 2 + 0.5;
+        const y = Math.random() * 512;
+        const curve = Math.random() * 20 - 10;
+        ctx.moveTo(0, y);
+        ctx.quadraticCurveTo(256, y + curve, 512, y);
+        ctx.stroke();
+      }
+      
+      // Wood texture detail
+      for (let i = 0; i < 3000; i++) {
+        const x = Math.random() * 512;
+        const y = Math.random() * 512;
+        const brightness = Math.random() * 30 - 15;
+        ctx.fillStyle = `rgba(${58 + brightness}, ${74 + brightness}, ${42 + brightness}, 0.4)`;
+        ctx.fillRect(x, y, 1, 1);
       }
       
       const texture = new THREE.CanvasTexture(canvas);
@@ -430,6 +515,9 @@
     
     const ceilingColor = createCeilingTexture();
     ceilingColor.repeat.set(4, 4);
+
+    const woodColor = createWoodTexture();
+    woodColor.repeat.set(1, 3);
 
     // Materials
     const floorMaterial = new THREE.MeshStandardMaterial({
@@ -459,9 +547,9 @@
     });
 
     const doorMaterial = new THREE.MeshStandardMaterial({
-      color: 0x3a4a2a,
+      map: woodColor,
       roughness: 0.7,
-      metalness: 0.1
+      metalness: 0.05
     });
 
     // Collision system
@@ -472,7 +560,7 @@
       const group = new THREE.Group();
       const width = 3;
       const height = 2.7;
-      const length = 40; // Longer hallway
+      const length = 40;
 
       // Floor
       const floor = new THREE.Mesh(
@@ -488,7 +576,6 @@
       const numTilesWidth = Math.ceil(width / tileSize);
       const numTilesLength = Math.ceil(length / tileSize);
       
-      // Create individual ceiling tiles
       for (let x = 0; x < numTilesWidth; x++) {
         for (let z = 0; z < numTilesLength; z++) {
           const tile = new THREE.Mesh(
@@ -504,7 +591,7 @@
         }
       }
       
-      // Ceiling grid framework (dark green metal)
+      // Ceiling grid framework
       const gridMaterial = new THREE.MeshStandardMaterial({
         color: 0x4a5a3a,
         roughness: 0.7,
@@ -514,7 +601,6 @@
       const gridThickness = 0.02;
       const gridDepth = 0.03;
       
-      // Horizontal grid lines
       for (let z = -length / 2; z <= length / 2; z += tileSize) {
         const grid = new THREE.Mesh(
           new THREE.BoxGeometry(width, gridDepth, gridThickness),
@@ -525,7 +611,6 @@
         group.add(grid);
       }
       
-      // Vertical grid lines
       for (let x = -width / 2; x <= width / 2; x += tileSize) {
         const grid = new THREE.Mesh(
           new THREE.BoxGeometry(gridThickness, gridDepth, length),
@@ -585,44 +670,70 @@
       rightBaseboard.receiveShadow = true;
       group.add(rightBaseboard);
       
-      // Door at the end
+      // Enhanced realistic door with panels
+      const doorGroup = new THREE.Group();
+      doorGroup.position.set(0, 1.1, -length / 2 + 0.05);
+      
+      // Main door body
       const door = new THREE.Mesh(
-        new THREE.BoxGeometry(1.2, 2.2, 0.1),
+        new THREE.BoxGeometry(1.2, 2.2, 0.08),
         doorMaterial
       );
-      door.position.set(0, 1.1, -length / 2 + 0.05);
       door.castShadow = true;
       door.receiveShadow = true;
       door.userData.isDoor = true;
-      group.add(door);
+      doorGroup.add(door);
       doorMesh = door;
       
-      // Door frame
-      const frameMaterial = new THREE.MeshStandardMaterial({ color: 0x2a2d1a, roughness: 0.8 });
-      const frameThickness = 0.1;
+      // Door panels (recessed rectangles)
+      const panelInset = 0.02;
+      const panelMat = new THREE.MeshStandardMaterial({
+        color: 0x2a3520,
+        roughness: 0.8,
+        metalness: 0
+      });
       
-      const topFrame = new THREE.Mesh(
-        new THREE.BoxGeometry(1.4, frameThickness, frameThickness),
-        frameMaterial
+      // Top panel
+      const topPanel = new THREE.Mesh(
+        new THREE.BoxGeometry(0.9, 0.8, panelInset),
+        panelMat
       );
-      topFrame.position.set(0, 2.2, -length / 2);
-      group.add(topFrame);
+      topPanel.position.set(0, 0.5, -0.04);
+      doorGroup.add(topPanel);
       
-      const leftFrame = new THREE.Mesh(
-        new THREE.BoxGeometry(frameThickness, 2.4, frameThickness),
-        frameMaterial
+      // Bottom panel
+      const bottomPanel = new THREE.Mesh(
+        new THREE.BoxGeometry(0.9, 0.8, panelInset),
+        panelMat
       );
-      leftFrame.position.set(-0.7, 1.2, -length / 2);
-      group.add(leftFrame);
+      bottomPanel.position.set(0, -0.5, -0.04);
+      doorGroup.add(bottomPanel);
       
-      const rightFrame = new THREE.Mesh(
-        new THREE.BoxGeometry(frameThickness, 2.4, frameThickness),
-        frameMaterial
+      // Door handle
+      const handleMat = new THREE.MeshStandardMaterial({
+        color: 0x8a8a6a,
+        roughness: 0.3,
+        metalness: 0.8
+      });
+      
+      const handleBase = new THREE.Mesh(
+        new THREE.CylinderGeometry(0.02, 0.02, 0.1, 8),
+        handleMat
       );
-      rightFrame.position.set(0.7, 1.2, -length / 2);
-      group.add(rightFrame);
+      handleBase.rotation.z = Math.PI / 2;
+      handleBase.position.set(0.45, 0, 0.04);
+      doorGroup.add(handleBase);
       
-      // Realistic ceiling panels - recessed fixtures
+      const handleKnob = new THREE.Mesh(
+        new THREE.SphereGeometry(0.04, 8, 8),
+        handleMat
+      );
+      handleKnob.position.set(0.5, 0, 0.04);
+      doorGroup.add(handleKnob);
+      
+      group.add(doorGroup);
+      
+      // Lighting
       for (let z = -length / 2 + 4; z < length / 2 - 4; z += 3.6) {
         // Recessed housing/frame
         const housingMaterial = new THREE.MeshStandardMaterial({
@@ -639,7 +750,7 @@
         housing.receiveShadow = true;
         group.add(housing);
         
-        // Light diffuser panel (translucent)
+        // Light diffuser panel
         const diffuserMaterial = new THREE.MeshStandardMaterial({
           color: 0xf5f5e8,
           emissive: 0xc8d4b8,
@@ -660,7 +771,6 @@
         panel.castShadow = false;
         group.add(panel);
         
-        // Bright point light from inside fixture
         const light = new THREE.PointLight(0xc8d4b8, 6, 20);
         light.position.set(0, height - 0.1, z);
         light.decay = 2;
@@ -683,7 +793,6 @@
         maxZ: length / 2
       });
       
-      // Back wall collision (door wall)
       collisionWalls.push({
         minX: -width / 2,
         maxX: width / 2,
@@ -712,6 +821,30 @@
     dirLight.shadow.mapSize.height = 1024;
     scene.add(dirLight);
 
+    // Voice memo visualizer
+    const waveformContainer = document.getElementById('waveformContainer');
+    const numBars = 30;
+    const waveformBars = [];
+    
+    for (let i = 0; i < numBars; i++) {
+      const bar = document.createElement('div');
+      bar.className = 'waveform-bar';
+      bar.style.height = '10px';
+      waveformContainer.appendChild(bar);
+      waveformBars.push(bar);
+    }
+    
+    function animateWaveform() {
+      if (!state.holding) return;
+      
+      waveformBars.forEach((bar, i) => {
+        const height = Math.random() * 50 + 10;
+        bar.style.height = height + 'px';
+      });
+      
+      requestAnimationFrame(animateWaveform);
+    }
+
     // Controls
     const keys = {};
     let mouseX = 0;
@@ -725,13 +858,9 @@
         state.hudVisible = true;
         document.getElementById('hud').classList.add('show');
         document.getElementById('doorPrompt').classList.remove('show');
-      }
-      
-      if (e.code === 'Escape' && state.started) {
-        if (state.hudVisible && !state.nearDoor) {
-          state.hudVisible = false;
-          document.getElementById('hud').classList.remove('show');
-        }
+        canvas.classList.add('hud-active');
+        // Release pointer lock when HUD opens
+        document.exitPointerLock();
       }
     });
 
@@ -744,7 +873,10 @@
         state.started = true;
         document.getElementById('loading').style.display = 'none';
       }
-      canvas.requestPointerLock();
+      // Only request pointer lock if HUD is not visible
+      if (!state.hudVisible) {
+        canvas.requestPointerLock();
+      }
     });
 
     document.addEventListener('pointerlockchange', () => {
@@ -763,21 +895,31 @@
     const recordBtn = document.getElementById('recordBtn');
     const attemptCounter = document.getElementById('attemptCounter');
     const feedback = document.getElementById('feedback');
+    const voiceVisualizer = document.getElementById('voiceMemoVisualizer');
 
-    recordBtn.addEventListener('mousedown', () => {
+    recordBtn.addEventListener('mousedown', (e) => {
+      e.preventDefault();
+      e.stopPropagation();
       state.holding = true;
       state.holdStart = Date.now();
       recordBtn.classList.add('holding');
       recordBtn.textContent = 'RECORDING...';
+      voiceVisualizer.classList.add('active');
+      animateWaveform();
     });
 
-    function handleRecordEnd() {
+    function handleRecordEnd(e) {
+      if (e) {
+        e.preventDefault();
+        e.stopPropagation();
+      }
       if (!state.holding) return;
 
       const holdDuration = (Date.now() - state.holdStart) / 1000;
       state.holding = false;
       recordBtn.classList.remove('holding');
       recordBtn.textContent = 'Hold to Record';
+      voiceVisualizer.classList.remove('active');
 
       if (holdDuration >= 2.0) {
         state.attempts++;
@@ -817,7 +959,6 @@
     }
     
     function openDoor() {
-      // Exit to homepage
       const overlay = document.getElementById('fadeOverlay');
       overlay.classList.add('active');
       setTimeout(() => {
@@ -826,12 +967,10 @@
     }
 
     function resetToStart() {
-      // Reset player to start of hallway
       camera.position.set(0, 1.6, 18);
       state.nearDoor = false;
       state.hallwaysPassed++;
       
-      // Generate new random target
       state.targetAttempts = Math.floor(Math.random() * 100) + 1;
       state.attempts = 0;
       attemptCounter.textContent = 'Attempts: 0';
