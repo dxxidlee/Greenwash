@@ -1,11 +1,7 @@
 'use client';
 
 import React, { useState, useRef, useEffect, useCallback } from 'react';
-import { Camera, RotateCcw, Monitor, Eye } from 'lucide-react';
-import * as THREE from 'three';
-import { ObjectDetector, FilesetResolver } from '@mediapipe/tasks-vision';
-import * as tf from '@tensorflow/tfjs';
-import '@tensorflow/tfjs-backend-webgl';
+import { Camera, RotateCcw, Eye } from 'lucide-react';
 
 export default function HueScan() {
   const [stream, setStream] = useState<MediaStream | null>(null);
@@ -19,11 +15,9 @@ export default function HueScan() {
   const [error, setError] = useState<string | null>(null);
   const [isFlipped, setIsFlipped] = useState(true); // Default to flipped for rear camera
   const [effectsEnabled, setEffectsEnabled] = useState(true);
-  const [cctvMode, setCctvMode] = useState(false);
-  const [webglSupported, setWebglSupported] = useState(false);
   const [fps, setFps] = useState(0);
   const [detectMode, setDetectMode] = useState(false);
-  const [detectionEngine, setDetectionEngine] = useState<'mediapipe' | 'tensorflow' | null>(null);
+  const [detectionEngine, setDetectionEngine] = useState<'color' | null>(null);
   const [detectionFps, setDetectionFps] = useState(0);
   const [inferenceTime, setInferenceTime] = useState(0);
   const [confidenceThreshold, setConfidenceThreshold] = useState(0.6);
@@ -33,44 +27,22 @@ export default function HueScan() {
   const animationRef = useRef<number | null>(null);
   const overlayCanvasRef = useRef<HTMLCanvasElement>(null);
   const effectsCanvasRef = useRef<HTMLCanvasElement>(null);
-  const webglCanvasRef = useRef<HTMLCanvasElement>(null);
   const detectionCanvasRef = useRef<HTMLCanvasElement>(null);
-  const sceneRef = useRef<THREE.Scene | null>(null);
-  const rendererRef = useRef<THREE.WebGLRenderer | null>(null);
-  const composerRef = useRef<any>(null);
-  const lastFrameTimeRef = useRef<number>(0);
-  const frameCountRef = useRef<number>(0);
-  const objectDetectorRef = useRef<ObjectDetector | null>(null);
-  const cocoModelRef = useRef<tf.LayersModel | null>(null);
-  const detectionWorkerRef = useRef<Worker | null>(null);
   const detectionBoxesRef = useRef<Map<string, any>>(new Map());
   const lastDetectionTimeRef = useRef<number>(0);
 
   const targetColor = { r: 0, g: 143, b: 70 }; // #008f46
 
-  // Initialize CCTV and Detect modes from localStorage and URL params
+  // Initialize Detect mode from localStorage and URL params
   useEffect(() => {
     const urlParams = new URLSearchParams(window.location.search);
-    const cctvParam = urlParams.get('cctv') === '1';
     const detectParam = urlParams.get('detect') === '1';
-    const savedCctvMode = localStorage.getItem('huescan-cctv-mode') === 'true';
     const savedDetectMode = localStorage.getItem('huescan-detect-mode') === 'true';
-    const initialCctvMode = cctvParam || savedCctvMode;
     const initialDetectMode = detectParam || savedDetectMode;
-    setCctvMode(initialCctvMode);
     setDetectMode(initialDetectMode);
-    
-    // Check WebGL support
-    const canvas = document.createElement('canvas');
-    const gl = canvas.getContext('webgl') || canvas.getContext('experimental-webgl');
-    setWebglSupported(!!gl);
   }, []);
 
-  // Save modes to localStorage
-  useEffect(() => {
-    localStorage.setItem('huescan-cctv-mode', cctvMode.toString());
-  }, [cctvMode]);
-
+  // Save Detect mode to localStorage
   useEffect(() => {
     localStorage.setItem('huescan-detect-mode', detectMode.toString());
   }, [detectMode]);
@@ -150,190 +122,19 @@ export default function HueScan() {
     setEffectsEnabled(prev => !prev);
   };
 
-  const toggleCctvMode = () => {
-    setCctvMode(prev => !prev);
-  };
-
   const toggleDetectMode = () => {
     setDetectMode(prev => !prev);
   };
-
-  // Initialize WebGL scene for CCTV mode
-  const initWebGLScene = useCallback(() => {
-    if (!webglCanvasRef.current || !videoRef.current) return;
-    
-    const canvas = webglCanvasRef.current;
-    const video = videoRef.current;
-    
-    // Set canvas size
-    canvas.width = video.videoWidth || video.clientWidth;
-    canvas.height = video.videoHeight || video.clientHeight;
-    
-    // Create Three.js scene
-    const scene = new THREE.Scene();
-    const camera = new THREE.OrthographicCamera(-1, 1, 1, -1, 0, 1);
-    
-    // Create renderer
-    const renderer = new THREE.WebGLRenderer({ 
-      canvas, 
-      antialias: false,
-      alpha: false 
-    });
-    renderer.setSize(canvas.width, canvas.height);
-    renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
-    
-    // Create video texture
-    const videoTexture = new THREE.VideoTexture(video);
-    videoTexture.minFilter = THREE.LinearFilter;
-    videoTexture.magFilter = THREE.LinearFilter;
-    videoTexture.format = THREE.RGBAFormat;
-    
-    // CRT Shader Material
-    const crtMaterial = new THREE.ShaderMaterial({
-      uniforms: {
-        uTexture: { value: videoTexture },
-        uTime: { value: 0 },
-        uResolution: { value: new THREE.Vector2(canvas.width, canvas.height) },
-        uFlip: { value: isFlipped ? -1 : 1 }
-      },
-      vertexShader: `
-        varying vec2 vUv;
-        void main() {
-          vUv = uv;
-          gl_Position = projectionMatrix * modelViewMatrix * vec4(position, 1.0);
-        }
-      `,
-      fragmentShader: `
-        uniform sampler2D uTexture;
-        uniform float uTime;
-        uniform vec2 uResolution;
-        uniform float uFlip;
-        varying vec2 vUv;
-        
-        // Barrel distortion
-        vec2 barrelDistortion(vec2 coord, float strength) {
-          vec2 cc = coord - 0.5;
-          float dist = dot(cc, cc) * strength;
-          return coord + cc * (1.0 + dist) * dist;
-        }
-        
-        // Chromatic aberration
-        vec3 chromaticAberration(sampler2D tex, vec2 uv, float strength) {
-          float r = texture2D(tex, uv + vec2(strength, 0.0)).r;
-          float g = texture2D(tex, uv).g;
-          float b = texture2D(tex, uv - vec2(strength, 0.0)).b;
-          return vec3(r, g, b);
-        }
-        
-        // Scanlines
-        float scanlines(vec2 uv, float time) {
-          float scanline = sin(uv.y * uResolution.y * 0.5) * 0.04;
-          float roll = sin(time * 0.1) * 0.02;
-          return scanline + roll;
-        }
-        
-        // Noise
-        float noise(vec2 uv, float time) {
-          return fract(sin(dot(uv + time, vec2(12.9898, 78.233))) * 43758.5453);
-        }
-        
-        // Vignette
-        float vignette(vec2 uv) {
-          uv = uv * 2.0 - 1.0;
-          return 1.0 - dot(uv, uv) * 0.3;
-        }
-        
-        void main() {
-          vec2 uv = vUv;
-          uv.x *= uFlip;
-          
-          // Apply barrel distortion
-          uv = barrelDistortion(uv, 0.12);
-          
-                        // Apply chromatic aberration
-                        vec3 color = chromaticAberration(uTexture, uv, 0.001);
-          
-          // Apply scanlines
-          color += scanlines(uv, uTime);
-          
-          // Apply noise
-          color += (noise(uv * 100.0, uTime) - 0.5) * 0.2;
-          
-          gl_FragColor = vec4(color, 1.0);
-        }
-      `
-    });
-    
-    // Create full-screen quad
-    const geometry = new THREE.PlaneGeometry(2, 2);
-    const quad = new THREE.Mesh(geometry, crtMaterial);
-    scene.add(quad);
-    
-    // Store references
-    sceneRef.current = scene;
-    rendererRef.current = renderer;
-    
-    // Animation loop
-    const animate = () => {
-      if (!cctvMode || !sceneRef.current || !rendererRef.current) return;
-      
-      crtMaterial.uniforms.uTime.value = performance.now() * 0.001;
-      renderer.render(sceneRef.current, camera);
-      
-      requestAnimationFrame(animate);
-    };
-    
-    animate();
-    
-  }, [isFlipped, cctvMode]);
-
-  // Initialize WebGL when CCTV mode is enabled
-  useEffect(() => {
-    if (cctvMode && webglSupported && videoRef.current) {
-      initWebGLScene();
-    }
-  }, [cctvMode, webglSupported, initWebGLScene]);
 
   // Initialize detection engine
   const initDetectionEngine = useCallback(async () => {
     if (!detectMode) return;
     
-    try {
-      // Try MediaPipe first
-      const vision = await FilesetResolver.forVisionTasks(
-        "https://cdn.jsdelivr.net/npm/@mediapipe/tasks-vision@0.10.0/wasm"
-      );
-      
-      const objectDetector = await ObjectDetector.createFromOptions(vision, {
-        baseOptions: {
-          modelAssetPath: "https://storage.googleapis.com/mediapipe-models/object_detector/efficientdet_lite0/float16/1/efficientdet_lite0.tflite",
-          delegate: "GPU"
-        },
-        scoreThreshold: confidenceThreshold,
-        categoryAllowlist: ["person", "chair", "bottle", "cup", "book", "laptop", "mouse", "keyboard", "cell phone", "tv", "car", "truck", "bus", "motorcycle", "bicycle"]
-      });
-      
-      objectDetectorRef.current = objectDetector;
-      setDetectionEngine('mediapipe');
-      console.log('MediaPipe ObjectDetector initialized');
-      
-    } catch (error) {
-      console.log('MediaPipe failed, falling back to TensorFlow.js:', error);
-      
-      try {
-        // Fallback to TensorFlow.js COCO-SSD
-        await tf.ready();
-        const model = await tf.loadLayersModel('https://tfhub.dev/tensorflow/tfjs-model/ssd_mobilenet_v2/1/default/1');
-        cocoModelRef.current = model;
-        setDetectionEngine('tensorflow');
-        console.log('TensorFlow.js COCO-SSD initialized');
-        
-      } catch (tfError) {
-        console.error('Both detection engines failed:', tfError);
-        setDetectionEngine(null);
-      }
-    }
-  }, [detectMode, confidenceThreshold]);
+    // For green object detection, we don't need AI models
+    // We'll use the existing color analysis from the HueScan functionality
+    setDetectionEngine('color');
+    console.log('Color-based green detection initialized');
+  }, [detectMode]);
 
   // Initialize detection engine when Detect Mode is enabled
   useEffect(() => {
@@ -353,9 +154,6 @@ export default function HueScan() {
         case 'd':
           toggleDetectMode();
           break;
-        case 'c':
-          toggleCctvMode();
-          break;
         case 'f':
           toggleFlip();
           break;
@@ -367,7 +165,7 @@ export default function HueScan() {
     
     window.addEventListener('keydown', handleKeyPress);
     return () => window.removeEventListener('keydown', handleKeyPress);
-  }, [toggleDetectMode, toggleCctvMode, toggleFlip, toggleEffects]);
+  }, [toggleDetectMode, toggleFlip, toggleEffects]);
 
   // Draw detection boxes with animations
   const drawDetectionBoxes = useCallback((ctx: CanvasRenderingContext2D, width: number, height: number) => {
@@ -487,52 +285,71 @@ export default function HueScan() {
     try {
       let detections: any[] = [];
       
-      if (detectionEngine === 'mediapipe' && objectDetectorRef.current) {
-        // MediaPipe detection
-        const results = objectDetectorRef.current.detect(video);
-        detections = results.detections.map((detection: any) => ({
-          bbox: detection.boundingBox,
-          score: detection.categories[0]?.score || 0,
-          class: detection.categories[0]?.categoryName || 'unknown'
-        }));
+      if (detectionEngine === 'color') {
+        // Color-based green detection
+        const tempCanvas = document.createElement('canvas');
+        const tempCtx = tempCanvas.getContext('2d');
+        if (!tempCtx) return;
         
-      } else if (detectionEngine === 'tensorflow' && cocoModelRef.current) {
-        // TensorFlow.js detection
-        const tensor = tf.browser.fromPixels(video);
-        const resized = tf.image.resizeBilinear(tensor, [300, 300]);
-        const batched = resized.expandDims(0);
+        tempCanvas.width = video.videoWidth;
+        tempCanvas.height = video.videoHeight;
+        tempCtx.drawImage(video, 0, 0);
         
-        const predictions = await cocoModelRef.current.predict(batched) as tf.Tensor[];
-        const boxes = await predictions[0].data();
-        const scores = await predictions[1].data();
-        const classes = await predictions[2].data();
+        const imageData = tempCtx.getImageData(0, 0, tempCanvas.width, tempCanvas.height);
+        const data = imageData.data;
         
-        // Process predictions
-        for (let i = 0; i < scores.length; i++) {
-          if (scores[i] > confidenceThreshold) {
-            const boxStart = i * 4;
-            const y1 = boxes[boxStart];
-            const x1 = boxes[boxStart + 1];
-            const y2 = boxes[boxStart + 2];
-            const x2 = boxes[boxStart + 3];
-            detections.push({
-              bbox: {
-                originX: x1 * video.videoWidth,
-                originY: y1 * video.videoHeight,
-                width: (x2 - x1) * video.videoWidth,
-                height: (y2 - y1) * video.videoHeight
-              },
-              score: scores[i],
-              class: classes[i]
-            });
+        // Find green regions
+        const greenRegions: { x: number; y: number; width: number; height: number; score: number }[] = [];
+        const blockSize = 20; // Check every 20x20 pixel block
+        
+        for (let y = 0; y < tempCanvas.height - blockSize; y += blockSize) {
+          for (let x = 0; x < tempCanvas.width - blockSize; x += blockSize) {
+            let totalR = 0, totalG = 0, totalB = 0;
+            let pixelCount = 0;
+            
+            // Sample the block
+            for (let by = 0; by < blockSize; by++) {
+              for (let bx = 0; bx < blockSize; bx++) {
+                const pixelIndex = ((y + by) * tempCanvas.width + (x + bx)) * 4;
+                totalR += data[pixelIndex];
+                totalG += data[pixelIndex + 1];
+                totalB += data[pixelIndex + 2];
+                pixelCount++;
+              }
+            }
+            
+            const avgR = totalR / pixelCount;
+            const avgG = totalG / pixelCount;
+            const avgB = totalB / pixelCount;
+            
+            // Check if this block is green enough
+            const distance = colorDistance({ r: avgR, g: avgG, b: avgB }, targetColor);
+            const maxDistance = 100; // Threshold for green detection
+            const similarity = Math.max(0, 100 - (distance / maxDistance) * 100);
+            
+            if (similarity >= 60) { // Only detect strong green matches
+              greenRegions.push({
+                x: x,
+                y: y,
+                width: blockSize,
+                height: blockSize,
+                score: similarity / 100
+              });
+            }
           }
         }
         
-        // Cleanup tensors
-        tensor.dispose();
-        resized.dispose();
-        batched.dispose();
-        predictions.forEach(p => p.dispose());
+        // Convert to detection format
+        detections = greenRegions.map((region, index) => ({
+          bbox: {
+            originX: region.x,
+            originY: region.y,
+            width: region.width,
+            height: region.height
+          },
+          score: region.score,
+          class: 'green_object'
+        }));
       }
       
       // Update detection boxes with smoothing
@@ -578,7 +395,7 @@ export default function HueScan() {
     } catch (error) {
       console.error('Detection processing error:', error);
     }
-  }, [detectMode, detectionEngine, confidenceThreshold]);
+  }, [detectMode, detectionEngine, drawDetectionBoxes]);
 
   // Detection loop
   useEffect(() => {
@@ -609,29 +426,6 @@ export default function HueScan() {
     
     detectionLoop();
   }, [detectMode, detectionEngine, processDetection]);
-
-  // FPS Counter
-  useEffect(() => {
-    if (!cctvMode) return;
-    
-    let lastTime = performance.now();
-    let frameCount = 0;
-    
-    const updateFPS = () => {
-      const now = performance.now();
-      frameCount++;
-      
-      if (now - lastTime >= 1000) {
-        setFps(Math.round((frameCount * 1000) / (now - lastTime)));
-        frameCount = 0;
-        lastTime = now;
-      }
-      
-      requestAnimationFrame(updateFPS);
-    };
-    
-    updateFPS();
-  }, [cctvMode]);
 
   const applyCreativeEffects = useCallback(() => {
     if (!effectsCanvasRef.current || !videoRef.current) {
@@ -952,33 +746,6 @@ export default function HueScan() {
         className="absolute inset-0 w-full h-full object-cover pointer-events-none"
       />
       
-      {/* WebGL Canvas for CCTV Mode */}
-      {cctvMode && webglSupported && (
-        <canvas
-          ref={webglCanvasRef}
-          className="absolute inset-0 w-full h-full object-cover pointer-events-none"
-        />
-      )}
-      
-      {/* CSS Fallback for CCTV Mode */}
-      {cctvMode && !webglSupported && (
-        <div className="absolute inset-0 pointer-events-none">
-          <div className="w-full h-full cctv-fallback">
-            {/* Quad view grid */}
-            <div className="grid grid-cols-2 grid-rows-2 w-full h-full">
-              <div className="cctv-quad cctv-quad-1"></div>
-              <div className="cctv-quad cctv-quad-2"></div>
-              <div className="cctv-quad cctv-quad-3"></div>
-              <div className="cctv-quad cctv-quad-4"></div>
-            </div>
-            {/* Scanlines overlay */}
-            <div className="absolute inset-0 cctv-scanlines"></div>
-            {/* Vignette overlay */}
-            <div className="absolute inset-0 cctv-vignette"></div>
-          </div>
-        </div>
-      )}
-      
       {/* Overlay Canvas */}
       <canvas
         ref={overlayCanvasRef}
@@ -1018,11 +785,6 @@ export default function HueScan() {
             <div className="flex items-center gap-2">
               <span className="text-green-500">EFFECTS:</span>
               <span className="text-white">{effectsEnabled ? 'ON' : 'OFF'}</span>
-            </div>
-            
-            <div className="flex items-center gap-2">
-              <span className="text-green-500">CCTV:</span>
-              <span className="text-white">{cctvMode ? 'ON' : 'OFF'}</span>
             </div>
             
             <div className="flex items-center gap-2">
@@ -1130,16 +892,6 @@ export default function HueScan() {
                   effectsEnabled ? 'bg-green-400 animate-pulse' : 'bg-gray-400'
                 }`} />
               </div>
-            </button>
-            
-            <button
-              onClick={toggleCctvMode}
-              className={`bg-black/60 backdrop-blur-sm border border-green-400/30 text-green-400 p-3 rounded-full hover:bg-green-400/20 transition-all ${
-                cctvMode ? 'bg-green-400/20 border-green-400' : ''
-              }`}
-              title={cctvMode ? 'Disable CCTV Mode' : 'Enable CCTV Mode'}
-            >
-              <Monitor size={20} />
             </button>
             
             <button
