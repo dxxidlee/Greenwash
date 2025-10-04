@@ -86,7 +86,7 @@
       padding: 12px 30px;
       border-radius: 2px;
       cursor: pointer;
-      font-family: 'Space Grotesk', sans-serif;
+      font-family: 'PPNeueMontreal', sans-serif;
       font-size: 12px;
       font-weight: 500;
       transition: all 0.3s;
@@ -158,7 +158,7 @@
     #fadeOverlay.active {
       opacity: 1;
     }
-
+    
     #loading {
       position: fixed;
       top: 50%;
@@ -169,7 +169,7 @@
       z-index: 5000;
       letter-spacing: 2px;
     }
-
+    
     #vignette {
       position: fixed;
       top: 0;
@@ -180,26 +180,26 @@
       background: radial-gradient(circle at center, transparent 0%, rgba(0, 0, 0, 0.7) 100%);
       z-index: 1;
     }
-
+    
     #homeButton {
       position: fixed;
       top: 20px;
-      right: 20px;
+      left: 20px;
       background: rgba(0, 143, 70, 0.8);
       color: white;
       border: none;
       padding: 10px 20px;
       border-radius: 2px;
       cursor: pointer;
-      font-family: 'Space Grotesk', sans-serif;
-      font-size: 11px;
+      font-family: 'PPNeueMontreal', sans-serif;
+      font-size: 12px;
       font-weight: 500;
-      transition: all 0.3s;
       letter-spacing: 1px;
       text-transform: uppercase;
       z-index: 1000;
+      transition: all 0.3s;
     }
-
+    
     #homeButton:hover {
       background: rgba(0, 143, 70, 1);
     }
@@ -222,13 +222,13 @@
       <div id="attemptCounter">Attempts: 0</div>
     </div>
   </div>
-  
+
   <div id="feedback"></div>
   <div id="instructions">Click to start • WASD to move • Mouse to look • ESC for interface</div>
   <div id="fadeOverlay"></div>
 
   <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
-  
+
   <script>
     console.log('Starting Greenwash Backroom...');
 
@@ -242,18 +242,18 @@
       holdStart: 0,
       started: false
     };
-    
+
     console.log('Target attempts:', state.targetAttempts);
 
     // Scene setup
     const scene = new THREE.Scene();
     scene.background = new THREE.Color(0x000000);
     scene.fog = new THREE.FogExp2(0x0a1508, 0.08);
-    
+
     const camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 100);
     camera.position.set(0, 1.6, 5);
     camera.lookAt(0, 1.6, 0);
-    
+
     const canvas = document.getElementById('canvas');
     const renderer = new THREE.WebGLRenderer({ canvas: canvas, antialias: true });
     renderer.setSize(window.innerWidth, window.innerHeight);
@@ -262,7 +262,7 @@
     renderer.shadowMap.type = THREE.PCFSoftShadowMap;
     renderer.toneMapping = THREE.ACESFilmicToneMapping;
     renderer.toneMappingExposure = 0.6;
-    
+
     console.log('Renderer initialized');
 
     // Materials with more texture and grime
@@ -271,25 +271,25 @@
       roughness: 0.95,
       metalness: 0.02
     });
-    
+
     const floorMaterial = new THREE.MeshStandardMaterial({
       color: 0x8a9a85,
       roughness: 0.9,
       metalness: 0.02
     });
-    
+
     const columnMaterial = new THREE.MeshStandardMaterial({
       color: 0xb0c0a8,
       roughness: 0.92,
       metalness: 0.03
     });
-    
+
     const ceilingMaterial = new THREE.MeshStandardMaterial({
       color: 0x95a590,
       roughness: 0.95,
       metalness: 0.01
     });
-    
+
     const panelMaterial = new THREE.MeshStandardMaterial({
       color: 0xc0ffc0,
       emissive: 0x40a040,
@@ -302,23 +302,23 @@
     function createRoomSection(offsetX, offsetZ) {
       const group = new THREE.Group();
       const size = 20;
-      
+
       // Floor
       const floorGeo = new THREE.PlaneGeometry(size, size, 10, 10);
       const floor = new THREE.Mesh(floorGeo, floorMaterial);
       floor.rotation.x = -Math.PI / 2;
       floor.position.set(offsetX, 0, offsetZ);
       floor.receiveShadow = true;
-      
+
       // Add slight random height variations for realism
       const posAttr = floorGeo.attributes.position;
       for (let i = 0; i < posAttr.count; i++) {
         posAttr.setZ(i, posAttr.getZ(i) + (Math.random() - 0.5) * 0.02);
       }
       floorGeo.computeVertexNormals();
-      
+
       group.add(floor);
-      
+
       // Ceiling with tiles
       const ceilingY = 2.7;
       const ceilingGeo = new THREE.PlaneGeometry(size, size);
@@ -327,7 +327,7 @@
       ceiling.position.set(offsetX, ceilingY, offsetZ);
       ceiling.receiveShadow = true;
       group.add(ceiling);
-      
+
       // Walls - create maze-like structure
       const wallHeight = 2.7;
       const wallConfigs = [
@@ -337,13 +337,13 @@
         { x: 0, z: -size/2, w: size, d: 0.15, rot: 0 },
         { x: 0, z: size/2, w: size, d: 0.15, rot: 0 },
       ];
-      
+
       // Add some internal walls randomly
       for (let i = 0; i < 3; i++) {
         const rx = (Math.random() - 0.5) * size * 0.6;
         const rz = (Math.random() - 0.5) * size * 0.6;
         const isHorizontal = Math.random() > 0.5;
-        
+
         wallConfigs.push({
           x: rx,
           z: rz,
@@ -352,7 +352,7 @@
           rot: 0
         });
       }
-      
+
       wallConfigs.forEach(config => {
         const wall = new THREE.Mesh(
           new THREE.BoxGeometry(config.w, wallHeight, config.d),
@@ -363,14 +363,14 @@
         wall.receiveShadow = true;
         group.add(wall);
       });
-      
+
       // Columns - irregular placement
       const columnPositions = [
         [-6, -6], [-6, 0], [-6, 6],
         [0, -6], [0, 6],
         [6, -6], [6, 0], [6, 6]
       ];
-      
+
       columnPositions.forEach(([x, z]) => {
         const column = new THREE.Mesh(
           new THREE.BoxGeometry(0.5, wallHeight, 0.5),
@@ -381,14 +381,14 @@
         column.receiveShadow = true;
         group.add(column);
       });
-      
+
       // Ceiling panels - flickering effect will be added in animation
       const panelPositions = [
         [-7, -7], [-7, 0], [-7, 7],
         [0, -7], [0, 7],
         [7, -7], [7, 0], [7, 7]
       ];
-      
+
       panelPositions.forEach(([x, z]) => {
         const panel = new THREE.Mesh(
           new THREE.BoxGeometry(1.8, 0.08, 0.9),
@@ -399,10 +399,10 @@
         panel.userData.flickerOffset = Math.random() * 100;
         group.add(panel);
       });
-      
+
       return group;
     }
-    
+
     // Create 3x3 grid of rooms
     const rooms = [];
     for (let x = -1; x <= 1; x++) {
@@ -417,38 +417,38 @@
       }
     }
     console.log('Rooms created');
-    
+
     // Lighting - fewer lights, more dramatic
     const ambientLight = new THREE.AmbientLight(0x304030, 0.15);
     scene.add(ambientLight);
-    
+
     // Key lights positioned for dramatic effect
     const keyLight1 = new THREE.PointLight(0x60a060, 2, 20);
     keyLight1.position.set(0, 2.5, 0);
     keyLight1.castShadow = true;
     scene.add(keyLight1);
-    
+
     const keyLight2 = new THREE.PointLight(0x50a050, 1.5, 18);
     keyLight2.position.set(8, 2.5, 8);
     scene.add(keyLight2);
-    
+
     const keyLight3 = new THREE.PointLight(0x50a050, 1.5, 18);
     keyLight3.position.set(-8, 2.5, -8);
     scene.add(keyLight3);
-    
+
     // Dim fill light
     const fillLight = new THREE.DirectionalLight(0x405040, 0.2);
     fillLight.position.set(5, 10, 5);
     scene.add(fillLight);
-    
+
     console.log('Lighting added');
-    
+
     // Controls
     const keys = {};
     let mouseX = 0;
     let mouseY = 0;
     let pointerLocked = false;
-    
+
     window.addEventListener('keydown', (e) => {
       keys[e.code] = true;
       if (e.code === 'Escape' && state.started) {
@@ -456,11 +456,11 @@
         document.getElementById('hud').classList.toggle('show', state.hudVisible);
       }
     });
-    
+
     window.addEventListener('keyup', (e) => {
       keys[e.code] = false;
     });
-    
+
     canvas.addEventListener('click', () => {
       if (!state.started) {
         state.started = true;
@@ -469,11 +469,11 @@
       }
       canvas.requestPointerLock();
     });
-    
+
     document.addEventListener('pointerlockchange', () => {
       pointerLocked = document.pointerLockElement === canvas;
     });
-    
+
     document.addEventListener('mousemove', (e) => {
       if (pointerLocked) {
         mouseX -= e.movementX * 0.002;
@@ -481,31 +481,31 @@
         mouseY = Math.max(-Math.PI / 2 + 0.1, Math.min(Math.PI / 2 - 0.1, mouseY));
       }
     });
-    
+
     // HUD Controls
     const recordBtn = document.getElementById('recordBtn');
     const attemptCounter = document.getElementById('attemptCounter');
     const feedback = document.getElementById('feedback');
-    
+
     recordBtn.addEventListener('mousedown', () => {
       state.holding = true;
       state.holdStart = Date.now();
       recordBtn.classList.add('holding');
       recordBtn.textContent = 'RECORDING...';
     });
-    
+
     function handleRecordEnd() {
       if (!state.holding) return;
-      
+
       const holdDuration = (Date.now() - state.holdStart) / 1000;
       state.holding = false;
       recordBtn.classList.remove('holding');
       recordBtn.textContent = 'Hold to Record';
-      
+
       if (holdDuration >= 2.0) {
         state.attempts++;
         attemptCounter.textContent = `Attempts: ${state.attempts}`;
-        
+
         if (state.attempts >= state.targetAttempts) {
           state.exitAuthorized = true;
           showFeedback('EXIT AUTHORIZED', true);
@@ -515,10 +515,10 @@
         }
       }
     }
-    
+
     recordBtn.addEventListener('mouseup', handleRecordEnd);
     recordBtn.addEventListener('mouseleave', handleRecordEnd);
-    
+
     function showFeedback(message, success = false) {
       feedback.textContent = message;
       feedback.style.display = 'block';
@@ -536,36 +536,36 @@
         window.location.href = '/';
       }, 1000);
     }
-    
+
     // Movement with head bob
     const moveSpeed = 3.5;
     let bobPhase = 0;
-    
+
     function updateMovement(delta) {
       if (!state.started) return;
-      
+
       const velocity = new THREE.Vector3();
       let isMoving = false;
-      
+
       if (keys['KeyW']) { velocity.z = -1; isMoving = true; }
       if (keys['KeyS']) { velocity.z = 1; isMoving = true; }
       if (keys['KeyA']) { velocity.x = -1; isMoving = true; }
       if (keys['KeyD']) { velocity.x = 1; isMoving = true; }
-      
+
       if (velocity.length() > 0) {
         velocity.normalize();
-        
+
         const direction = new THREE.Vector3();
         camera.getWorldDirection(direction);
         direction.y = 0;
         direction.normalize();
-        
+
         const right = new THREE.Vector3();
         right.crossVectors(camera.up, direction).normalize();
-        
+
         camera.position.add(direction.multiplyScalar(velocity.z * moveSpeed * delta));
         camera.position.add(right.multiplyScalar(-velocity.x * moveSpeed * delta));
-        
+
         // Head bob
         bobPhase += delta * 8;
         camera.position.y = 1.6 + Math.sin(bobPhase) * 0.03;
@@ -573,20 +573,20 @@
         // Return to normal height
         camera.position.y += (1.6 - camera.position.y) * delta * 5;
       }
-      
+
       // Update camera rotation
       camera.rotation.order = 'YXZ';
       camera.rotation.y = mouseX;
       camera.rotation.x = mouseY;
-      
+
       // Room recycling for endless effect
       const playerTileX = Math.round(camera.position.x / 20);
       const playerTileZ = Math.round(camera.position.z / 20);
-      
+
       rooms.forEach(room => {
         const dx = room.gridX - playerTileX;
         const dz = room.gridZ - playerTileZ;
-        
+
         if (Math.abs(dx) > 1 || Math.abs(dz) > 1) {
           // Recycle this room
           if (Math.abs(dx) > 1) {
@@ -595,25 +595,25 @@
           if (Math.abs(dz) > 1) {
             room.gridZ = playerTileZ + (dz > 0 ? 1 : -1);
           }
-          
+
           room.mesh.position.x = room.gridX * 20;
           room.mesh.position.z = room.gridZ * 20;
         }
       });
     }
-    
+
     // Animation loop with flickering panels
     const clock = new THREE.Clock();
     let frameCount = 0;
-    
+
     function animate() {
       requestAnimationFrame(animate);
-      
+
       const delta = clock.getDelta();
       const time = clock.getElapsedTime();
-      
+
       updateMovement(delta);
-      
+
       // Flicker ceiling panels
       scene.traverse((obj) => {
         if (obj.userData.isPanel) {
@@ -622,26 +622,26 @@
           obj.material.emissiveIntensity = 3 + flicker * 1.5 + noise;
         }
       });
-      
+
       renderer.render(scene, camera);
-      
+
       frameCount++;
       if (frameCount === 1) {
         console.log('First frame rendered!');
         document.getElementById('loading').textContent = 'CLICK TO START';
       }
     }
-    
+
     console.log('Starting animation loop...');
     animate();
-    
+
     // Handle window resize
     window.addEventListener('resize', () => {
       camera.aspect = window.innerWidth / window.innerHeight;
       camera.updateProjectionMatrix();
       renderer.setSize(window.innerWidth, window.innerHeight);
     });
-    
+
     // Show HUD after exploring
     setTimeout(() => {
       if (state.started) {
@@ -649,7 +649,7 @@
         document.getElementById('hud').classList.add('show');
       }
     }, 8000);
-    
+
     console.log('Setup complete!');
   </script>
 </body>

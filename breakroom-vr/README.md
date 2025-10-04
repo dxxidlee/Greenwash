@@ -16,7 +16,7 @@ A simple HTML-based 3D compliance training environment built with Three.js.
 # Start the server
 npm start
 # or
-python3 -m http.server 3001 --directory public
+python3 -m http.server 3001
 ```
 
 Then visit: `http://localhost:3001`
