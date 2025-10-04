@@ -37,9 +37,9 @@ export default function Home() {
     
     // Navigate to internal routes for specific features
     if (label === 'BreakRoom BRK-37') {
-      window.open('/breakroom', '_blank');
+      window.location.href = '/breakroom';
     } else if (label === 'HueScan HUE-37') {
-      window.open('/huescan', '_blank');
+      window.location.href = '/huescan';
     } else {
       // For other features, show placeholder
       console.log(`Clicked: ${label} - Feature coming soon`);
