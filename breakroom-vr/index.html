@@ -322,7 +322,7 @@
       "Uniform green is policy. Compliance is a public good. I affirm my role in Greenwash."
     </div>
     <div class="hud-controls">
-      <button id="recordBtn">Hold to Record</button>
+      <button id="recordBtn">Click to Record</button>
       <div id="voiceMemoVisualizer">
         <div class="waveform-container" id="waveformContainer"></div>
       </div>
@@ -837,10 +837,23 @@
     function animateWaveform() {
       if (!state.holding) return;
       
-      waveformBars.forEach((bar, i) => {
-        const height = Math.random() * 50 + 10;
-        bar.style.height = height + 'px';
-      });
+      if (analyser && dataArray) {
+        // Use actual audio data
+        analyser.getByteFrequencyData(dataArray);
+        
+        waveformBars.forEach((bar, i) => {
+          const dataIndex = Math.floor(i * dataArray.length / waveformBars.length);
+          const value = dataArray[dataIndex];
+          const height = (value / 255) * 60 + 5;
+          bar.style.height = height + 'px';
+        });
+      } else {
+        // Fallback to random animation
+        waveformBars.forEach((bar, i) => {
+          const height = Math.random() * 50 + 10;
+          bar.style.height = height + 'px';
+        });
+      }
       
       requestAnimationFrame(animateWaveform);
     }
@@ -897,29 +910,80 @@
     const feedback = document.getElementById('feedback');
     const voiceVisualizer = document.getElementById('voiceMemoVisualizer');
 
-    recordBtn.addEventListener('mousedown', (e) => {
+    let mediaRecorder = null;
+    let audioStream = null;
+    let audioContext = null;
+    let analyser = null;
+    let dataArray = null;
+    let audioEnabled = false;
+
+    // Initialize audio recording
+    async function initAudio() {
+      try {
+        audioStream = await navigator.mediaDevices.getUserMedia({ audio: true });
+        audioContext = new (window.AudioContext || window.webkitAudioContext)();
+        const source = audioContext.createMediaStreamSource(audioStream);
+        analyser = audioContext.createAnalyser();
+        analyser.fftSize = 64;
+        source.connect(analyser);
+        dataArray = new Uint8Array(analyser.frequencyBinCount);
+        audioEnabled = true;
+        return true;
+      } catch (err) {
+        console.log('Audio not available, using timer mode:', err.message);
+        audioEnabled = false;
+        return false;
+      }
+    }
+
+    recordBtn.addEventListener('click', async (e) => {
       e.preventDefault();
       e.stopPropagation();
-      state.holding = true;
-      state.holdStart = Date.now();
-      recordBtn.classList.add('holding');
-      recordBtn.textContent = 'RECORDING...';
-      voiceVisualizer.classList.add('active');
-      animateWaveform();
+      
+      if (state.holding) {
+        // Stop recording
+        handleRecordEnd();
+      } else {
+        // Start recording
+        if (!audioStream && !audioEnabled) {
+          const hasAudio = await initAudio();
+          if (!hasAudio) {
+            // Continue without audio - just use timer
+            console.log('Recording without microphone - using timer only');
+          }
+        }
+        
+        state.holding = true;
+        state.holdStart = Date.now();
+        recordBtn.classList.add('holding');
+        recordBtn.textContent = 'RECORDING... (Click to Stop)';
+        voiceVisualizer.classList.add('active');
+        animateWaveform();
+        
+        // Start media recorder if available
+        if (audioStream) {
+          try {
+            mediaRecorder = new MediaRecorder(audioStream);
+            mediaRecorder.start();
+          } catch (err) {
+            console.log('MediaRecorder not available');
+          }
+        }
+      }
     });
 
-    function handleRecordEnd(e) {
-      if (e) {
-        e.preventDefault();
-        e.stopPropagation();
-      }
+    function handleRecordEnd() {
       if (!state.holding) return;
 
       const holdDuration = (Date.now() - state.holdStart) / 1000;
       state.holding = false;
       recordBtn.classList.remove('holding');
-      recordBtn.textContent = 'Hold to Record';
+      recordBtn.textContent = 'Click to Record';
       voiceVisualizer.classList.remove('active');
+      
+      if (mediaRecorder && mediaRecorder.state === 'recording') {
+        mediaRecorder.stop();
+      }
 
       if (holdDuration >= 2.0) {
         state.attempts++;
@@ -930,6 +994,7 @@
           showFeedback('COMPLIANCE ACCEPTED', true);
           setTimeout(() => {
             document.getElementById('hud').classList.remove('show');
+            canvas.classList.remove('hud-active');
             state.hudVisible = false;
             openDoor();
           }, 1500);
@@ -937,15 +1002,15 @@
           showFeedback('NONCOMPLIANT — DOOR REMAINS LOCKED');
           setTimeout(() => {
             document.getElementById('hud').classList.remove('show');
+            canvas.classList.remove('hud-active');
             state.hudVisible = false;
             resetToStart();
           }, 2000);
         }
+      } else {
+        showFeedback('RECORDING TOO SHORT — MINIMUM 2 SECONDS');
       }
     }
-
-    recordBtn.addEventListener('mouseup', handleRecordEnd);
-    recordBtn.addEventListener('mouseleave', handleRecordEnd);
 
     function showFeedback(message, success = false) {
       feedback.textContent = message;
