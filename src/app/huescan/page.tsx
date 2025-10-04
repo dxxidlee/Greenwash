@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState, useRef, useEffect } from 'react';
+import React, { useState, useRef, useEffect, useCallback } from 'react';
 import { Camera, RotateCcw } from 'lucide-react';
 
 export default function HueScan() {
@@ -19,17 +19,7 @@ export default function HueScan() {
 
   const targetColor = { r: 0, g: 143, b: 70 }; // #008f46
 
-  useEffect(() => {
-    return () => {
-      stopCamera();
-    };
-  }, []);
-
-  useEffect(() => {
-    startCamera();
-  }, []);
-
-  const startCamera = async () => {
+  const startCamera = useCallback(async () => {
     try {
       const constraints = {
         video: {
@@ -50,9 +40,9 @@ export default function HueScan() {
     } catch (err) {
       console.error('Camera error:', err);
     }
-  };
+  }, [facingMode]);
 
-  const stopCamera = () => {
+  const stopCamera = useCallback(() => {
     if (stream) {
       stream.getTracks().forEach((track: MediaStreamTrack) => track.stop());
       setStream(null);
@@ -61,7 +51,17 @@ export default function HueScan() {
       cancelAnimationFrame(animationRef.current);
     }
     setScanning(false);
-  };
+  }, [stream]);
+
+  useEffect(() => {
+    return () => {
+      stopCamera();
+    };
+  }, [stopCamera]);
+
+  useEffect(() => {
+    startCamera();
+  }, [startCamera]);
 
   const switchCamera = async () => {
     stopCamera();
@@ -77,7 +77,7 @@ export default function HueScan() {
     );
   };
 
-  const drawOverlay = () => {
+  const drawOverlay = useCallback(() => {
     const canvas = overlayCanvasRef.current;
     if (!canvas) return;
     
@@ -154,9 +154,9 @@ export default function HueScan() {
     ctx.moveTo(centerX, centerY - crossSize);
     ctx.lineTo(centerX, centerY + crossSize);
     ctx.stroke();
-  };
+  }, [match]);
 
-  const analyzeFrame = () => {
+  const analyzeFrame = useCallback(() => {
     if (!videoRef.current || !canvasRef.current || !scanning) return;
 
     const video = videoRef.current;
@@ -230,18 +230,17 @@ export default function HueScan() {
     }
     
     animationRef.current = requestAnimationFrame(analyzeFrame);
-  };
+  }, [scanning, targetColor, drawOverlay]);
 
   useEffect(() => {
     if (scanning && videoRef.current) {
-      videoRef.current.addEventListener('loadeddata', analyzeFrame);
+      const video = videoRef.current;
+      video.addEventListener('loadeddata', analyzeFrame);
       return () => {
-        if (videoRef.current) {
-          videoRef.current.removeEventListener('loadeddata', analyzeFrame);
-        }
+        video.removeEventListener('loadeddata', analyzeFrame);
       };
     }
-  }, [scanning]);
+  }, [scanning, analyzeFrame]);
 
   return (
     <div className="fixed inset-0 bg-black overflow-hidden">
