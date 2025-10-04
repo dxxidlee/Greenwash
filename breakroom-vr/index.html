@@ -5,7 +5,12 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Greenwash Backroom</title>
   <style>
-    @import url('https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500&display=swap');
+    @font-face {
+      font-family: 'PPNeueMontreal';
+      src: url('./fonts/PPNeueMontreal-Medium.otf') format('opentype');
+      font-weight: 500;
+      font-style: normal;
+    }
     
     * {
       margin: 0;
@@ -14,7 +19,7 @@
     }
     
     body {
-      font-family: 'Space Grotesk', sans-serif;
+      font-family: 'PPNeueMontreal', sans-serif;
       overflow: hidden;
       background: #000;
     }
@@ -29,21 +34,70 @@
       filter: contrast(1.08) saturate(0.85) brightness(0.95);
     }
     
+    /* iOS-style glass pill used for hover labels */
+    .gw-glass {
+      color: #fff;
+      background: rgba(0, 0, 0, 0.6);
+      border: 1px solid rgba(255, 255, 255, 0.2);
+      border-radius: 9999px;
+      padding: 8px 14px;
+      box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3), inset 0 1px 0 rgba(255, 255, 255, 0.1);
+      backdrop-filter: blur(16px) saturate(180%);
+      -webkit-backdrop-filter: blur(16px) saturate(180%);
+      font-weight: 500;
+    }
+
+    /* Light silver glass for profile and circle hover labels */
+    .gw-glass-light {
+      color: #008F46;
+      background: rgba(217, 217, 217, 0.3);
+      border: 1px solid rgba(217, 217, 217, 0.4);
+      border-radius: 9999px;
+      padding: 8px 14px;
+      box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1), inset 0 1px 0 rgba(255, 255, 255, 0.3);
+      backdrop-filter: blur(16px) saturate(180%);
+      -webkit-backdrop-filter: blur(16px) saturate(180%);
+      font-weight: 500;
+    }
+
+    /* Profile dropdown uses rectangular glass */
+    .gw-glass-light.profile-dropdown {
+      border-radius: 12px;
+      padding: 12px 16px;
+    }
+
+    /* Dark glass for Ministry of Love and other dark modals */
+    .gw-glass-dark {
+      color: var(--gw-green);
+      background: rgba(0, 0, 0, 0.8);
+      border: 1px solid rgba(0, 143, 70, 0.3);
+      border-radius: 12px;
+      padding: 12px 16px;
+      box-shadow: 0 4px 20px rgba(0, 0, 0, 0.5), inset 0 1px 0 rgba(0, 143, 70, 0.2);
+      backdrop-filter: blur(16px) saturate(180%);
+      -webkit-backdrop-filter: blur(16px) saturate(180%);
+      font-weight: 500;
+    }
+
+    :root { 
+      --gw-green: #008F46; 
+    }
+    
     #hud {
       position: fixed;
       top: 50%;
       left: 50%;
       transform: translate(-50%, -50%);
-      background: rgba(0, 20, 10, 0.85);
-      backdrop-filter: blur(10px);
+      background: rgba(0, 0, 0, 0.8);
+      backdrop-filter: blur(16px);
       padding: 30px 40px;
-      border-radius: 2px;
+      border-radius: 12px;
       border: 1px solid rgba(0, 143, 70, 0.3);
       text-align: center;
       max-width: 500px;
       display: none;
       z-index: 100;
-      box-shadow: 0 0 30px rgba(0, 143, 70, 0.2);
+      box-shadow: 0 4px 20px rgba(0, 0, 0, 0.5), inset 0 1px 0 rgba(0, 143, 70, 0.2);
     }
     
     #hud.show {
@@ -80,14 +134,15 @@
       color: white;
       border: none;
       padding: 12px 30px;
-      border-radius: 2px;
+      border-radius: 8px;
       cursor: pointer;
-      font-family: 'Space Grotesk', sans-serif;
+      font-family: 'PPNeueMontreal', sans-serif;
       font-size: 12px;
       font-weight: 500;
       transition: all 0.3s;
-      letter-spacing: 1px;
+      letter-spacing: 2px;
       text-transform: uppercase;
+      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
     }
     
     #recordBtn:hover {
@@ -110,16 +165,17 @@
       top: 50px;
       left: 50%;
       transform: translateX(-50%);
-      background: rgba(0, 0, 0, 0.9);
       color: #008F46;
       padding: 15px 30px;
-      border-radius: 2px;
       font-size: 14px;
       font-weight: 500;
       display: none;
       z-index: 1000;
-      border: 1px solid #008F46;
       letter-spacing: 2px;
+    }
+    
+    #feedback.gw-glass-dark {
+      border-radius: 8px;
     }
     
     #instructions {
@@ -127,14 +183,11 @@
       bottom: 30px;
       left: 50%;
       transform: translateX(-50%);
-      color: rgba(0, 143, 70, 0.6);
+      color: rgba(0, 143, 70, 0.8);
       font-size: 11px;
       text-align: center;
       z-index: 10;
-      background: rgba(0, 0, 0, 0.7);
-      padding: 10px 20px;
-      border-radius: 2px;
-      letter-spacing: 1px;
+      letter-spacing: 2px;
       text-transform: uppercase;
     }
     
@@ -154,7 +207,7 @@
     #fadeOverlay.active {
       opacity: 1;
     }
-
+    
     #loading {
       position: fixed;
       top: 50%;
@@ -165,7 +218,7 @@
       z-index: 5000;
       letter-spacing: 2px;
     }
-
+    
     #vignette {
       position: fixed;
       top: 0;
@@ -199,14 +252,11 @@
       font-size: 18px;
       text-align: center;
       z-index: 50;
-      background: rgba(0, 0, 0, 0.8);
       padding: 20px 30px;
-      border-radius: 4px;
-      border: 1px solid #008F46;
       display: none;
-      letter-spacing: 1px;
+      letter-spacing: 2px;
     }
-
+    
     #doorPrompt.show {
       display: block;
     }
@@ -218,7 +268,7 @@
   <div id="vignette"></div>
   <div id="filmGrain"></div>
   
-  <div id="doorPrompt">
+  <div id="doorPrompt" class="gw-glass-dark">
     Press E to approach the door
   </div>
   
@@ -232,13 +282,13 @@
       <div id="attemptCounter">Attempts: 0</div>
     </div>
   </div>
-  
+
   <div id="feedback"></div>
-  <div id="instructions">Click to start • WASD to move • Mouse to look • E to interact with door</div>
+  <div id="instructions" class="gw-glass-light">Click to start • WASD to move • Mouse to look • E to interact with door</div>
   <div id="fadeOverlay"></div>
 
   <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
-  
+
   <script>
     // Game state
     const state = {
@@ -252,17 +302,17 @@
       nearDoor: false,
       hallwaysPassed: 0
     };
-    
+
     console.log('Target attempts:', state.targetAttempts);
 
     // Scene setup
     const scene = new THREE.Scene();
     scene.background = new THREE.Color(0x0f140f);
     scene.fog = new THREE.Fog(0x2a3520, 3, 35);
-    
+
     const camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 100);
     camera.position.set(0, 1.6, 0);
-    
+
     const canvas = document.getElementById('canvas');
     const renderer = new THREE.WebGLRenderer({ canvas: canvas, antialias: true });
     renderer.setSize(window.innerWidth, window.innerHeight);
@@ -393,13 +443,13 @@
       roughness: 0.88,
       metalness: 0
     });
-    
+
     const ceilingMaterial = new THREE.MeshStandardMaterial({
       map: ceilingColor,
       roughness: 0.92,
       metalness: 0
     });
-    
+
     const panelMaterial = new THREE.MeshStandardMaterial({
       color: 0xffffff,
       emissive: 0xb8c4a8,
@@ -423,7 +473,7 @@
       const width = 3;
       const height = 2.7;
       const length = 40; // Longer hallway
-      
+
       // Floor
       const floor = new THREE.Mesh(
         new THREE.PlaneGeometry(width, length),
@@ -432,7 +482,7 @@
       floor.rotation.x = -Math.PI / 2;
       floor.receiveShadow = true;
       group.add(floor);
-      
+
       // Ceiling with realistic drop ceiling tiles
       const tileSize = 0.6;
       const numTilesWidth = Math.ceil(width / tileSize);
@@ -640,10 +690,10 @@
         minZ: -length / 2 - 0.1,
         maxZ: -length / 2 + 0.1
       });
-      
+
       return group;
     }
-    
+
     // Create initial corridor
     const corridor = createCorridor();
     scene.add(corridor);
@@ -651,7 +701,7 @@
     // Lighting
     const ambientLight = new THREE.AmbientLight(0x6a7a5a, 0.4);
     scene.add(ambientLight);
-    
+
     const hemiLight = new THREE.HemisphereLight(0x808a60, 0x4a5438, 0.5);
     scene.add(hemiLight);
     
@@ -661,13 +711,13 @@
     dirLight.shadow.mapSize.width = 1024;
     dirLight.shadow.mapSize.height = 1024;
     scene.add(dirLight);
-    
+
     // Controls
     const keys = {};
     let mouseX = 0;
     let mouseY = 0;
     let pointerLocked = false;
-    
+
     window.addEventListener('keydown', (e) => {
       keys[e.code] = true;
       
@@ -684,11 +734,11 @@
         }
       }
     });
-    
+
     window.addEventListener('keyup', (e) => {
       keys[e.code] = false;
     });
-    
+
     canvas.addEventListener('click', () => {
       if (!state.started) {
         state.started = true;
@@ -696,11 +746,11 @@
       }
       canvas.requestPointerLock();
     });
-    
+
     document.addEventListener('pointerlockchange', () => {
       pointerLocked = document.pointerLockElement === canvas;
     });
-    
+
     document.addEventListener('mousemove', (e) => {
       if (pointerLocked) {
         mouseX -= e.movementX * 0.002;
@@ -708,31 +758,31 @@
         mouseY = Math.max(-Math.PI / 2 + 0.1, Math.min(Math.PI / 2 - 0.1, mouseY));
       }
     });
-    
+
     // HUD
     const recordBtn = document.getElementById('recordBtn');
     const attemptCounter = document.getElementById('attemptCounter');
     const feedback = document.getElementById('feedback');
-    
+
     recordBtn.addEventListener('mousedown', () => {
       state.holding = true;
       state.holdStart = Date.now();
       recordBtn.classList.add('holding');
       recordBtn.textContent = 'RECORDING...';
     });
-    
+
     function handleRecordEnd() {
       if (!state.holding) return;
-      
+
       const holdDuration = (Date.now() - state.holdStart) / 1000;
       state.holding = false;
       recordBtn.classList.remove('holding');
       recordBtn.textContent = 'Hold to Record';
-      
+
       if (holdDuration >= 2.0) {
         state.attempts++;
         attemptCounter.textContent = `Attempts: ${state.attempts}`;
-        
+
         if (state.attempts >= state.targetAttempts) {
           state.exitAuthorized = true;
           showFeedback('COMPLIANCE ACCEPTED', true);
@@ -751,12 +801,13 @@
         }
       }
     }
-    
+
     recordBtn.addEventListener('mouseup', handleRecordEnd);
     recordBtn.addEventListener('mouseleave', handleRecordEnd);
-    
+
     function showFeedback(message, success = false) {
       feedback.textContent = message;
+      feedback.className = 'gw-glass-dark';
       feedback.style.display = 'block';
       feedback.style.borderColor = success ? '#008F46' : '#a03030';
       feedback.style.color = success ? '#008F46' : '#ff6060';
@@ -773,7 +824,7 @@
         window.location.href = '/';
       }, 1000);
     }
-    
+
     function resetToStart() {
       // Reset player to start of hallway
       camera.position.set(0, 1.6, 18);
@@ -802,28 +853,28 @@
     const moveSpeed = 4;
     let bobPhase = 0;
     const playerRadius = 0.3;
-    
+
     function updateMovement(delta) {
       if (!state.started || state.hudVisible) return;
-      
+
       const velocity = new THREE.Vector3();
       
       if (keys['KeyW']) velocity.z = 1;
       if (keys['KeyS']) velocity.z = -1;
       if (keys['KeyA']) velocity.x = -1;
       if (keys['KeyD']) velocity.x = 1;
-      
+
       if (velocity.length() > 0) {
         velocity.normalize();
-        
+
         const direction = new THREE.Vector3();
         camera.getWorldDirection(direction);
         direction.y = 0;
         direction.normalize();
-        
+
         const right = new THREE.Vector3();
         right.crossVectors(camera.up, direction).normalize();
-        
+
         const moveZ = direction.clone().multiplyScalar(velocity.z * moveSpeed * delta);
         const moveX = right.clone().multiplyScalar(-velocity.x * moveSpeed * delta);
         
@@ -852,11 +903,11 @@
       } else {
         camera.position.y += (1.6 - camera.position.y) * delta * 5;
       }
-      
+
       camera.rotation.order = 'YXZ';
       camera.rotation.y = mouseX;
       camera.rotation.x = mouseY;
-      
+
       // Check if near door
       if (doorMesh) {
         const doorPos = new THREE.Vector3();
@@ -875,15 +926,15 @@
     
     // Animation
     const clock = new THREE.Clock();
-    
+
     function animate() {
       requestAnimationFrame(animate);
-      
+
       const delta = clock.getDelta();
       const time = clock.getElapsedTime();
-      
+
       updateMovement(delta);
-      
+
       // Panel flicker
       scene.traverse((obj) => {
         if (obj.userData.isPanel) {
@@ -891,18 +942,18 @@
           obj.material.emissiveIntensity = obj.userData.baseIntensity + flicker;
         }
       });
-      
+
       renderer.render(scene, camera);
     }
     
     animate();
-    
+
     window.addEventListener('resize', () => {
       camera.aspect = window.innerWidth / window.innerHeight;
       camera.updateProjectionMatrix();
       renderer.setSize(window.innerWidth, window.innerHeight);
     });
-    
+
     setTimeout(() => {
       document.getElementById('loading').textContent = 'CLICK TO START';
     }, 100);
