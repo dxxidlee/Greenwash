@@ -100,7 +100,7 @@ export default function HueScan() {
   };
 
   const applyCreativeEffects = useCallback(() => {
-    if (!effectsCanvasRef.current || !videoRef.current || !effectsEnabled) return;
+    if (!effectsCanvasRef.current || !videoRef.current) return;
     
     const canvas = effectsCanvasRef.current;
     const ctx = canvas.getContext('2d');
@@ -122,42 +122,47 @@ export default function HueScan() {
       ctx.translate(-width, 0);
     }
     
-    // Draw the video
+    // Draw the video first (base layer)
+    ctx.globalCompositeOperation = 'source-over';
+    ctx.globalAlpha = 1;
+    ctx.filter = 'none';
     ctx.drawImage(video, 0, 0, width, height);
     
-    // Apply creative effects
-    const time = Date.now() * 0.001;
-    
-    // Chromatic aberration effect
-    ctx.globalCompositeOperation = 'screen';
-    ctx.filter = 'hue-rotate(120deg) blur(1px)';
-    ctx.globalAlpha = 0.3;
-    ctx.drawImage(video, -2, 0, width, height);
-    
-    ctx.filter = 'hue-rotate(240deg) blur(1px)';
-    ctx.globalAlpha = 0.3;
-    ctx.drawImage(video, 2, 0, width, height);
+    if (effectsEnabled) {
+      // Apply creative effects
+      const time = Date.now() * 0.001;
+      
+      // Chromatic aberration effect
+      ctx.globalCompositeOperation = 'screen';
+      ctx.filter = 'hue-rotate(120deg) blur(1px)';
+      ctx.globalAlpha = 0.3;
+      ctx.drawImage(video, -2, 0, width, height);
+      
+      ctx.filter = 'hue-rotate(240deg) blur(1px)';
+      ctx.globalAlpha = 0.3;
+      ctx.drawImage(video, 2, 0, width, height);
+      
+      // Add scanlines
+      ctx.globalCompositeOperation = 'multiply';
+      ctx.fillStyle = 'rgba(0, 0, 0, 0.1)';
+      for (let i = 0; i < height; i += 4) {
+        ctx.fillRect(0, i, width, 1);
+      }
+      
+      // Add glitch effect
+      if (Math.random() < 0.1) {
+        ctx.globalCompositeOperation = 'difference';
+        ctx.fillStyle = `hsl(${Math.random() * 360}, 100%, 50%)`;
+        ctx.fillRect(Math.random() * width, 0, Math.random() * 50, height);
+      }
+      
+      // Add noise
+      ctx.globalCompositeOperation = 'overlay';
+      ctx.fillStyle = `rgba(${Math.random() * 255}, ${Math.random() * 255}, ${Math.random() * 255}, 0.1)`;
+      ctx.fillRect(0, 0, width, height);
+    }
     
     ctx.restore();
-    
-    // Add scanlines
-    ctx.globalCompositeOperation = 'multiply';
-    ctx.fillStyle = 'rgba(0, 0, 0, 0.1)';
-    for (let i = 0; i < height; i += 4) {
-      ctx.fillRect(0, i, width, 1);
-    }
-    
-    // Add glitch effect
-    if (Math.random() < 0.1) {
-      ctx.globalCompositeOperation = 'difference';
-      ctx.fillStyle = `hsl(${Math.random() * 360}, 100%, 50%)`;
-      ctx.fillRect(Math.random() * width, 0, Math.random() * 50, height);
-    }
-    
-    // Add noise
-    ctx.globalCompositeOperation = 'overlay';
-    ctx.fillStyle = `rgba(${Math.random() * 255}, ${Math.random() * 255}, ${Math.random() * 255}, 0.1)`;
-    ctx.fillRect(0, 0, width, height);
     
   }, [isFlipped, effectsEnabled]);
 
