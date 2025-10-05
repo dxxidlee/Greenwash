@@ -9,6 +9,7 @@ import GreenwashForms from './components/GreenwashForms';
 import GreenwashFinder from './components/GreenwashFinder';
 import GreenwashJournal from './components/GreenwashJournal';
 import GreenwashQuiz from './components/GreenwashQuiz';
+import GreenwashManual from './components/GreenwashManual';
 
 const DOT_LABELS = [
   'BreakRoom BRK-37',
@@ -27,6 +28,7 @@ export default function Home() {
   const [isFilesOpen, setIsFilesOpen] = useState(false);
   const [isJournalOpen, setIsJournalOpen] = useState(false);
   const [isQuizOpen, setIsQuizOpen] = useState(false);
+  const [isManualOpen, setIsManualOpen] = useState(false);
   const ringRef = useRef<HTMLDivElement|null>(null);
 
   useEffect(() => {
@@ -46,6 +48,8 @@ export default function Home() {
     // Navigate to internal routes for specific features
     if (label === 'BreakRoom BRK-37') {
       window.location.href = '/breakroom';
+    } else if (label === 'Protocol PRT-37') {
+      setIsManualOpen(true);
     } else if (label === 'HueScan HUE-37') {
       window.location.href = '/huescan';
     } else if (label === 'Report RPT-37') {
@@ -73,6 +77,7 @@ export default function Home() {
       <GreenwashFinder isOpen={isFilesOpen} onClose={() => setIsFilesOpen(false)} />
       <GreenwashJournal isOpen={isJournalOpen} onClose={() => setIsJournalOpen(false)} />
       <GreenwashQuiz isOpen={isQuizOpen} onClose={() => setIsQuizOpen(false)} />
+      <GreenwashManual isOpen={isManualOpen} onClose={() => setIsManualOpen(false)} />
     </main>
   );
 }
