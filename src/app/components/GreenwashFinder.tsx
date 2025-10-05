@@ -8,9 +8,18 @@ interface GreenwashFinderProps {
   onClose: () => void;
 }
 
+interface FileItem {
+  id: number;
+  name: string;
+  type: string;
+  size: string;
+  date: string;
+  preview: 'violation' | 'auth' | 'photo' | 'text' | 'report' | 'code' | 'spreadsheet';
+}
+
 const GreenwashFinder: React.FC<GreenwashFinderProps> = ({ isOpen, onClose }) => {
   const [selectedFolder, setSelectedFolder] = useState('violations');
-  const [selectedFile, setSelectedFile] = useState(null);
+  const [selectedFile, setSelectedFile] = useState<FileItem | null>(null);
   const [zoom, setZoom] = useState(100);
   const [rotation, setRotation] = useState(0);
   const [isMinimized, setIsMinimized] = useState(false);
@@ -24,7 +33,7 @@ const GreenwashFinder: React.FC<GreenwashFinderProps> = ({ isOpen, onClose }) =>
     { id: 'archived', name: 'Archived', icon: Folder, count: 156 }
   ];
 
-  const files = {
+  const files: Record<string, FileItem[]> = {
     violations: [
       { id: 1, name: 'UN-2037-032_VendorCart.pdf', type: 'pdf', size: '2.4 MB', date: '01/28/2037', preview: 'violation' },
       { id: 2, name: 'UN-2037-033_Billboard.pdf', type: 'pdf', size: '1.8 MB', date: '01/29/2037', preview: 'violation' },
@@ -73,7 +82,7 @@ const GreenwashFinder: React.FC<GreenwashFinderProps> = ({ isOpen, onClose }) =>
     }
   };
 
-  const getPreviewContent = (file: any) => {
+  const getPreviewContent = (file: FileItem) => {
     if (!file) return null;
 
     const previewTypes = {
@@ -358,7 +367,7 @@ const GreenwashFinder: React.FC<GreenwashFinderProps> = ({ isOpen, onClose }) =>
                 </div>
               </div>
               <div className="divide-y divide-green-300">
-                {currentFiles.map(file => {
+                {currentFiles.map((file: FileItem) => {
                   const Icon = getFileIcon(file.type);
                   const isSelected = selectedFile?.id === file.id;
                   return (
