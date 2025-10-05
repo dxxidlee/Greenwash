@@ -6,6 +6,7 @@ import Clock2037 from './components/Clock2037';
 import Ring from './components/Ring';
 import HoverLabel from './components/HoverLabel';
 import GreenwashForms from './components/GreenwashForms';
+import GreenwashFinder from './components/GreenwashFinder';
 
 const DOT_LABELS = [
   'BreakRoom BRK-37',
@@ -21,6 +22,7 @@ export default function Home() {
   const [hoverIdx, setHoverIdx] = useState<number|null>(null);
   const [anchor, setAnchor] = useState<{x:number;y:number}|null>(null);
   const [isFormsOpen, setIsFormsOpen] = useState(false);
+  const [isFilesOpen, setIsFilesOpen] = useState(false);
   const ringRef = useRef<HTMLDivElement|null>(null);
 
   useEffect(() => {
@@ -44,6 +46,8 @@ export default function Home() {
       window.location.href = '/huescan';
     } else if (label === 'Report RPT-37') {
       setIsFormsOpen(true);
+    } else if (label === 'Files FLS-37') {
+      setIsFilesOpen(true);
     } else {
       // For other features, show placeholder
       console.log(`Clicked: ${label} - Feature coming soon`);
@@ -58,6 +62,7 @@ export default function Home() {
       <Ring hoverIdx={hoverIdx} setHoverIdx={setHoverIdx} onDotClick={handleDotClick} />
       {hoverIdx !== null && <HoverLabel text={DOT_LABELS[hoverIdx] || "Lorem Ipsum"} anchor={anchor} />}
       <GreenwashForms isOpen={isFormsOpen} onClose={() => setIsFormsOpen(false)} />
+      <GreenwashFinder isOpen={isFilesOpen} onClose={() => setIsFilesOpen(false)} />
     </main>
   );
 }
