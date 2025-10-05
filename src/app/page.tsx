@@ -7,6 +7,7 @@ import Ring from './components/Ring';
 import HoverLabel from './components/HoverLabel';
 import GreenwashForms from './components/GreenwashForms';
 import GreenwashFinder from './components/GreenwashFinder';
+import GreenwashJournal from './components/GreenwashJournal';
 
 const DOT_LABELS = [
   'BreakRoom BRK-37',
@@ -23,6 +24,7 @@ export default function Home() {
   const [anchor, setAnchor] = useState<{x:number;y:number}|null>(null);
   const [isFormsOpen, setIsFormsOpen] = useState(false);
   const [isFilesOpen, setIsFilesOpen] = useState(false);
+  const [isJournalOpen, setIsJournalOpen] = useState(false);
   const ringRef = useRef<HTMLDivElement|null>(null);
 
   useEffect(() => {
@@ -48,6 +50,8 @@ export default function Home() {
       setIsFormsOpen(true);
     } else if (label === 'Files FLS-37') {
       setIsFilesOpen(true);
+    } else if (label === 'Journal JNL-37') {
+      setIsJournalOpen(true);
     } else {
       // For other features, show placeholder
       console.log(`Clicked: ${label} - Feature coming soon`);
@@ -63,6 +67,7 @@ export default function Home() {
       {hoverIdx !== null && <HoverLabel text={DOT_LABELS[hoverIdx] || "Lorem Ipsum"} anchor={anchor} />}
       <GreenwashForms isOpen={isFormsOpen} onClose={() => setIsFormsOpen(false)} />
       <GreenwashFinder isOpen={isFilesOpen} onClose={() => setIsFilesOpen(false)} />
+      <GreenwashJournal isOpen={isJournalOpen} onClose={() => setIsJournalOpen(false)} />
     </main>
   );
 }
