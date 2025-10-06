@@ -48,3 +48,45 @@
     filter: contrast(1.02) saturate(1.02);
   }
 }
+
+/* Smooth modal animations */
+.modal-enter {
+  opacity: 0;
+  transform: scale(0.95);
+}
+
+.modal-enter-active {
+  opacity: 1;
+  transform: scale(1);
+  transition: opacity 300ms ease-out, transform 300ms ease-out;
+}
+
+.modal-exit {
+  opacity: 1;
+  transform: scale(1);
+}
+
+.modal-exit-active {
+  opacity: 0;
+  transform: scale(0.95);
+  transition: opacity 300ms ease-out, transform 300ms ease-out;
+}
+
+/* Backdrop blur animation */
+.backdrop-blur-enter {
+  backdrop-filter: blur(0px);
+}
+
+.backdrop-blur-enter-active {
+  backdrop-filter: blur(12px);
+  transition: backdrop-filter 300ms ease-out;
+}
+
+.backdrop-blur-exit {
+  backdrop-filter: blur(12px);
+}
+
+.backdrop-blur-exit-active {
+  backdrop-filter: blur(0px);
+  transition: backdrop-filter 300ms ease-out;
+}
