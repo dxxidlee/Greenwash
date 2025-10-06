@@ -1,4 +1,4 @@
-import React, { useEffect, useRef } from "react";
+import React, { useEffect, useRef, useCallback } from "react";
 import { useLockBodyScroll } from "./useLockBodyScroll";
 
 type JournalEntry = {
@@ -22,13 +22,22 @@ export default function JournalModal({ open, onClose, entries }: Props) {
 
   useLockBodyScroll(open);
 
+  // Handle close with animation
+  const handleClose = useCallback(() => {
+    setIsClosing(true);
+    setTimeout(() => {
+      onClose();
+      setIsClosing(false);
+    }, 400); // Match animation duration (500ms / 1.25 = 400ms)
+  }, [onClose]);
+
   // ESC to close
   useEffect(() => {
     if (!open) return;
-    const onKey = (e: KeyboardEvent) => { if (e.key === "Escape") onClose(); };
+    const onKey = (e: KeyboardEvent) => { if (e.key === "Escape") handleClose(); };
     window.addEventListener("keydown", onKey);
     return () => window.removeEventListener("keydown", onKey);
-  }, [open, onClose]);
+  }, [open, handleClose]);
 
   // Focus trap (minimal) + restore
   useEffect(() => {
@@ -39,15 +48,6 @@ export default function JournalModal({ open, onClose, entries }: Props) {
       prevActive.current?.focus?.();
     }
   }, [open]);
-
-  // Handle close with animation
-  const handleClose = () => {
-    setIsClosing(true);
-    setTimeout(() => {
-      onClose();
-      setIsClosing(false);
-    }, 400); // Match animation duration (500ms / 1.25 = 400ms)
-  };
 
   // Backdrop click closes; panel stops propagation
   const onBackdropMouseDown: React.MouseEventHandler<HTMLDivElement> = (e) => {
