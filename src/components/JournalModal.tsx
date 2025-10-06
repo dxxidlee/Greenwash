@@ -53,23 +53,28 @@ export default function JournalModal({ open, onClose, entries }: Props) {
       aria-hidden={false}
       aria-modal="true"
       role="dialog"
-      className="
-        fixed inset-0 z-[100] flex items-center justify-center
-        bg-transparent                       /* NO darkening */
-        backdrop-blur-md md:backdrop-blur-lg /* blur only */
-        supports-[backdrop-filter]:backdrop-saturate-150
-        supports-[backdrop-filter]:backdrop-contrast-100
-        animate-in fade-in duration-150
-        pointer-events-auto
-        backdrop-boost no-blur-fallback
-      "
+      className="fixed inset-0 z-[100] flex items-center justify-center bg-transparent animate-in fade-in duration-150"
     >
+      {/* Localized blur effect behind the journal panel */}
+      <div 
+        className="
+          absolute inset-0
+          backdrop-blur-md md:backdrop-blur-lg
+          supports-[backdrop-filter]:backdrop-saturate-150
+          supports-[backdrop-filter]:backdrop-contrast-100
+          backdrop-boost no-blur-fallback
+        "
+        style={{
+          clipPath: 'inset(10vh 10vw 10vh 10vw)',
+        }}
+      />
+      
       <div
         ref={panelRef}
         tabIndex={-1}
         onMouseDown={(e) => e.stopPropagation()}
         className="
-          relative
+          relative z-10
           w-[92vw] sm:w-[86vw] md:w-auto
           h-[84vh] sm:h-[82vh] md:h-[78vh]
           max-w-[40rem] md:max-w-[42rem]           /* THIN column like reference */
