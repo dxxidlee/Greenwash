@@ -55,44 +55,33 @@ export default function JournalModal({ open, onClose, entries }: Props) {
       role="dialog"
       className="
         fixed inset-0 z-[100] flex items-center justify-center
-        bg-transparent
+        bg-transparent                       /* NO darkening */
+        backdrop-blur-md md:backdrop-blur-lg /* blur only */
+        supports-[backdrop-filter]:backdrop-saturate-150
+        supports-[backdrop-filter]:backdrop-contrast-100
+        animate-in fade-in duration-150
         pointer-events-auto
-        transition-opacity duration-300 ease-out
-        animate-in fade-in duration-300
+        backdrop-boost no-blur-fallback
       "
     >
-      {/* Blurred background overlay - separate from journal content */}
-      <div 
-        className="
-          absolute inset-0
-          backdrop-blur-md md:backdrop-blur-lg
-          supports-[backdrop-filter]:backdrop-saturate-150
-          supports-[backdrop-filter]:backdrop-contrast-100
-          backdrop-boost no-blur-fallback
-          transition-all duration-300 ease-out
-        "
-      />
-      
-      {/* Journal panel - NOT blurred */}
       <div
         ref={panelRef}
         tabIndex={-1}
         onMouseDown={(e) => e.stopPropagation()}
         className="
-          relative z-10
+          relative
           w-[92vw] sm:w-[86vw] md:w-auto
           h-[84vh] sm:h-[82vh] md:h-[78vh]
-          max-w-[40rem] md:max-w-[42rem]
+          max-w-[40rem] md:max-w-[42rem]           /* THIN column like reference */
           rounded-2xl md:rounded-3xl
           bg-white/90 dark:bg-neutral-900/85
           border border-black/10 dark:border-white/10
           shadow-[0_10px_40px_rgba(0,0,0,0.25)]
           focus:outline-none
           noise-surface
+          animate-in zoom-in-95 fade-in duration-200 ease-out
           p-4 sm:p-6 md:p-7
           overflow-hidden
-          transform transition-all duration-300 ease-out
-          animate-in zoom-in-95 fade-in duration-300
         "
       >
         {/* Exit X — same visuals & behavior */}
