@@ -49,11 +49,6 @@ export default function JournalModal({ open, onClose, entries }: Props) {
     }
   }, [open]);
 
-  // Backdrop click closes; panel stops propagation
-  const onBackdropMouseDown: React.MouseEventHandler<HTMLDivElement> = (e) => {
-    if (e.target === backdropRef.current) handleClose();
-  };
-
   if (!open) return null;
 
   return (
@@ -89,7 +84,7 @@ export default function JournalModal({ open, onClose, entries }: Props) {
 
       <div
         ref={backdropRef}
-        onClick={onClose}
+        onClick={handleClose}
         aria-hidden={false}
         aria-modal="true"
         role="dialog"
