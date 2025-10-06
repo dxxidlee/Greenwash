@@ -48,3 +48,18 @@
     filter: contrast(1.02) saturate(1.02);
   }
 }
+
+/* Hide scrollbars (preserve scroll) */
+.hide-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
+.hide-scrollbar::-webkit-scrollbar { display: none; }
+/* GPU hint for backdrop blur */
+.backdrop-boost { will-change: backdrop-filter; }
+/* No backdrop-filter fallback (brightness neutral) */
+@supports not ((-webkit-backdrop-filter: blur(1px)) or (backdrop-filter: blur(1px))) {
+  .no-blur-fallback { background: transparent !important; }
+  #appRoot[data-modal-open="true"] { filter: contrast(1.02) saturate(1.02); }
+}
+/* Respect reduced motion */
+@media (prefers-reduced-motion: reduce) {
+  .rm-no-anim { transition: none !important; animation: none !important; }
+}

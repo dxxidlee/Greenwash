@@ -20,6 +20,7 @@
     "@types/react-dom": "^18.2.0",
     "autoprefixer": "^10.4.0",
     "caniuse-lite": "^1.0.30001747",
+    "framer-motion": "^12.23.22",
     "lucide-react": "^0.263.1",
     "next": "^14.0.0",
     "postcss": "^8.4.0",
