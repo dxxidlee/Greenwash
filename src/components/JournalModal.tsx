@@ -52,8 +52,13 @@ export default function JournalModal({ open, onClose, entries }: Props) {
       <button
         onClick={onClose}
         aria-label="Close"
+        style={{
+          position: 'fixed',
+          top: '16px',
+          right: '16px',
+          zIndex: 200
+        }}
         className="
-          fixed top-4 right-4 z-[200]
           inline-flex items-center justify-center
           h-12 w-12
           rounded-full
