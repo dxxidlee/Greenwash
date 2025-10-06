@@ -49,13 +49,13 @@ export default function JournalModal({ open, onClose, entries }: Props) {
   return (
     <div
       ref={backdropRef}
-      onMouseDown={onBackdropMouseDown}
+      onClick={onClose}
       aria-hidden={false}
       aria-modal="true"
       role="dialog"
-      className="fixed inset-0 z-[100] flex items-center justify-center bg-transparent animate-in fade-in duration-150"
+      className="fixed inset-0 z-[100] flex items-center justify-center bg-transparent animate-in fade-in duration-300"
     >
-      {/* Full screen blur layer */}
+      {/* Full screen blur layer with smooth animation */}
       <div 
         className="
           fixed inset-0
@@ -63,15 +63,16 @@ export default function JournalModal({ open, onClose, entries }: Props) {
           supports-[backdrop-filter]:backdrop-saturate-150
           supports-[backdrop-filter]:backdrop-contrast-100
           backdrop-boost no-blur-fallback
+          animate-in fade-in duration-300
         "
       />
       
-      {/* Exit X — positioned at top right corner of screen, outside journal container */}
+      {/* Exit X — positioned at top right corner of screen */}
       <button
         onClick={onClose}
         aria-label="Close"
         className="
-          fixed top-4 right-4 z-20
+          fixed top-6 right-6 z-20
           inline-flex items-center justify-center
           h-12 w-12
           rounded-2xl md:rounded-[24px]
@@ -81,8 +82,9 @@ export default function JournalModal({ open, onClose, entries }: Props) {
           noise-surface
           text-green-600 dark:text-green-400
           hover:bg-white dark:hover:bg-neutral-900
-          transition
+          transition-all duration-300
           focus:outline-none focus:ring-2 focus:ring-green-300 dark:focus:ring-green-500
+          animate-in zoom-in-95 fade-in duration-300 delay-100
         "
       >
         <svg viewBox="0 0 24 24" width="18" height="18" aria-hidden="true">
@@ -94,20 +96,20 @@ export default function JournalModal({ open, onClose, entries }: Props) {
       <div
         ref={panelRef}
         tabIndex={-1}
-        onMouseDown={(e) => e.stopPropagation()}
+        onClick={(e) => e.stopPropagation()}
         className="
           relative z-10
           w-[92vw] sm:w-[86vw] md:w-auto
           h-screen
           max-w-[40rem] md:max-w-[42rem]
           focus:outline-none
-          animate-in zoom-in-95 fade-in duration-200 ease-out
+          animate-in zoom-in-95 fade-in duration-300 delay-150
         "
       >
-        {/* Scrollable column of journal entries with top/bottom spacing */}
+        {/* Scrollable column of journal entries with much more top/bottom spacing */}
         <div className="h-full w-full overflow-y-auto overscroll-contain scroll-smooth hide-scrollbar">
-          <div className="pt-4 pb-4 space-y-4 sm:space-y-5 md:space-y-6">
-            {entries.map((e) => (
+          <div className="pt-40 pb-40 space-y-4 sm:space-y-5 md:space-y-6">
+            {entries.map((e, index) => (
               <article
                 key={e.id}
                 className="
@@ -119,7 +121,11 @@ export default function JournalModal({ open, onClose, entries }: Props) {
                   noise-surface
                   p-4 sm:p-5 md:p-6
                   scroll-mt-6
+                  animate-in fade-in slide-in-from-bottom-4 duration-300
                 "
+                style={{
+                  animationDelay: `${200 + (index * 50)}ms`
+                }}
               >
                 <div className="text-xs tracking-wide uppercase text-green-600 dark:text-green-400 mb-2">
                   {e.date}
