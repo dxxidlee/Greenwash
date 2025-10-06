@@ -87,3 +87,42 @@
     transform: translateY(0); 
   }
 }
+
+/* Reverse animations for closing */
+@keyframes fadeOut {
+  from { opacity: 1; }
+  to { opacity: 0; }
+}
+
+@keyframes fadeOutScale {
+  from { 
+    opacity: 1; 
+    transform: scale(1); 
+  }
+  to { 
+    opacity: 0; 
+    transform: scale(0.95); 
+  }
+}
+
+@keyframes fadeOutScaleDown {
+  from { 
+    opacity: 1; 
+    transform: scale(1) translateY(0); 
+  }
+  to { 
+    opacity: 0; 
+    transform: scale(0.95) translateY(16px); 
+  }
+}
+
+@keyframes fadeOutDown {
+  from { 
+    opacity: 1; 
+    transform: translateY(0); 
+  }
+  to { 
+    opacity: 0; 
+    transform: translateY(16px); 
+  }
+}

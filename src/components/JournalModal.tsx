@@ -18,6 +18,7 @@ export default function JournalModal({ open, onClose, entries }: Props) {
   const backdropRef = useRef<HTMLDivElement>(null);
   const panelRef = useRef<HTMLDivElement>(null);
   const prevActive = useRef<HTMLElement | null>(null);
+  const [isClosing, setIsClosing] = React.useState(false);
 
   useLockBodyScroll(open);
 
@@ -39,9 +40,18 @@ export default function JournalModal({ open, onClose, entries }: Props) {
     }
   }, [open]);
 
+  // Handle close with animation
+  const handleClose = () => {
+    setIsClosing(true);
+    setTimeout(() => {
+      onClose();
+      setIsClosing(false);
+    }, 500); // Match animation duration
+  };
+
   // Backdrop click closes; panel stops propagation
   const onBackdropMouseDown: React.MouseEventHandler<HTMLDivElement> = (e) => {
-    if (e.target === backdropRef.current) onClose();
+    if (e.target === backdropRef.current) handleClose();
   };
 
   if (!open) return null;
@@ -50,7 +60,7 @@ export default function JournalModal({ open, onClose, entries }: Props) {
     <>
       {/* Exit X — positioned at top right corner of screen, completely separate */}
       <button
-        onClick={onClose}
+        onClick={handleClose}
         aria-label="Close"
         style={{
           position: 'fixed',
@@ -62,16 +72,14 @@ export default function JournalModal({ open, onClose, entries }: Props) {
           inline-flex items-center justify-center
           h-12 w-12
           rounded-full
-          border border-black/10 dark:border-white/10
           shadow-[0_2px_12px_rgba(0,0,0,0.06)]
-          bg-white/90 dark:bg-neutral-900/90
+          bg-[rgba(0,143,70,0.3)]
           noise-surface
-          text-[#008F46]
-          hover:bg-white dark:hover:bg-neutral-900
+          text-white
+          hover:bg-[rgba(0,143,70,0.4)]
           transition-all duration-500 ease-out
-          focus:outline-none focus:ring-2 focus:ring-[#008F46]/30
-          opacity-0 scale-95
-          animate-[fadeInScale_0.5s_ease-out_0.1s_forwards]
+          focus:outline-none focus:ring-2 focus:ring-white/30
+          ${isClosing ? 'animate-[fadeOutScale_0.5s_ease-in_forwards]' : 'opacity-0 scale-95 animate-[fadeInScale_0.5s_ease-out_0.1s_forwards]'}
         "
       >
         <svg viewBox="0 0 24 24" width="18" height="18" aria-hidden="true">
@@ -89,15 +97,14 @@ export default function JournalModal({ open, onClose, entries }: Props) {
       >
         {/* Full screen blur layer with smooth animation */}
         <div 
-          className="
+          className={`
             fixed inset-0
             backdrop-blur-md md:backdrop-blur-lg
             supports-[backdrop-filter]:backdrop-saturate-150
             supports-[backdrop-filter]:backdrop-contrast-100
             backdrop-boost no-blur-fallback
-            opacity-0
-            animate-[fadeIn_0.4s_ease-out_forwards]
-          "
+            ${isClosing ? 'animate-[fadeOut_0.4s_ease-in_forwards]' : 'opacity-0 animate-[fadeIn_0.4s_ease-out_forwards]'}
+          `}
         />
 
         {/* Journal entries container - no visible container */}
@@ -105,15 +112,14 @@ export default function JournalModal({ open, onClose, entries }: Props) {
           ref={panelRef}
           tabIndex={-1}
           onClick={(e) => e.stopPropagation()}
-          className="
+          className={`
             relative z-10
             w-[92vw] sm:w-[86vw] md:w-auto
             h-screen
             max-w-[32rem] md:max-w-[34rem]
             focus:outline-none
-            opacity-0 scale-95 translate-y-4
-            animate-[fadeInScaleUp_0.5s_ease-out_0.2s_forwards]
-          "
+            ${isClosing ? 'animate-[fadeOutScaleDown_0.5s_ease-in_forwards]' : 'opacity-0 scale-95 translate-y-4 animate-[fadeInScaleUp_0.5s_ease-out_0.2s_forwards]'}
+          `}
         >
         {/* Scrollable column of journal entries with top/bottom spacing */}
         <div className="h-full w-full overflow-y-auto overscroll-contain scroll-smooth hide-scrollbar">
@@ -121,26 +127,24 @@ export default function JournalModal({ open, onClose, entries }: Props) {
             {entries.map((e, index) => (
               <article
                 key={e.id}
-                className="
+                className={`
                   relative
                   rounded-2xl md:rounded-[24px]
-                  border border-black/10 dark:border-white/10
                   shadow-[0_2px_12px_rgba(0,0,0,0.06)]
-                  bg-white/90 dark:bg-neutral-900/90
+                  bg-[rgba(0,143,70,0.3)]
                   noise-surface
                   p-4 sm:p-5 md:p-6
                   scroll-mt-6
-                  opacity-0 translate-y-4
-                  animate-[fadeInUp_0.4s_ease-out_forwards]
-                "
+                  ${isClosing ? 'animate-[fadeOutDown_0.4s_ease-in_forwards]' : 'opacity-0 translate-y-4 animate-[fadeInUp_0.4s_ease-out_forwards]'}
+                `}
                 style={{
                   animationDelay: `${300 + (index * 100)}ms`
                 }}
               >
-                <div className="text-xs tracking-wide uppercase text-[#008F46] mb-2">
+                <div className="text-xs tracking-wide uppercase text-white mb-2">
                   {e.date}
                 </div>
-                <div className="prose max-w-none text-sm md:text-[15px] leading-6 text-[#008F46]">
+                <div className="prose max-w-none text-sm md:text-[15px] leading-6 text-white">
                   {e.body}
                 </div>
               </article>
