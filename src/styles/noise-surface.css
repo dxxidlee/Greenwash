@@ -42,31 +42,31 @@
   }
 }
 
-/* Custom animations for journal modal */
+/* Custom animations for journal modal - 1.25x faster */
 @keyframes fadeIn {
   from { opacity: 0; }
   to { opacity: 1; }
 }
 
 @keyframes fadeInScale {
-  from { 
-    opacity: 0; 
-    transform: scale(0.95); 
+  from {
+    opacity: 0;
+    transform: scale(0.95);
   }
-  to { 
-    opacity: 1; 
-    transform: scale(1); 
+  to {
+    opacity: 1;
+    transform: scale(1);
   }
 }
 
 @keyframes fadeInScaleUp {
-  from { 
-    opacity: 0; 
-    transform: scale(0.95) translateY(16px); 
+  from {
+    opacity: 0;
+    transform: scale(0.95) translateY(16px);
   }
-  to { 
-    opacity: 1; 
-    transform: scale(1) translateY(0); 
+  to {
+    opacity: 1;
+    transform: scale(1) translateY(0);
   }
 }
 
@@ -81,7 +81,7 @@
   }
 }
 
-/* Reverse animations for closing */
+/* Reverse animations for closing - 1.25x faster */
 @keyframes fadeOut {
   from { opacity: 1; }
   to { opacity: 0; }
