@@ -1,14 +1,7 @@
 /* Rounded-square card surface: soft base + ultra-subtle grain */
 .noise-surface {
   position: relative;
-  background:
-    linear-gradient(0deg, rgba(255,255,255,0.9), rgba(255,255,255,0.9));
-}
-@media (prefers-color-scheme: dark) {
-  .noise-surface {
-    background:
-      linear-gradient(0deg, rgba(28,28,28,0.85), rgba(28,28,28,0.85));
-  }
+  /* Background color will be set by Tailwind classes */
 }
 
 /* Grain overlay */
