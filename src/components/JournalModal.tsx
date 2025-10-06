@@ -61,12 +61,7 @@ export default function JournalModal({ open, onClose, entries }: Props) {
         className="
           relative w-full h-[90vh] sm:h-[86vh] md:h-[82vh]
           max-w-[48rem] md:max-w-[56rem]
-          rounded-2xl md:rounded-3xl
-          bg-white/90 dark:bg-neutral-900/90
-          shadow-[0_10px_40px_rgba(0,0,0,0.25)]
-          border border-black/10 dark:border-white/10
           focus:outline-none
-          noise-surface
           animate-in zoom-in-95 fade-in duration-200 ease-out
           p-4 sm:p-6 md:p-8
           overflow-hidden
@@ -106,22 +101,20 @@ export default function JournalModal({ open, onClose, entries }: Props) {
                 key={e.id}
                 className="
                   relative
-                  rounded-2xl md:rounded-[24px]
-                  border border-black/10 dark:border-white/10
-                  shadow-[0_2px_12px_rgba(0,0,0,0.06)]
-                  bg-white/90 dark:bg-neutral-900/90
-                  noise-surface
+                  rounded-[40px]
+                  bg-black/30
                   p-4 sm:p-5 md:p-6
                   scroll-mt-6
                 "
+                style={{ backgroundColor: 'rgba(0, 0, 0, 0.3)' }}
               >
-                <div className="text-xs tracking-wide uppercase text-neutral-500 mb-2">
+                <div className="text-[15px] tracking-wide uppercase text-neutral-500 mb-2">
                   {e.date}
                 </div>
-                <h3 className="text-base md:text-lg font-medium mb-2">
+                <h3 className="text-[15px] font-medium mb-2">
                   {e.title}
                 </h3>
-                <div className="prose prose-neutral dark:prose-invert max-w-none text-sm md:text-[15px] leading-6">
+                <div className="prose prose-neutral dark:prose-invert max-w-none text-[15px] leading-6">
                   {e.body}
                 </div>
               </article>
