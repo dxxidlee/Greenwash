@@ -1,7 +1,8 @@
 'use client';
 
-import React, { useState } from 'react';
+import React, { useState, useRef, useCallback } from 'react';
 import { CheckCircle, XCircle, RotateCcw, Minimize2, Maximize2, X } from 'lucide-react';
+import { useLockBodyScroll } from '../../components/useLockBodyScroll';
 
 interface GreenwashQuizProps {
   isOpen: boolean;
@@ -27,6 +28,40 @@ const GreenwashQuiz: React.FC<GreenwashQuizProps> = ({ isOpen, onClose }) => {
   const [answers, setAnswers] = useState<Record<number, string>>({});
   const [showResults, setShowResults] = useState(false);
   const [isMinimized, setIsMinimized] = useState(false);
+  const [isClosing, setIsClosing] = useState(false);
+  
+  const backdropRef = useRef<HTMLDivElement>(null);
+  const panelRef = useRef<HTMLDivElement>(null);
+  const prevActive = useRef<HTMLElement | null>(null);
+
+  useLockBodyScroll(isOpen);
+
+  // Handle close with animation
+  const handleClose = useCallback(() => {
+    setIsClosing(true);
+    setTimeout(() => {
+      onClose();
+      setIsClosing(false);
+    }, 400); // Match animation duration
+  }, [onClose]);
+
+  // ESC to close
+  React.useEffect(() => {
+    if (!isOpen) return;
+    const onKey = (e: KeyboardEvent) => { if (e.key === "Escape") handleClose(); };
+    window.addEventListener("keydown", onKey);
+    return () => window.removeEventListener("keydown", onKey);
+  }, [isOpen, handleClose]);
+
+  // Focus trap (minimal) + restore
+  React.useEffect(() => {
+    if (isOpen) {
+      prevActive.current = document.activeElement as HTMLElement | null;
+      panelRef.current?.focus();
+    } else {
+      prevActive.current?.focus?.();
+    }
+  }, [isOpen]);
 
   const questions: QuizQuestion[] = [
     {
@@ -166,176 +201,207 @@ const GreenwashQuiz: React.FC<GreenwashQuizProps> = ({ isOpen, onClose }) => {
   if (!isOpen) return null;
 
   return (
-    <div className="fixed inset-0 z-50 bg-black bg-opacity-50 flex items-center justify-center p-4">
-      <div className={`bg-white text-green-800 font-mono shadow-2xl border-2 border-green-600 transition-all duration-300 ${
-        isMinimized ? 'w-96 h-16' : 'w-[95vw] h-[90vh] max-w-6xl'
-      }`}>
-        {/* Header Bar */}
-        <div className="border-b-2 border-green-600 bg-white p-3 flex items-center justify-between sticky top-0 z-50">
-          <div className="flex items-center gap-4">
-            <div className="text-lg font-bold tracking-wider text-green-700">GREENWASH</div>
-            <div className="text-xs text-green-600">OFFICER CERTIFICATION QUIZ</div>
-          </div>
-          <div className="flex items-center gap-2">
-            <div className="text-xs text-green-600">
-              {new Date().toLocaleDateString()} {new Date().toLocaleTimeString()}
-            </div>
-            <button
-              onClick={() => setIsMinimized(!isMinimized)}
-              className="p-1 hover:bg-green-100 border border-green-600"
-              title={isMinimized ? "Maximize" : "Minimize"}
-            >
-              {isMinimized ? <Maximize2 size={16} /> : <Minimize2 size={16} />}
-            </button>
-            <button
-              onClick={onClose}
-              className="p-1 hover:bg-red-100 border border-red-400 text-red-600"
-              title="Close"
-            >
-              <X size={16} />
-            </button>
-          </div>
-        </div>
+    <>
+      {/* Exit X — positioned at top right corner of screen, completely separate */}
+      <button
+        onClick={handleClose}
+        aria-label="Close"
+        style={{
+          position: 'fixed',
+          top: '16px',
+          right: '16px',
+          zIndex: 200
+        }}
+        className={`
+          inline-flex items-center justify-center
+          h-12 w-12
+          rounded-full
+          shadow-[0_2px_12px_rgba(0,0,0,0.06)]
+          bg-[rgba(0,143,70,0.3)]
+          noise-surface
+          text-white
+          hover:bg-[rgba(0,143,70,0.4)]
+          transition-all duration-500 ease-out
+          focus:outline-none focus:ring-2 focus:ring-white/30
+          ${isClosing ? 'animate-[fadeOutScale_0.4s_ease-in_forwards]' : 'opacity-0 scale-95 animate-[fadeInScale_0.4s_ease-out_0.08s_forwards]'}
+        `}
+      >
+        <svg viewBox="0 0 24 24" width="18" height="18" aria-hidden="true">
+          <path d="M6 6l12 12M18 6L6 18" stroke="currentColor" strokeWidth="2" strokeLinecap="round"/>
+        </svg>
+      </button>
 
-        {!isMinimized && (
-          <div className="h-[calc(90vh-80px)] overflow-y-auto p-6">
+      <div
+        ref={backdropRef}
+        onClick={handleClose}
+        aria-hidden={false}
+        aria-modal="true"
+        role="dialog"
+        className="fixed inset-0 z-[100] flex items-center justify-center bg-transparent"
+      >
+        {/* Full screen blur layer with smooth animation */}
+        <div 
+          className={`
+            fixed inset-0
+            backdrop-blur-md md:backdrop-blur-lg
+            supports-[backdrop-filter]:backdrop-saturate-150
+            supports-[backdrop-filter]:backdrop-contrast-100
+            backdrop-boost no-blur-fallback
+            ${isClosing ? 'animate-[fadeOut_0.32s_ease-in_forwards]' : 'opacity-0 animate-[fadeIn_0.32s_ease-out_forwards]'}
+          `}
+        />
+
+        {/* Quiz container - no visible container */}
+        <div
+          ref={panelRef}
+          tabIndex={-1}
+          onClick={(e) => e.stopPropagation()}
+          className={`
+            relative z-10
+            w-[92vw] sm:w-[86vw] md:w-auto
+            h-screen
+            max-w-[32rem] md:max-w-[34rem]
+            focus:outline-none
+            ${isClosing ? 'animate-[fadeOutScaleDown_0.4s_ease-in_forwards]' : 'opacity-0 scale-95 translate-y-4 animate-[fadeInScaleUp_0.4s_ease-out_0.16s_forwards]'}
+          `}
+        >
+        {/* Scrollable quiz content with top/bottom spacing */}
+        <div className="h-full w-full overflow-y-auto overscroll-contain scroll-smooth hide-scrollbar">
+          <div className="pt-20 pb-20 space-y-4 sm:space-y-5 md:space-y-6">
             {showResults ? (
-              <div className="max-w-4xl mx-auto">
+              <div className="space-y-4 sm:space-y-5 md:space-y-6">
                 {(() => {
                   const score = calculateScore();
                   const result = getResultMessage(score);
                   
                   return (
-                    <div className={`border-4 ${
-                      result.color === 'green' ? 'border-green-600 bg-green-50' :
-                      result.color === 'yellow' ? 'border-yellow-600 bg-yellow-50' :
-                      result.color === 'orange' ? 'border-orange-600 bg-orange-50' :
-                      'border-red-600 bg-red-50'
-                    } p-8`}>
-                      <div className="text-center mb-8">
-                        <div className="text-6xl font-bold mb-4">{score}/60</div>
-                        <div className={`text-2xl font-bold mb-2 ${
-                          result.color === 'green' ? 'text-green-800' :
-                          result.color === 'yellow' ? 'text-yellow-800' :
-                          result.color === 'orange' ? 'text-orange-800' :
-                          'text-red-800'
-                        }`}>
+                    <article
+                      className={`
+                        relative
+                        rounded-2xl md:rounded-[24px]
+                        shadow-[0_2px_12px_rgba(0,0,0,0.06)]
+                        bg-[rgba(0,143,70,0.3)]
+                        noise-surface
+                        p-4 sm:p-5 md:p-6
+                        scroll-mt-6
+                        opacity-0 translate-y-4
+                        animate-[fadeInUp_0.32s_ease-out_forwards]
+                      `}
+                    >
+                      <div className="text-center mb-6">
+                        <div className="text-4xl font-bold mb-2 text-white">{score}/60</div>
+                        <div className="text-lg font-bold mb-2 text-white">
                           {result.title}
                         </div>
-                        <div className="text-sm text-gray-700 leading-relaxed">
+                        <div className="text-sm text-white leading-relaxed">
                           {result.message}
                         </div>
                       </div>
 
-                      <div className="space-y-4 mb-8">
-                        {questions.map((q, idx) => {
-                          const userAnswer = answers[idx];
-                          const isCorrect = userAnswer === q.correctAnswer;
-                          const selectedOption = q.options.find(opt => opt.id === userAnswer);
-                          
-                          return (
-                            <div key={q.id} className="border-2 border-gray-300 bg-white p-4">
-                              <div className="flex items-start gap-3 mb-2">
-                                {isCorrect ? (
-                                  <CheckCircle className="text-green-600 flex-shrink-0" size={20} />
-                                ) : (
-                                  <XCircle className="text-red-600 flex-shrink-0" size={20} />
-                                )}
-                                <div className="flex-1">
-                                  <div className="text-sm font-bold mb-1">Question {idx + 1}</div>
-                                  <div className="text-xs text-gray-600 mb-2">{q.question}</div>
-                                  <div className="text-xs text-gray-700">
-                                    Your answer: {selectedOption?.text}
-                                  </div>
-                                  {!isCorrect && (
-                                    <div className="text-xs text-green-700 mt-1">
-                                      Correct: {q.options.find(opt => opt.id === q.correctAnswer)?.text}
-                                    </div>
-                                  )}
-                                </div>
-                              </div>
-                            </div>
-                          );
-                        })}
-                      </div>
-
                       <button
                         onClick={restart}
-                        className="w-full py-3 bg-green-700 text-white flex items-center justify-center gap-2 hover:bg-green-800 transition-colors"
+                        className="w-full py-3 bg-[rgba(0,143,70,0.5)] text-white flex items-center justify-center gap-2 hover:bg-[rgba(0,143,70,0.6)] transition-colors rounded-lg"
                       >
                         <RotateCcw size={16} />
                         Retake Assessment
                       </button>
-                    </div>
+                    </article>
                   );
                 })()}
               </div>
             ) : (
-              <div className="max-w-4xl mx-auto">
-                {/* Header */}
-                <div className="text-center mb-8">
-                  <div className="text-sm tracking-wider text-green-700 mb-2">GREENWASH COMPLIANCE DIVISION</div>
-                  <h1 className="text-3xl font-bold text-gray-900 mb-2">Officer Certification Quiz</h1>
-                  <div className="text-sm text-gray-600">Question {currentQuestion + 1} of {questions.length}</div>
-                </div>
+              <div className="space-y-4 sm:space-y-5 md:space-y-6">
+                {/* Quiz Header */}
+                <article
+                  className={`
+                    relative
+                    rounded-2xl md:rounded-[24px]
+                    shadow-[0_2px_12px_rgba(0,0,0,0.06)]
+                    bg-[rgba(0,143,70,0.3)]
+                    noise-surface
+                    p-4 sm:p-5 md:p-6
+                    scroll-mt-6
+                    opacity-0 translate-y-4
+                    animate-[fadeInUp_0.32s_ease-out_forwards]
+                  `}
+                >
+                  <div className="text-center">
+                    <div className="text-sm tracking-wide uppercase text-white mb-2">GREENWASH COMPLIANCE DIVISION</div>
+                    <h1 className="text-xl font-bold text-white mb-2">Officer Certification Quiz</h1>
+                    <div className="text-sm text-white">Question {currentQuestion + 1} of {questions.length}</div>
+                  </div>
+                </article>
 
                 {/* Progress Bar */}
-                <div className="w-full h-2 bg-gray-200 mb-8">
-                  <div 
-                    className="h-full bg-green-600 transition-all duration-300"
-                    style={{ width: `${((currentQuestion + 1) / questions.length) * 100}%` }}
-                  ></div>
-                </div>
+                <article
+                  className={`
+                    relative
+                    rounded-2xl md:rounded-[24px]
+                    shadow-[0_2px_12px_rgba(0,0,0,0.06)]
+                    bg-[rgba(0,143,70,0.3)]
+                    noise-surface
+                    p-4 sm:p-5 md:p-6
+                    scroll-mt-6
+                    opacity-0 translate-y-4
+                    animate-[fadeInUp_0.32s_ease-out_forwards]
+                  `}
+                  style={{ animationDelay: '100ms' }}
+                >
+                  <div className="w-full h-2 bg-white/20 rounded-full">
+                    <div 
+                      className="h-full bg-white transition-all duration-300 rounded-full"
+                      style={{ width: `${((currentQuestion + 1) / questions.length) * 100}%` }}
+                    ></div>
+                  </div>
+                </article>
 
                 {/* Question */}
-                <div className="bg-gray-50 border-2 border-green-600 p-8 mb-6">
-                  <h2 className="text-xl font-bold text-gray-900 mb-6 leading-relaxed">
+                <article
+                  className={`
+                    relative
+                    rounded-2xl md:rounded-[24px]
+                    shadow-[0_2px_12px_rgba(0,0,0,0.06)]
+                    bg-[rgba(0,143,70,0.3)]
+                    noise-surface
+                    p-4 sm:p-5 md:p-6
+                    scroll-mt-6
+                    opacity-0 translate-y-4
+                    animate-[fadeInUp_0.32s_ease-out_forwards]
+                  `}
+                  style={{ animationDelay: '200ms' }}
+                >
+                  <h2 className="text-lg font-bold text-white mb-6 leading-relaxed">
                     {questions[currentQuestion].question}
                   </h2>
 
                   <div className="space-y-3">
-                    {questions[currentQuestion].options.map((option) => (
+                    {questions[currentQuestion].options.map((option, index) => (
                       <button
                         key={option.id}
                         onClick={() => handleAnswer(option.id)}
-                        className="w-full text-left p-4 border-2 border-gray-300 hover:border-green-600 hover:bg-white transition-all group"
+                        className="w-full text-left p-4 bg-[rgba(0,143,70,0.2)] hover:bg-[rgba(0,143,70,0.4)] transition-all rounded-lg group"
                       >
                         <div className="flex items-start gap-3">
-                          <div className="w-8 h-8 rounded-full border-2 border-gray-400 group-hover:border-green-600 flex items-center justify-center flex-shrink-0 transition-colors">
-                            <span className="text-sm font-bold text-gray-600 group-hover:text-green-600 uppercase">
+                          <div className="w-8 h-8 rounded-full border-2 border-white/30 group-hover:border-white flex items-center justify-center flex-shrink-0 transition-colors">
+                            <span className="text-sm font-bold text-white uppercase">
                               {option.id}
                             </span>
                           </div>
-                          <div className="flex-1 text-sm text-gray-800 leading-relaxed pt-1">
+                          <div className="flex-1 text-sm text-white leading-relaxed pt-1">
                             {option.text}
                           </div>
                         </div>
                       </button>
                     ))}
                   </div>
-                </div>
-
-                <div className="text-xs text-gray-500 text-center">
-                  Your responses will be evaluated for compliance readiness
-                </div>
+                </article>
               </div>
             )}
           </div>
-        )}
-
-        {/* Status Bar */}
-        {!isMinimized && (
-          <div className="border-t-2 border-green-600 bg-green-50 px-4 py-2 flex items-center justify-between text-xs">
-            <div className="text-green-700">
-              {showResults ? 'Assessment Complete' : `Question ${currentQuestion + 1} of ${questions.length}`}
-            </div>
-            <div className="text-green-600">
-              GREENWASH Compliance Division • Officer Certification
-            </div>
-          </div>
-        )}
+        </div>
+        </div>
       </div>
-    </div>
+    </>
   );
 };
 
