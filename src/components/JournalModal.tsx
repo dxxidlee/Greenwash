@@ -75,10 +75,10 @@ export default function JournalModal({ open, onClose, entries }: Props) {
           shadow-[0_2px_12px_rgba(0,0,0,0.06)]
           bg-[rgba(0,143,70,0.3)]
           noise-surface
-          text-white
+          text-[#008F46]
           hover:bg-[rgba(0,143,70,0.4)]
           transition-all duration-500 ease-out
-          focus:outline-none focus:ring-2 focus:ring-white/30
+          focus:outline-none focus:ring-2 focus:ring-[#008F46]/30
           ${isClosing ? 'animate-[fadeOutScale_0.5s_ease-in_forwards]' : 'opacity-0 scale-95 animate-[fadeInScale_0.5s_ease-out_0.1s_forwards]'}
         "
       >
@@ -141,10 +141,10 @@ export default function JournalModal({ open, onClose, entries }: Props) {
                   animationDelay: `${300 + (index * 100)}ms`
                 }}
               >
-                <div className="text-xs tracking-wide uppercase text-white mb-2">
+                <div className="text-xs tracking-wide uppercase text-[#008F46] mb-2">
                   {e.date}
                 </div>
-                <div className="prose max-w-none text-sm md:text-[15px] leading-6 text-white">
+                <div className="prose max-w-none text-sm md:text-[15px] leading-6 text-[#008F46]">
                   {e.body}
                 </div>
               </article>
