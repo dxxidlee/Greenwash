@@ -55,18 +55,19 @@ export default function JournalModal({ open, onClose, entries }: Props) {
       role="dialog"
       className="fixed inset-0 z-[100] flex items-center justify-center bg-transparent animate-in fade-in duration-150"
     >
-      {/* Localized blur effect behind the journal panel */}
+      {/* Localized blur effect - positioned behind the journal panel */}
       <div 
         className="
-          absolute inset-0
+          absolute
+          w-[92vw] sm:w-[86vw] md:w-auto
+          h-[84vh] sm:h-[82vh] md:h-[78vh]
+          max-w-[40rem] md:max-w-[42rem]
           backdrop-blur-md md:backdrop-blur-lg
           supports-[backdrop-filter]:backdrop-saturate-150
           supports-[backdrop-filter]:backdrop-contrast-100
           backdrop-boost no-blur-fallback
+          rounded-2xl md:rounded-3xl
         "
-        style={{
-          clipPath: 'inset(10vh 10vw 10vh 10vw)',
-        }}
       />
       
       <div
