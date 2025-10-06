@@ -3,9 +3,9 @@ import { useLockBodyScroll } from "./useLockBodyScroll";
 
 type JournalEntry = {
   id: string;
-  date: string;      // "05.01.25"
+  date: string;    // "05.01.25"
   title: string;
-  body: string;      // plain text or sanitized HTML
+  body: string;    // plain text or sanitized HTML
 };
 
 type Props = {
@@ -21,7 +21,7 @@ export default function JournalModal({ open, onClose, entries }: Props) {
 
   useLockBodyScroll(open);
 
-  // Close on ESC
+  // ESC to close
   useEffect(() => {
     if (!open) return;
     const onKey = (e: KeyboardEvent) => { if (e.key === "Escape") onClose(); };
@@ -29,7 +29,7 @@ export default function JournalModal({ open, onClose, entries }: Props) {
     return () => window.removeEventListener("keydown", onKey);
   }, [open, onClose]);
 
-  // Focus trap + restore
+  // Focus trap (minimal) + restore
   useEffect(() => {
     if (open) {
       prevActive.current = document.activeElement as HTMLElement | null;
@@ -39,8 +39,8 @@ export default function JournalModal({ open, onClose, entries }: Props) {
     }
   }, [open]);
 
-  // Click-outside to close
-  const onBackdropClick: React.MouseEventHandler<HTMLDivElement> = (e) => {
+  // Backdrop click closes; panel stops propagation
+  const onBackdropMouseDown: React.MouseEventHandler<HTMLDivElement> = (e) => {
     if (e.target === backdropRef.current) onClose();
   };
 
@@ -49,26 +49,42 @@ export default function JournalModal({ open, onClose, entries }: Props) {
   return (
     <div
       ref={backdropRef}
-      onMouseDown={onBackdropClick}
+      onMouseDown={onBackdropMouseDown}
       aria-hidden={false}
       aria-modal="true"
       role="dialog"
-      className="fixed inset-0 z-[100] flex items-center justify-center bg-black/50 backdrop-blur-[2px] animate-in fade-in duration-150"
+      className="
+        fixed inset-0 z-[100] flex items-center justify-center
+        bg-transparent                       /* NO darkening */
+        backdrop-blur-md md:backdrop-blur-lg /* blur only */
+        supports-[backdrop-filter]:backdrop-saturate-150
+        supports-[backdrop-filter]:backdrop-contrast-100
+        animate-in fade-in duration-150
+        pointer-events-auto
+        backdrop-boost no-blur-fallback
+      "
     >
       <div
         ref={panelRef}
         tabIndex={-1}
+        onMouseDown={(e) => e.stopPropagation()}
         className="
-          relative w-full h-[90vh] sm:h-[86vh] md:h-[82vh]
-          max-w-[48rem] md:max-w-[56rem]
+          relative
+          w-[92vw] sm:w-[86vw] md:w-auto
+          h-[84vh] sm:h-[82vh] md:h-[78vh]
+          max-w-[40rem] md:max-w-[42rem]           /* THIN column like reference */
+          rounded-2xl md:rounded-3xl
+          bg-white/90 dark:bg-neutral-900/85
+          border border-black/10 dark:border-white/10
+          shadow-[0_10px_40px_rgba(0,0,0,0.25)]
           focus:outline-none
+          noise-surface
           animate-in zoom-in-95 fade-in duration-200 ease-out
-          p-4 sm:p-6 md:p-8
+          p-4 sm:p-6 md:p-7
           overflow-hidden
         "
-        onMouseDown={(e) => e.stopPropagation()}
       >
-        {/* Close (X) button */}
+        {/* Exit X — same visuals & behavior */}
         <button
           onClick={onClose}
           aria-label="Close"
@@ -87,34 +103,28 @@ export default function JournalModal({ open, onClose, entries }: Props) {
           </svg>
         </button>
 
-        {/* Scrollable stack of rounded-square cards */}
-        <div
-          className="
-            modal-scroll
-            h-full w-full overflow-y-auto overscroll-contain scroll-smooth
-            pr-1
-          "
-        >
+        {/* Scrollable column of rounded-square entries; scrollbar hidden */}
+        <div className="h-full w-full overflow-y-auto overscroll-contain scroll-smooth hide-scrollbar pr-0">
           <div className="space-y-4 sm:space-y-5 md:space-y-6">
             {entries.map((e) => (
               <article
                 key={e.id}
                 className="
                   relative
-                  rounded-[40px]
-                  bg-black/30
+                  rounded-2xl md:rounded-[24px]
+                  border border-black/10 dark:border-white/10
+                  shadow-[0_2px_12px_rgba(0,0,0,0.06)]
+                  bg-white/90 dark:bg-neutral-900/90
+                  noise-surface
                   p-4 sm:p-5 md:p-6
                   scroll-mt-6
                 "
-                style={{ backgroundColor: 'rgba(0, 0, 0, 0.3)' }}
               >
-                <div className="text-[15px] tracking-wide uppercase text-neutral-500 mb-2">
+                <div className="text-xs tracking-wide uppercase text-neutral-500 mb-2">
                   {e.date}
                 </div>
-                <h3 className="text-[15px] font-medium mb-2">
-                  {e.title}
-                </h3>
-                <div className="prose prose-neutral dark:prose-invert max-w-none text-[15px] leading-6">
+                <h3 className="text-base md:text-lg font-medium mb-2">{e.title}</h3>
+                <div className="prose prose-neutral dark:prose-invert max-w-none text-sm md:text-[15px] leading-6">
                   {e.body}
                 </div>
               </article>

@@ -1,22 +1,22 @@
-/* Minimal, tasteful noise + soft base tone to avoid flat solids */
+/* Rounded-square card surface: soft base + ultra-subtle grain */
 .noise-surface {
   position: relative;
   background:
-    linear-gradient(0deg, rgba(255,255,255,0.9), rgba(255,255,255,0.9)) /* light base for light mode */;
+    linear-gradient(0deg, rgba(255,255,255,0.9), rgba(255,255,255,0.9));
 }
 @media (prefers-color-scheme: dark) {
   .noise-surface {
     background:
-      linear-gradient(0deg, rgba(28,28,28,0.9), rgba(28,28,28,0.9));
+      linear-gradient(0deg, rgba(28,28,28,0.85), rgba(28,28,28,0.85));
   }
 }
 
-/* Subtle border highlight + shadow is from the card classes; here we add the noise overlay */
+/* Grain overlay */
 .noise-surface::after {
   content: "";
   pointer-events: none;
   position: absolute; inset: 0;
-  opacity: .06; /* keep it VERY subtle; tweak 0.04–0.08 */
+  opacity: .06; /* tweak between 0.04–0.08 to taste */
   mix-blend-mode: overlay;
   background-image: url("data:image/svg+xml;utf8,\
 <svg xmlns='http://www.w3.org/2000/svg' width='120' height='120' viewBox='0 0 120 120'>\
@@ -27,19 +27,24 @@
   </filter>\
   <rect width='100%' height='100%' filter='url(#n)'/>\
 </svg>");
-  background-size: 220px 220px; /* large, slow-moving grain */
+  background-size: 220px 220px;
 }
 
-/* Thin, neutral scrollbar */
-.modal-scroll {
-  scrollbar-gutter: stable;
+/* HIDE scrollbars but preserve scroll */
+.hide-scrollbar {
+  -ms-overflow-style: none;     /* IE/Edge legacy */
+  scrollbar-width: none;        /* Firefox */
 }
-.modal-scroll::-webkit-scrollbar { width: 8px; }
-.modal-scroll::-webkit-scrollbar-thumb {
-  background: rgba(0,0,0,.15);
-  border-radius: 9999px;
-}
-.modal-scroll::-webkit-scrollbar-track { background: transparent; }
-@media (prefers-color-scheme: dark) {
-  .modal-scroll::-webkit-scrollbar-thumb { background: rgba(255,255,255,.2); }
+.hide-scrollbar::-webkit-scrollbar { display: none; } /* Chrome/Safari/Edge */
+
+/* Backdrop GPU hint */
+.backdrop-boost { will-change: backdrop-filter; }
+
+/* No backdrop-filter fallback: keep brightness, no dark tint */
+@supports not ((-webkit-backdrop-filter: blur(1px)) or (backdrop-filter: blur(1px))) {
+  .no-blur-fallback { background: transparent !important; }
+  /* Optional slight clarity boost to separate modal without dimming */
+  #appRoot[data-modal-open="true"] {
+    filter: contrast(1.02) saturate(1.02);
+  }
 }
