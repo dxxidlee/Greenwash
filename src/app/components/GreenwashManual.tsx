@@ -1,7 +1,8 @@
 'use client';
 
-import React, { useState } from 'react';
+import React, { useState, useRef, useCallback } from 'react';
 import { BookOpen, ChevronDown, ChevronRight, AlertTriangle, Scale, Eye, Shield, FileText, X, Search, Minimize2, Maximize2 } from 'lucide-react';
+import { useLockBodyScroll } from '../../components/useLockBodyScroll';
 
 interface GreenwashManualProps {
   isOpen: boolean;
@@ -20,6 +21,40 @@ const GreenwashManual: React.FC<GreenwashManualProps> = ({ isOpen, onClose }) =>
   const [expandedItems, setExpandedItems] = useState<Record<string, boolean>>({});
   const [searchTerm, setSearchTerm] = useState('');
   const [isMinimized, setIsMinimized] = useState(false);
+  const [isClosing, setIsClosing] = useState(false);
+  
+  const backdropRef = useRef<HTMLDivElement>(null);
+  const panelRef = useRef<HTMLDivElement>(null);
+  const prevActive = useRef<HTMLElement | null>(null);
+
+  useLockBodyScroll(isOpen);
+
+  // Handle close with animation
+  const handleClose = useCallback(() => {
+    setIsClosing(true);
+    setTimeout(() => {
+      onClose();
+      setIsClosing(false);
+    }, 400); // Match animation duration
+  }, [onClose]);
+
+  // ESC to close
+  React.useEffect(() => {
+    if (!isOpen) return;
+    const onKey = (e: KeyboardEvent) => { if (e.key === "Escape") handleClose(); };
+    window.addEventListener("keydown", onKey);
+    return () => window.removeEventListener("keydown", onKey);
+  }, [isOpen, handleClose]);
+
+  // Focus trap (minimal) + restore
+  React.useEffect(() => {
+    if (isOpen) {
+      prevActive.current = document.activeElement as HTMLElement | null;
+      panelRef.current?.focus();
+    } else {
+      prevActive.current?.focus?.();
+    }
+  }, [isOpen]);
 
   const toggleItem = (id: string) => {
     setExpandedItems(prev => ({
@@ -450,123 +485,224 @@ const GreenwashManual: React.FC<GreenwashManualProps> = ({ isOpen, onClose }) =>
   if (!isOpen) return null;
 
   return (
-    <div className="fixed inset-0 z-50 bg-black bg-opacity-50 flex items-center justify-center p-4">
-      <div className={`bg-white text-green-800 font-mono shadow-2xl border-2 border-green-600 transition-all duration-300 ${
-        isMinimized ? 'w-96 h-16' : 'w-[95vw] h-[90vh] max-w-7xl'
-      }`}>
-        {/* Header Bar */}
-        <div className="border-b-2 border-green-600 bg-green-50 p-3 flex items-center justify-between sticky top-0 z-50">
-          <div className="flex items-center gap-4">
-            <BookOpen size={20} className="text-green-700" />
-            <div>
-              <div className="text-lg font-bold tracking-wider text-green-700">GREENWASH</div>
-              <div className="text-xs text-green-600">COMPLIANCE MANUAL</div>
-            </div>
-          </div>
-          <div className="flex items-center gap-2">
-            <div className="text-xs text-green-600">
-              Edition 4.1 • January 2037
-            </div>
-            <button
-              onClick={() => setIsMinimized(!isMinimized)}
-              className="p-1 hover:bg-green-100 border border-green-600"
-              title={isMinimized ? "Maximize" : "Minimize"}
-            >
-              {isMinimized ? <Maximize2 size={16} /> : <Minimize2 size={16} />}
-            </button>
-            <button
-              onClick={onClose}
-              className="p-1 hover:bg-red-100 border border-red-400 text-red-600"
-              title="Close"
-            >
-              <X size={16} />
-            </button>
-          </div>
-        </div>
+    <>
+      {/* Exit X — positioned at top right corner of screen, completely separate */}
+      <button
+        onClick={handleClose}
+        aria-label="Close"
+        style={{
+          position: 'fixed',
+          top: '16px',
+          right: '16px',
+          zIndex: 200
+        }}
+        className={`
+          inline-flex items-center justify-center
+          h-12 w-12
+          rounded-full
+          shadow-[0_2px_12px_rgba(0,0,0,0.06)]
+          bg-[rgba(0,143,70,0.3)]
+          noise-surface
+          text-white
+          hover:bg-[rgba(0,143,70,0.4)]
+          transition-all duration-500 ease-out
+          focus:outline-none focus:ring-2 focus:ring-white/30
+          ${isClosing ? 'animate-[fadeOutScale_0.4s_ease-in_forwards]' : 'opacity-0 scale-95 animate-[fadeInScale_0.4s_ease-out_0.08s_forwards]'}
+        `}
+      >
+        <svg viewBox="0 0 24 24" width="18" height="18" aria-hidden="true">
+          <path d="M6 6l12 12M18 6L6 18" stroke="currentColor" strokeWidth="2" strokeLinecap="round"/>
+        </svg>
+      </button>
 
-        {!isMinimized && (
-          <>
-            {/* Search Bar */}
-            <div className="border-b-2 border-green-600 bg-white p-3">
+      <div
+        ref={backdropRef}
+        onClick={handleClose}
+        aria-hidden={false}
+        aria-modal="true"
+        role="dialog"
+        className="fixed inset-0 z-[100] flex items-center justify-center bg-transparent"
+      >
+        {/* Full screen blur layer with smooth animation */}
+        <div 
+          className={`
+            fixed inset-0
+            backdrop-blur-md md:backdrop-blur-lg
+            supports-[backdrop-filter]:backdrop-saturate-150
+            supports-[backdrop-filter]:backdrop-contrast-100
+            backdrop-boost no-blur-fallback
+            ${isClosing ? 'animate-[fadeOut_0.32s_ease-in_forwards]' : 'opacity-0 animate-[fadeIn_0.32s_ease-out_forwards]'}
+          `}
+        />
+
+        {/* Manual container - no visible container */}
+        <div
+          ref={panelRef}
+          tabIndex={-1}
+          onClick={(e) => e.stopPropagation()}
+          className={`
+            relative z-10
+            w-[92vw] sm:w-[86vw] md:w-auto
+            h-screen
+            max-w-[32rem] md:max-w-[34rem]
+            focus:outline-none
+            ${isClosing ? 'animate-[fadeOutScaleDown_0.4s_ease-in_forwards]' : 'opacity-0 scale-95 translate-y-4 animate-[fadeInScaleUp_0.4s_ease-out_0.16s_forwards]'}
+          `}
+        >
+        {/* Scrollable manual content with top/bottom spacing */}
+        <div className="h-full w-full overflow-y-auto overscroll-contain scroll-smooth hide-scrollbar">
+          <div className="pt-20 pb-20 space-y-4 sm:space-y-5 md:space-y-6">
+            {/* Manual Header */}
+            <article
+              className={`
+                relative
+                rounded-2xl md:rounded-[24px]
+                shadow-[0_2px_12px_rgba(0,0,0,0.06)]
+                bg-[rgba(0,143,70,0.3)]
+                noise-surface
+                p-4 sm:p-5 md:p-6
+                scroll-mt-6
+                opacity-0 translate-y-4
+                animate-[fadeInUp_0.32s_ease-out_forwards]
+              `}
+            >
+              <div className="text-center">
+                <div className="text-sm tracking-wide uppercase text-white mb-2">GREENWASH COMPLIANCE MANUAL</div>
+                <h1 className="text-xl font-bold text-white mb-2">Officer Reference Guide</h1>
+                <div className="text-sm text-white">Edition 4.1 • January 2037</div>
+              </div>
+            </article>
+
+            {/* Search */}
+            <article
+              className={`
+                relative
+                rounded-2xl md:rounded-[24px]
+                shadow-[0_2px_12px_rgba(0,0,0,0.06)]
+                bg-[rgba(0,143,70,0.3)]
+                noise-surface
+                p-4 sm:p-5 md:p-6
+                scroll-mt-6
+                opacity-0 translate-y-4
+                animate-[fadeInUp_0.32s_ease-out_forwards]
+              `}
+              style={{ animationDelay: '100ms' }}
+            >
               <div className="relative">
-                <Search size={16} className="absolute left-3 top-1/2 transform -translate-y-1/2 text-green-600" />
+                <Search size={16} className="absolute left-3 top-1/2 transform -translate-y-1/2 text-white" />
                 <input
                   type="text"
                   placeholder="Search manual..."
                   value={searchTerm}
                   onChange={(e) => setSearchTerm(e.target.value)}
-                  className="w-full pl-10 pr-4 py-2 border-2 border-green-600 text-sm focus:outline-none focus:border-green-700"
+                  className="w-full pl-10 pr-4 py-2 bg-[rgba(0,143,70,0.2)] border border-white/30 text-white text-sm focus:outline-none focus:border-white rounded"
                 />
               </div>
-            </div>
+            </article>
 
-            <div className="flex h-[calc(90vh-140px)] overflow-hidden">
-              {/* Sidebar Navigation */}
-              <div className="w-64 border-r-2 border-green-600 bg-white overflow-y-auto">
-                <div className="p-3">
-                  <div className="text-xs font-bold text-green-700 mb-3 uppercase tracking-wide">Table of Contents</div>
-                  <div className="space-y-1">
-                    {sections.map(section => {
-                      const Icon = section.icon;
-                      const isActive = activeSection === section.id;
-                      return (
-                        <button
-                          key={section.id}
-                          onClick={() => setActiveSection(section.id)}
-                          className={`w-full flex items-center gap-2 p-2.5 text-left text-sm transition-all ${
-                            isActive 
-                              ? 'bg-green-600 text-white border-l-4 border-green-800' 
-                              : 'hover:bg-green-50 text-green-800'
-                          }`}
-                        >
-                          <Icon size={16} />
-                          <span>{section.title}</span>
-                        </button>
-                      );
-                    })}
+            {/* Sections Navigation */}
+            <article
+              className={`
+                relative
+                rounded-2xl md:rounded-[24px]
+                shadow-[0_2px_12px_rgba(0,0,0,0.06)]
+                bg-[rgba(0,143,70,0.3)]
+                noise-surface
+                p-4 sm:p-5 md:p-6
+                scroll-mt-6
+                opacity-0 translate-y-4
+                animate-[fadeInUp_0.32s_ease-out_forwards]
+              `}
+              style={{ animationDelay: '200ms' }}
+            >
+              <div className="mb-4">
+                <div className="text-sm font-bold text-white mb-3">Table of Contents:</div>
+                <div className="space-y-2">
+                  {sections.map(section => {
+                    const Icon = section.icon;
+                    const isActive = activeSection === section.id;
+                    return (
+                      <button
+                        key={section.id}
+                        onClick={() => setActiveSection(section.id)}
+                        className={`w-full flex items-center gap-2 p-3 text-left transition-all rounded-lg ${
+                          isActive 
+                            ? 'bg-[rgba(0,143,70,0.5)] text-white' 
+                            : 'bg-[rgba(0,143,70,0.2)] hover:bg-[rgba(0,143,70,0.4)] text-white'
+                        }`}
+                      >
+                        <Icon size={16} />
+                        <span className="text-sm">{section.title}</span>
+                      </button>
+                    );
+                  })}
+                </div>
+              </div>
+            </article>
+
+            {/* Current Section Content */}
+            {currentSection && (
+              <article
+                className={`
+                  relative
+                  rounded-2xl md:rounded-[24px]
+                  shadow-[0_2px_12px_rgba(0,0,0,0.06)]
+                  bg-[rgba(0,143,70,0.3)]
+                  noise-surface
+                  p-4 sm:p-5 md:p-6
+                  scroll-mt-6
+                  opacity-0 translate-y-4
+                  animate-[fadeInUp_0.32s_ease-out_forwards]
+                `}
+                style={{ animationDelay: '300ms' }}
+              >
+                <div className="mb-4">
+                  <h2 className="text-lg font-bold text-white mb-4">{currentSection.title}</h2>
+                  <div className="text-sm text-white leading-relaxed">
+                    {currentSection.content}
                   </div>
                 </div>
+              </article>
+            )}
 
-                <div className="p-3 border-t-2 border-green-600 bg-green-50">
-                  <div className="text-xs font-bold text-green-700 mb-2">QUICK REFERENCE</div>
-                  <div className="space-y-1 text-xs text-green-600">
-                    <div className="flex justify-between">
-                      <span>Total Codes:</span>
-                      <span className="font-bold">41</span>
-                    </div>
-                    <div className="flex justify-between">
-                      <span>Active Zones:</span>
-                      <span className="font-bold">12</span>
-                    </div>
-                    <div className="flex justify-between">
-                      <span>Last Updated:</span>
-                      <span className="font-bold">Jan 2037</span>
-                    </div>
+            {/* Quick Reference */}
+            <article
+              className={`
+                relative
+                rounded-2xl md:rounded-[24px]
+                shadow-[0_2px_12px_rgba(0,0,0,0.06)]
+                bg-[rgba(0,143,70,0.3)]
+                noise-surface
+                p-4 sm:p-5 md:p-6
+                scroll-mt-6
+                opacity-0 translate-y-4
+                animate-[fadeInUp_0.32s_ease-out_forwards]
+              `}
+              style={{ animationDelay: '400ms' }}
+            >
+              <div className="mb-4">
+                <div className="text-sm font-bold text-white mb-3">Quick Reference:</div>
+                <div className="space-y-2 text-xs text-white">
+                  <div className="flex justify-between">
+                    <span>Total Codes:</span>
+                    <span className="font-bold">41</span>
+                  </div>
+                  <div className="flex justify-between">
+                    <span>Active Zones:</span>
+                    <span className="font-bold">12</span>
+                  </div>
+                  <div className="flex justify-between">
+                    <span>Last Updated:</span>
+                    <span className="font-bold">Jan 2037</span>
                   </div>
                 </div>
               </div>
-
-              {/* Main Content */}
-              <div className="flex-1 overflow-y-auto">
-                <div className="p-6 max-w-4xl mx-auto">
-                  {currentSection && currentSection.content}
-                </div>
-              </div>
-            </div>
-
-            {/* Footer */}
-            <div className="border-t-2 border-green-600 bg-green-50 px-4 py-2 flex items-center justify-between text-xs">
-              <div className="text-green-700">
-                GREENWASH Compliance Division • Edition 4.1 • January 2037
-              </div>
-              <div className="text-green-600">
-                Page classification: OFFICIAL USE ONLY
-              </div>
-            </div>
-          </>
-        )}
+            </article>
+          </div>
+        </div>
+        </div>
       </div>
-    </div>
+    </>
   );
 };
 

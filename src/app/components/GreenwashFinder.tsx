@@ -1,7 +1,8 @@
 'use client';
 
-import React, { useState } from 'react';
+import React, { useState, useRef, useCallback } from 'react';
 import { Folder, FileText, Image, File, ChevronRight, ZoomIn, ZoomOut, X, RotateCw, Maximize2, Download, Minimize2 } from 'lucide-react';
+import { useLockBodyScroll } from '../../components/useLockBodyScroll';
 
 interface GreenwashFinderProps {
   isOpen: boolean;
@@ -23,6 +24,40 @@ const GreenwashFinder: React.FC<GreenwashFinderProps> = ({ isOpen, onClose }) =>
   const [zoom, setZoom] = useState(100);
   const [rotation, setRotation] = useState(0);
   const [isMinimized, setIsMinimized] = useState(false);
+  const [isClosing, setIsClosing] = useState(false);
+  
+  const backdropRef = useRef<HTMLDivElement>(null);
+  const panelRef = useRef<HTMLDivElement>(null);
+  const prevActive = useRef<HTMLElement | null>(null);
+
+  useLockBodyScroll(isOpen);
+
+  // Handle close with animation
+  const handleClose = useCallback(() => {
+    setIsClosing(true);
+    setTimeout(() => {
+      onClose();
+      setIsClosing(false);
+    }, 400); // Match animation duration
+  }, [onClose]);
+
+  // ESC to close
+  React.useEffect(() => {
+    if (!isOpen) return;
+    const onKey = (e: KeyboardEvent) => { if (e.key === "Escape") handleClose(); };
+    window.addEventListener("keydown", onKey);
+    return () => window.removeEventListener("keydown", onKey);
+  }, [isOpen, handleClose]);
+
+  // Focus trap (minimal) + restore
+  React.useEffect(() => {
+    if (isOpen) {
+      prevActive.current = document.activeElement as HTMLElement | null;
+      panelRef.current?.focus();
+    } else {
+      prevActive.current?.focus?.();
+    }
+  }, [isOpen]);
 
   const folders = [
     { id: 'violations', name: 'Violations', icon: Folder, count: 8 },
@@ -288,44 +323,112 @@ const GreenwashFinder: React.FC<GreenwashFinderProps> = ({ isOpen, onClose }) =>
   if (!isOpen) return null;
 
   return (
-    <div className="fixed inset-0 z-50 bg-black bg-opacity-50 flex items-center justify-center p-4">
-      <div className={`bg-white text-green-800 font-mono shadow-2xl border-2 border-green-600 transition-all duration-300 ${
-        isMinimized ? 'w-96 h-16' : 'w-[95vw] h-[90vh] max-w-7xl'
-      }`}>
-        {/* Header Bar */}
-        <div className="border-b-2 border-green-600 bg-white p-3 flex items-center justify-between sticky top-0 z-50">
-          <div className="flex items-center gap-4">
-            <div className="text-lg font-bold tracking-wider text-green-700">GREENWASH</div>
-            <div className="text-xs text-green-600">FILE SYSTEM</div>
-          </div>
-          <div className="flex items-center gap-2">
-            <div className="text-xs text-green-600">
-              {new Date().toLocaleDateString()} {new Date().toLocaleTimeString()}
-            </div>
-            <button
-              onClick={() => setIsMinimized(!isMinimized)}
-              className="p-1 hover:bg-green-100 border border-green-600"
-              title={isMinimized ? "Maximize" : "Minimize"}
-            >
-              {isMinimized ? <Maximize2 size={16} /> : <Minimize2 size={16} />}
-            </button>
-            <button
-              onClick={onClose}
-              className="p-1 hover:bg-red-100 border border-red-400 text-red-600"
-              title="Close"
-            >
-              <X size={16} />
-            </button>
-          </div>
-        </div>
+    <>
+      {/* Exit X — positioned at top right corner of screen, completely separate */}
+      <button
+        onClick={handleClose}
+        aria-label="Close"
+        style={{
+          position: 'fixed',
+          top: '16px',
+          right: '16px',
+          zIndex: 200
+        }}
+        className={`
+          inline-flex items-center justify-center
+          h-12 w-12
+          rounded-full
+          shadow-[0_2px_12px_rgba(0,0,0,0.06)]
+          bg-[rgba(0,143,70,0.3)]
+          noise-surface
+          text-white
+          hover:bg-[rgba(0,143,70,0.4)]
+          transition-all duration-500 ease-out
+          focus:outline-none focus:ring-2 focus:ring-white/30
+          ${isClosing ? 'animate-[fadeOutScale_0.4s_ease-in_forwards]' : 'opacity-0 scale-95 animate-[fadeInScale_0.4s_ease-out_0.08s_forwards]'}
+        `}
+      >
+        <svg viewBox="0 0 24 24" width="18" height="18" aria-hidden="true">
+          <path d="M6 6l12 12M18 6L6 18" stroke="currentColor" strokeWidth="2" strokeLinecap="round"/>
+        </svg>
+      </button>
 
-        {!isMinimized && (
-          <div className="flex h-[calc(90vh-80px)] overflow-hidden">
-            {/* Sidebar */}
-            <div className="w-64 border-r-2 border-green-600 bg-green-50 overflow-y-auto">
-              <div className="p-3">
-                <div className="text-xs font-bold text-green-700 mb-3 uppercase tracking-wide">Directories</div>
-                <div className="space-y-1">
+      <div
+        ref={backdropRef}
+        onClick={handleClose}
+        aria-hidden={false}
+        aria-modal="true"
+        role="dialog"
+        className="fixed inset-0 z-[100] flex items-center justify-center bg-transparent"
+      >
+        {/* Full screen blur layer with smooth animation */}
+        <div 
+          className={`
+            fixed inset-0
+            backdrop-blur-md md:backdrop-blur-lg
+            supports-[backdrop-filter]:backdrop-saturate-150
+            supports-[backdrop-filter]:backdrop-contrast-100
+            backdrop-boost no-blur-fallback
+            ${isClosing ? 'animate-[fadeOut_0.32s_ease-in_forwards]' : 'opacity-0 animate-[fadeIn_0.32s_ease-out_forwards]'}
+          `}
+        />
+
+        {/* File Finder container - no visible container */}
+        <div
+          ref={panelRef}
+          tabIndex={-1}
+          onClick={(e) => e.stopPropagation()}
+          className={`
+            relative z-10
+            w-[92vw] sm:w-[86vw] md:w-auto
+            h-screen
+            max-w-[32rem] md:max-w-[34rem]
+            focus:outline-none
+            ${isClosing ? 'animate-[fadeOutScaleDown_0.4s_ease-in_forwards]' : 'opacity-0 scale-95 translate-y-4 animate-[fadeInScaleUp_0.4s_ease-out_0.16s_forwards]'}
+          `}
+        >
+        {/* Scrollable file finder content with top/bottom spacing */}
+        <div className="h-full w-full overflow-y-auto overscroll-contain scroll-smooth hide-scrollbar">
+          <div className="pt-20 pb-20 space-y-4 sm:space-y-5 md:space-y-6">
+            {/* File Finder Header */}
+            <article
+              className={`
+                relative
+                rounded-2xl md:rounded-[24px]
+                shadow-[0_2px_12px_rgba(0,0,0,0.06)]
+                bg-[rgba(0,143,70,0.3)]
+                noise-surface
+                p-4 sm:p-5 md:p-6
+                scroll-mt-6
+                opacity-0 translate-y-4
+                animate-[fadeInUp_0.32s_ease-out_forwards]
+              `}
+            >
+              <div className="text-center">
+                <div className="text-sm tracking-wide uppercase text-white mb-2">GREENWASH FILE SYSTEM</div>
+                <h1 className="text-xl font-bold text-white mb-2">Document Browser</h1>
+                <div className="text-sm text-white">Compliance Files & Records</div>
+              </div>
+            </article>
+
+            {/* Folders */}
+            <article
+              className={`
+                relative
+                rounded-2xl md:rounded-[24px]
+                shadow-[0_2px_12px_rgba(0,0,0,0.06)]
+                bg-[rgba(0,143,70,0.3)]
+                noise-surface
+                p-4 sm:p-5 md:p-6
+                scroll-mt-6
+                opacity-0 translate-y-4
+                animate-[fadeInUp_0.32s_ease-out_forwards]
+              `}
+              style={{ animationDelay: '100ms' }}
+            >
+              <div className="mb-4">
+                <div className="text-sm font-bold text-white mb-3">Directories:</div>
+                <div className="space-y-2">
                   {folders.map(folder => {
                     const Icon = folder.icon;
                     const isSelected = selectedFolder === folder.id;
@@ -336,17 +439,17 @@ const GreenwashFinder: React.FC<GreenwashFinderProps> = ({ isOpen, onClose }) =>
                           setSelectedFolder(folder.id);
                           setSelectedFile(null);
                         }}
-                        className={`w-full flex items-center justify-between p-2 text-left text-sm transition-all ${
+                        className={`w-full flex items-center justify-between p-3 text-left transition-all rounded-lg ${
                           isSelected 
-                            ? 'bg-green-600 text-white' 
-                            : 'hover:bg-green-100 text-green-800'
+                            ? 'bg-[rgba(0,143,70,0.5)] text-white' 
+                            : 'bg-[rgba(0,143,70,0.2)] hover:bg-[rgba(0,143,70,0.4)] text-white'
                         }`}
                       >
                         <div className="flex items-center gap-2">
                           <Icon size={16} />
-                          <span className="truncate">{folder.name}</span>
+                          <span className="text-sm">{folder.name}</span>
                         </div>
-                        <span className={`text-xs ${isSelected ? 'text-green-100' : 'text-green-600'}`}>
+                        <span className="text-xs opacity-70">
                           {folder.count}
                         </span>
                       </button>
@@ -354,155 +457,103 @@ const GreenwashFinder: React.FC<GreenwashFinderProps> = ({ isOpen, onClose }) =>
                   })}
                 </div>
               </div>
-            </div>
+            </article>
 
-            {/* File List */}
-            <div className="w-80 border-r-2 border-green-600 bg-white overflow-y-auto">
-              <div className="p-3 border-b-2 border-green-600 bg-green-50">
-                <div className="text-xs font-bold text-green-700 uppercase tracking-wide">
-                  {folders.find(f => f.id === selectedFolder)?.name}
+            {/* Files */}
+            <article
+              className={`
+                relative
+                rounded-2xl md:rounded-[24px]
+                shadow-[0_2px_12px_rgba(0,0,0,0.06)]
+                bg-[rgba(0,143,70,0.3)]
+                noise-surface
+                p-4 sm:p-5 md:p-6
+                scroll-mt-6
+                opacity-0 translate-y-4
+                animate-[fadeInUp_0.32s_ease-out_forwards]
+              `}
+              style={{ animationDelay: '200ms' }}
+            >
+              <div className="mb-4">
+                <div className="text-sm font-bold text-white mb-3">
+                  {folders.find(f => f.id === selectedFolder)?.name} ({currentFiles.length} items)
                 </div>
-                <div className="text-xs text-green-600 mt-1">
-                  {currentFiles.length} items
-                </div>
-              </div>
-              <div className="divide-y divide-green-300">
-                {currentFiles.map((file: FileItem) => {
-                  const Icon = getFileIcon(file.type);
-                  const isSelected = selectedFile?.id === file.id;
-                  return (
-                    <button
-                      key={file.id}
-                      onClick={() => {
-                        setSelectedFile(file);
-                        resetView();
-                      }}
-                      className={`w-full p-3 text-left hover:bg-green-50 transition-all ${
-                        isSelected ? 'bg-green-100 border-l-4 border-green-600' : ''
-                      }`}
-                    >
-                      <div className="flex items-start gap-2">
-                        <Icon size={16} className="mt-0.5 flex-shrink-0 text-green-600" />
+                <div className="space-y-2 max-h-64 overflow-y-auto">
+                  {currentFiles.map((file: FileItem) => {
+                    const Icon = getFileIcon(file.type);
+                    const isSelected = selectedFile?.id === file.id;
+                    return (
+                      <button
+                        key={file.id}
+                        onClick={() => {
+                          setSelectedFile(file);
+                          resetView();
+                        }}
+                        className={`w-full flex items-start gap-2 p-3 text-left transition-all rounded-lg ${
+                          isSelected ? 'bg-[rgba(0,143,70,0.5)] text-white' : 'bg-[rgba(0,143,70,0.2)] hover:bg-[rgba(0,143,70,0.4)] text-white'
+                        }`}
+                      >
+                        <Icon size={16} className="mt-0.5 flex-shrink-0" />
                         <div className="flex-1 min-w-0">
-                          <div className="text-xs font-semibold text-green-800 truncate">
+                          <div className="text-xs font-semibold truncate">
                             {file.name}
                           </div>
-                          <div className="text-xs text-green-600 mt-1">
+                          <div className="text-xs opacity-70 mt-1">
                             {file.size} • {file.date}
                           </div>
                         </div>
-                      </div>
-                    </button>
-                  );
-                })}
+                      </button>
+                    );
+                  })}
+                </div>
               </div>
-            </div>
+            </article>
 
-            {/* Preview Panel */}
-            <div className="flex-1 flex flex-col bg-gray-50">
-              {selectedFile ? (
-                <>
-                  {/* Preview Header */}
-                  <div className="border-b-2 border-green-600 bg-white p-3 flex items-center justify-between">
-                    <div className="flex items-center gap-3">
-                      <FileIcon size={20} className="text-green-600" />
-                      <div>
-                        <div className="text-sm font-bold text-green-800">{selectedFile.name}</div>
-                        <div className="text-xs text-green-600">
-                          {selectedFile.size} • {selectedFile.date}
-                        </div>
-                      </div>
-                    </div>
+            {/* File Preview */}
+            {selectedFile && (
+              <article
+                className={`
+                  relative
+                  rounded-2xl md:rounded-[24px]
+                  shadow-[0_2px_12px_rgba(0,0,0,0.06)]
+                  bg-[rgba(0,143,70,0.3)]
+                  noise-surface
+                  p-4 sm:p-5 md:p-6
+                  scroll-mt-6
+                  opacity-0 translate-y-4
+                  animate-[fadeInUp_0.32s_ease-out_forwards]
+                `}
+                style={{ animationDelay: '300ms' }}
+              >
+                <div className="mb-4">
+                  <div className="flex items-center justify-between mb-3">
                     <div className="flex items-center gap-2">
-                      <button
-                        onClick={zoomOut}
-                        className="p-1.5 border-2 border-green-600 hover:bg-green-50"
-                        title="Zoom Out"
-                      >
-                        <ZoomOut size={16} />
-                      </button>
-                      <div className="text-xs font-bold text-green-700 w-12 text-center">
-                        {zoom}%
-                      </div>
-                      <button
-                        onClick={zoomIn}
-                        className="p-1.5 border-2 border-green-600 hover:bg-green-50"
-                        title="Zoom In"
-                      >
-                        <ZoomIn size={16} />
-                      </button>
-                      <button
-                        onClick={rotate}
-                        className="p-1.5 border-2 border-green-600 hover:bg-green-50"
-                        title="Rotate"
-                      >
-                        <RotateCw size={16} />
-                      </button>
-                      <button
-                        onClick={resetView}
-                        className="p-1.5 border-2 border-green-600 hover:bg-green-50"
-                        title="Reset View"
-                      >
-                        <Maximize2 size={16} />
-                      </button>
-                      <button
-                        className="p-1.5 border-2 border-green-600 hover:bg-green-50"
-                        title="Download"
-                      >
-                        <Download size={16} />
-                      </button>
-                      <button
-                        onClick={() => setSelectedFile(null)}
-                        className="p-1.5 border-2 border-red-400 hover:bg-red-50 text-red-600"
-                        title="Close"
-                      >
-                        <X size={16} />
-                      </button>
+                      <FileIcon size={16} className="text-white" />
+                      <div className="text-sm font-bold text-white">{selectedFile.name}</div>
                     </div>
-                  </div>
-
-                  {/* Preview Content */}
-                  <div className="flex-1 overflow-auto p-6 flex items-center justify-center">
-                    <div 
-                      className="transition-all duration-300 ease-in-out"
-                      style={{
-                        transform: `scale(${zoom / 100}) rotate(${rotation}deg)`,
-                        transformOrigin: 'center'
-                      }}
+                    <button
+                      onClick={() => setSelectedFile(null)}
+                      className="p-1 hover:bg-[rgba(0,143,70,0.4)] rounded"
                     >
-                      <div className="shadow-2xl">
-                        {getPreviewContent(selectedFile)}
-                      </div>
-                    </div>
+                      <X size={16} className="text-white" />
+                    </button>
                   </div>
-                </>
-              ) : (
-                <div className="flex-1 flex items-center justify-center">
-                  <div className="text-center text-green-600">
-                    <File size={64} className="mx-auto mb-4 opacity-30" />
-                    <div className="text-sm">Select a file to preview</div>
+                  <div className="text-xs text-white opacity-70 mb-3">
+                    {selectedFile.size} • {selectedFile.date}
+                  </div>
+                  <div className="bg-[rgba(0,143,70,0.2)] rounded-lg p-4 max-h-64 overflow-y-auto">
+                    <div className="text-xs text-white">
+                      {getPreviewContent(selectedFile)}
+                    </div>
                   </div>
                 </div>
-              )}
-            </div>
-          </div>
-        )}
-
-        {/* Status Bar */}
-        {!isMinimized && (
-          <div className="border-t-2 border-green-600 bg-green-50 px-4 py-2 flex items-center justify-between text-xs">
-            <div className="text-green-700">
-              {currentFiles.length} items in {folders.find(f => f.id === selectedFolder)?.name}
-            </div>
-            {selectedFile && (
-              <div className="text-green-600">
-                Viewing: {selectedFile.name}
-              </div>
+              </article>
             )}
           </div>
-        )}
+        </div>
+        </div>
       </div>
-    </div>
+    </>
   );
 };
 
