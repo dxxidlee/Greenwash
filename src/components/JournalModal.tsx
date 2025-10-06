@@ -95,17 +95,6 @@ export default function JournalModal({ open, onClose, entries }: Props) {
         role="dialog"
         className="fixed inset-0 z-[100] flex items-center justify-center bg-transparent"
       >
-        {/* Full screen blur layer with smooth animation */}
-        <div 
-          className={`
-            fixed inset-0
-            backdrop-blur-md md:backdrop-blur-lg
-            supports-[backdrop-filter]:backdrop-saturate-150
-            supports-[backdrop-filter]:backdrop-contrast-100
-            backdrop-boost no-blur-fallback
-            ${isClosing ? 'animate-[fadeOut_0.4s_ease-in_forwards]' : 'opacity-0 animate-[fadeIn_0.4s_ease-out_forwards]'}
-          `}
-        />
 
         {/* Journal entries container - no visible container */}
         <div
