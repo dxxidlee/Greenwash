@@ -56,7 +56,7 @@ export default function JournalModal({ open, onClose, entries }: Props) {
           fixed top-4 right-4 z-[200]
           inline-flex items-center justify-center
           h-12 w-12
-          rounded-2xl md:rounded-[24px]
+          rounded-full
           border border-black/10 dark:border-white/10
           shadow-[0_2px_12px_rgba(0,0,0,0.06)]
           bg-white/90 dark:bg-neutral-900/90
@@ -107,9 +107,9 @@ export default function JournalModal({ open, onClose, entries }: Props) {
             animate-in zoom-in-95 fade-in duration-300 delay-150
           "
         >
-        {/* Scrollable column of journal entries with much more top/bottom spacing */}
+        {/* Scrollable column of journal entries with top/bottom spacing */}
         <div className="h-full w-full overflow-y-auto overscroll-contain scroll-smooth hide-scrollbar">
-          <div className="pt-40 pb-40 space-y-4 sm:space-y-5 md:space-y-6">
+          <div className="pt-20 pb-20 space-y-4 sm:space-y-5 md:space-y-6">
             {entries.map((e, index) => (
               <article
                 key={e.id}
