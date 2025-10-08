@@ -199,7 +199,7 @@ export default function HomeHeroV2() {
                   alt="GREENWASH Logo"
                   className="object-contain"
                   style={{
-                    height: '224px'
+                    height: '80vh'
                   }}
                 />
               </div>
@@ -224,7 +224,7 @@ export default function HomeHeroV2() {
           <>
             {/* Desktop Layout */}
             {/* Profile Section - Top Left */}
-            <div className="absolute top-3 left-3 z-20">
+            <div className="absolute top-8 left-8 z-20">
               <div className="relative">
                 <div 
                   className="cursor-pointer"
@@ -268,7 +268,7 @@ export default function HomeHeroV2() {
             </div>
 
             {/* Center Brand Column */}
-            <div className="col-span-12 flex flex-col items-center justify-center relative">
+            <div className="col-span-8 flex flex-col items-center justify-center relative">
               {/* Vertical GREENWASH Logo */}
               <div className="flex items-center justify-center mb-8">
                 <img 
@@ -276,14 +276,14 @@ export default function HomeHeroV2() {
                   alt="GREENWASH Logo"
                   className="object-contain"
                   style={{
-                    height: '336px'
+                    height: '80vh'
                   }}
                 />
               </div>
             </div>
 
             {/* Right Panel - Ring Container */}
-            <div className="col-span-12 flex items-center justify-center">
+            <div className="col-span-4 flex items-center justify-center">
               <div 
                 ref={rightPanelRef}
                 className="w-full h-full flex items-center justify-center"
@@ -298,7 +298,7 @@ export default function HomeHeroV2() {
             </div>
 
             {/* Live Time - Top Right */}
-            <div className="absolute top-3 right-3 z-20">
+            <div className="absolute top-8 right-8 z-20">
               <div 
                 className="font-medium text-[#008F46]"
                 style={{ 
