@@ -129,7 +129,7 @@ export default function HomeHeroV2() {
       <div className="fixed inset-0 bg-gradient-to-br from-green-50/20 to-green-100/10 pointer-events-none" />
       
       {/* Main Grid Layout */}
-      <div className="relative z-10 min-h-screen grid grid-cols-12 gap-4 p-4 md:p-6 lg:p-8">
+      <div className="relative z-10 min-h-screen grid grid-cols-12 gap-4 p-2 md:p-3 lg:p-4">
         
         {/* Mobile Layout */}
         {isMobile ? (
@@ -139,7 +139,8 @@ export default function HomeHeroV2() {
               {/* Profile Section */}
               <div className="relative">
                 <div 
-                  className="w-12 h-12 cursor-pointer"
+                  className="cursor-pointer"
+                  style={{ width: '60px', height: '60px' }}
                   onTouchStart={() => setShowProfilePopup(true)}
                   onTouchEnd={() => setShowProfilePopup(false)}
                   tabIndex={0}
@@ -179,8 +180,11 @@ export default function HomeHeroV2() {
 
               {/* Live Time */}
               <div 
-                className="text-sm font-medium text-[#008F46]"
-                style={{ fontFamily: 'PPNeueMontreal, sans-serif' }}
+                className="font-medium text-[#008F46]"
+                style={{ 
+                  fontFamily: 'PPNeueMontreal, sans-serif',
+                  fontSize: '0.75rem'
+                }}
               >
                 {currentTime}
               </div>
@@ -190,16 +194,14 @@ export default function HomeHeroV2() {
             <div className="col-span-12 flex flex-col items-center justify-center mb-8 relative">
               {/* Vertical GREENWASH Logo */}
               <div className="flex items-center justify-center mb-8">
-                <h1 
-                  className="text-3xl font-bold text-[#008F46]"
+                <img 
+                  src="/img/logo.png" 
+                  alt="GREENWASH Logo"
+                  className="h-32 object-contain"
                   style={{
-                    writingMode: 'vertical-rl',
-                    transform: 'rotate(180deg)',
-                    fontFamily: 'PPNeueMontreal, sans-serif'
+                    transform: 'rotate(90deg)'
                   }}
-                >
-                  GREENWASH
-                </h1>
+                />
               </div>
               
               {/* Seal at bottom */}
@@ -235,7 +237,8 @@ export default function HomeHeroV2() {
               {/* Profile Section */}
               <div className="relative">
                 <div 
-                  className="w-14 h-14 cursor-pointer"
+                  className="cursor-pointer"
+                  style={{ width: '70px', height: '70px' }}
                   onMouseEnter={() => setShowProfilePopup(true)}
                   onMouseLeave={() => setShowProfilePopup(false)}
                   tabIndex={0}
@@ -278,16 +281,14 @@ export default function HomeHeroV2() {
             <div className="col-span-4 flex flex-col items-center justify-center relative">
               {/* Vertical GREENWASH Logo */}
               <div className="flex items-center justify-center mb-8">
-                <h1 
-                  className="text-6xl lg:text-8xl font-bold text-[#008F46]"
+                <img 
+                  src="/img/logo.png" 
+                  alt="GREENWASH Logo"
+                  className="h-48 lg:h-64 object-contain"
                   style={{
-                    writingMode: 'vertical-rl',
-                    transform: 'rotate(180deg)',
-                    fontFamily: 'PPNeueMontreal, sans-serif'
+                    transform: 'rotate(90deg)'
                   }}
-                >
-                  GREENWASH
-                </h1>
+                />
               </div>
               
               {/* Seal at bottom of column */}
@@ -316,10 +317,13 @@ export default function HomeHeroV2() {
             </div>
 
             {/* Live Time - Top Right */}
-            <div className="absolute top-6 right-6 lg:top-8 lg:right-8 z-20">
+            <div className="absolute top-2 right-2 z-20">
               <div 
-                className="text-base font-medium text-[#008F46]"
-                style={{ fontFamily: 'PPNeueMontreal, sans-serif' }}
+                className="font-medium text-[#008F46]"
+                style={{ 
+                  fontFamily: 'PPNeueMontreal, sans-serif',
+                  fontSize: '0.75rem'
+                }}
               >
                 {currentTime}
               </div>
