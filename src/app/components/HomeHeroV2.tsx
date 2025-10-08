@@ -158,14 +158,14 @@ export default function HomeHeroV2() {
           
           {/* Profile Popup */}
           {showProfilePopup && (
-            <div className="absolute top-16 left-0 bg-[#008F46]/90 backdrop-blur-sm border border-[#008F46]/30 rounded-lg p-4 shadow-lg min-w-[280px] z-50">
-              <div className="text-sm font-medium text-white mb-2">
+            <div className="absolute top-16 left-0 bg-white text-green-800 font-mono shadow-2xl border-2 border-green-600 rounded-lg p-4 min-w-[280px] z-50">
+              <div className="text-sm font-bold text-white mb-2">
                 Officer: D. Lee | ID: 229-B
               </div>
-              <div className="text-xs font-medium text-white/90 mb-1">
+              <div className="text-xs font-bold text-white mb-1">
                 Project Information:
               </div>
-              <div className="text-xs text-white/80 leading-relaxed">
+              <div className="text-xs text-white leading-relaxed">
                 The GREENWASH initiative represents a comprehensive approach to urban environmental compliance. 
                 Through systematic color standardization and visual harmony protocols, we ensure that all public 
                 and commercial spaces adhere to the established green palette guidelines. This project aims to 
