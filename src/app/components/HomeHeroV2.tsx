@@ -199,7 +199,7 @@ export default function HomeHeroV2() {
                   alt="GREENWASH Logo"
                   className="object-contain"
                   style={{
-                    height: '80vh'
+                    height: '100vh' // 1.25x larger than 80vh (80 * 1.25 = 100)
                   }}
                 />
               </div>
@@ -276,7 +276,7 @@ export default function HomeHeroV2() {
                   alt="GREENWASH Logo"
                   className="object-contain"
                   style={{
-                    height: '80vh'
+                    height: '100vh' // 1.25x larger than 80vh (80 * 1.25 = 100)
                   }}
                 />
               </div>
