@@ -128,189 +128,97 @@ export default function HomeHeroV2() {
       {/* Green haze overlay */}
       <div className="fixed inset-0 bg-gradient-to-br from-green-50/20 to-green-100/10 pointer-events-none" />
       
+      {/* Profile and Live Time - Fixed Position */}
+      <div className="absolute top-4 left-4 z-20">
+        <div className="relative">
+          <div 
+            className="cursor-pointer"
+            style={{ width: '70px', height: '70px' }}
+            onMouseEnter={() => !isMobile && setShowProfilePopup(true)}
+            onMouseLeave={() => !isMobile && setShowProfilePopup(false)}
+            onTouchStart={() => isMobile && setShowProfilePopup(true)}
+            onTouchEnd={() => isMobile && setShowProfilePopup(false)}
+            tabIndex={0}
+            onKeyDown={(e) => {
+              if (e.key === 'Enter' || e.key === ' ') {
+                e.preventDefault();
+                setShowProfilePopup(!showProfilePopup);
+              }
+            }}
+          >
+            <img 
+              src="/img/id_photo.png" 
+              alt="Officer Profile"
+              className="w-full h-full object-contain"
+            />
+          </div>
+          
+          {/* Profile Popup */}
+          {showProfilePopup && (
+            <div className="absolute top-16 left-0 bg-white/80 backdrop-blur-sm border border-white/20 rounded-lg p-4 shadow-lg min-w-[280px] z-50">
+              <div className="text-sm font-medium text-gray-800 mb-2">
+                Officer: D. Lee | ID: 229-B
+              </div>
+              <div className="text-xs font-medium text-gray-600 mb-1">
+                Project Information:
+              </div>
+              <div className="text-xs text-gray-700 leading-relaxed">
+                The GREENWASH initiative represents a comprehensive approach to urban environmental compliance. 
+                Through systematic color standardization and visual harmony protocols, we ensure that all public 
+                and commercial spaces adhere to the established green palette guidelines. This project aims to 
+                create a unified, peaceful urban environment while maintaining strict compliance standards 
+                across all zones and sectors.
+              </div>
+            </div>
+          )}
+        </div>
+      </div>
+
+      {/* Live Time - Fixed Position */}
+      <div className="absolute top-4 right-4 z-20">
+        <div 
+          className="font-medium text-[#008F46]"
+          style={{ 
+            fontFamily: 'PPNeueMontreal, sans-serif',
+            fontSize: '0.8rem'
+          }}
+        >
+          {currentTime}
+        </div>
+      </div>
+
       {/* Main Grid Layout */}
       <div className="relative z-10 min-h-screen grid grid-cols-12 gap-4 p-4">
         
-        {/* Mobile Layout */}
-        {isMobile ? (
-          <>
-            {/* Top Row - Profile and Time */}
-            <div className="col-span-12 flex justify-between items-start mb-8">
-              {/* Profile Section */}
-              <div className="relative">
-                <div 
-                  className="cursor-pointer"
-                  style={{ width: '60px', height: '60px' }}
-                  onTouchStart={() => setShowProfilePopup(true)}
-                  onTouchEnd={() => setShowProfilePopup(false)}
-                  tabIndex={0}
-                  onKeyDown={(e) => {
-                    if (e.key === 'Enter' || e.key === ' ') {
-                      e.preventDefault();
-                      setShowProfilePopup(!showProfilePopup);
-                    }
-                  }}
-                >
-                  <img 
-                    src="/img/id_photo.png" 
-                    alt="Officer Profile"
-                    className="w-full h-full object-contain"
-                  />
-                </div>
-                
-                {/* Profile Popup */}
-                {showProfilePopup && (
-                  <div className="absolute top-16 left-0 bg-white/80 backdrop-blur-sm border border-white/20 rounded-lg p-4 shadow-lg min-w-[280px] z-50">
-                    <div className="text-sm font-medium text-gray-800 mb-2">
-                      Officer: D. Lee | ID: 229-B
-                    </div>
-                    <div className="text-xs font-medium text-gray-600 mb-1">
-                      Project Information:
-                    </div>
-                    <div className="text-xs text-gray-700 leading-relaxed">
-                      The GREENWASH initiative represents a comprehensive approach to urban environmental compliance. 
-                      Through systematic color standardization and visual harmony protocols, we ensure that all public 
-                      and commercial spaces adhere to the established green palette guidelines. This project aims to 
-                      create a unified, peaceful urban environment while maintaining strict compliance standards 
-                      across all zones and sectors.
-                    </div>
-                  </div>
-                )}
-              </div>
+        {/* Center Brand Column */}
+        <div className="col-span-12 flex flex-col items-center justify-center relative">
+          {/* Vertical GREENWASH Logo */}
+          <div className="flex items-center justify-center w-full">
+            <img 
+              src="/img/vertical_logo.png" 
+              alt="GREENWASH Logo"
+              className="object-contain"
+              style={{
+                height: '90vh'
+              }}
+            />
+          </div>
+        </div>
 
-              {/* Live Time */}
-              <div 
-                className="font-medium text-[#008F46]"
-                style={{ 
-                  fontFamily: 'PPNeueMontreal, sans-serif',
-                  fontSize: '0.8rem'
-                }}
-              >
-                {currentTime}
-              </div>
-            </div>
-
-            {/* Center Brand */}
-            <div className="col-span-12 flex flex-col items-center justify-center mb-8 relative">
-              {/* Vertical GREENWASH Logo */}
-              <div className="flex items-center justify-center mb-8">
-                <img 
-                  src="/img/vertical_logo.png" 
-                  alt="GREENWASH Logo"
-                  className="object-contain"
-                  style={{
-                    height: '90vh'
-                  }}
-                />
-              </div>
-            </div>
-
-            {/* Bottom Ring Panel - Full Width */}
-            <div className="col-span-12 flex items-center justify-center">
-              <div 
-                ref={rightPanelRef}
-                className="w-full h-64 flex items-center justify-center"
-              >
-                <Ring 
-                  hoverIdx={hoverIdx} 
-                  setHoverIdx={setHoverIdx} 
-                  onDotClick={handleDotClick}
-                  containerRef={rightPanelRef}
-                />
-              </div>
-            </div>
-          </>
-        ) : (
-          <>
-            {/* Desktop Layout */}
-            {/* Profile Section - Top Left */}
-            <div className="absolute top-4 left-4 z-20">
-              <div className="relative">
-                <div 
-                  className="cursor-pointer"
-                  style={{ width: '70px', height: '70px' }}
-                  onMouseEnter={() => setShowProfilePopup(true)}
-                  onMouseLeave={() => setShowProfilePopup(false)}
-                  tabIndex={0}
-                  onKeyDown={(e) => {
-                    if (e.key === 'Enter' || e.key === ' ') {
-                      e.preventDefault();
-                      setShowProfilePopup(!showProfilePopup);
-                    }
-                  }}
-                >
-                  <img 
-                    src="/img/id_photo.png" 
-                    alt="Officer Profile"
-                    className="w-full h-full object-contain"
-                  />
-                </div>
-                
-                {/* Profile Popup */}
-                {showProfilePopup && (
-                  <div className="absolute top-16 left-0 bg-white/80 backdrop-blur-sm border border-white/20 rounded-lg p-4 shadow-lg min-w-[280px] z-50">
-                    <div className="text-sm font-medium text-gray-800 mb-2">
-                      Officer: D. Lee | ID: 229-B
-                    </div>
-                    <div className="text-xs font-medium text-gray-600 mb-1">
-                      Project Information:
-                    </div>
-                    <div className="text-xs text-gray-700 leading-relaxed">
-                      The GREENWASH initiative represents a comprehensive approach to urban environmental compliance. 
-                      Through systematic color standardization and visual harmony protocols, we ensure that all public 
-                      and commercial spaces adhere to the established green palette guidelines. This project aims to 
-                      create a unified, peaceful urban environment while maintaining strict compliance standards 
-                      across all zones and sectors.
-                    </div>
-                  </div>
-                )}
-              </div>
-            </div>
-
-            {/* Center Brand Column */}
-            <div className="col-span-12 flex flex-col items-center justify-center relative">
-              {/* Vertical GREENWASH Logo */}
-              <div className="flex items-center justify-center w-full">
-                <img 
-                  src="/img/vertical_logo.png" 
-                  alt="GREENWASH Logo"
-                  className="object-contain"
-                  style={{
-                    height: '90vh'
-                  }}
-                />
-              </div>
-            </div>
-
-            {/* Right Panel - Ring Container */}
-            <div className="absolute right-0 top-1/2 transform -translate-y-1/2 w-1/4 h-full flex items-center justify-center z-10">
-              <div 
-                ref={rightPanelRef}
-                className="w-full h-full flex items-center justify-center"
-              >
-                <Ring 
-                  hoverIdx={hoverIdx} 
-                  setHoverIdx={setHoverIdx} 
-                  onDotClick={handleDotClick}
-                  containerRef={rightPanelRef}
-                />
-              </div>
-            </div>
-
-            {/* Live Time - Top Right */}
-            <div className="absolute top-4 right-4 z-20">
-              <div 
-                className="font-medium text-[#008F46]"
-                style={{ 
-                  fontFamily: 'PPNeueMontreal, sans-serif',
-                  fontSize: '0.8rem'
-                }}
-              >
-                {currentTime}
-              </div>
-            </div>
-          </>
-        )}
+        {/* Right Panel - Ring Container */}
+        <div className="absolute right-0 top-1/2 transform -translate-y-1/2 w-1/4 h-full flex items-center justify-center z-10">
+          <div 
+            ref={rightPanelRef}
+            className="w-full h-full flex items-center justify-center"
+          >
+            <Ring 
+              hoverIdx={hoverIdx} 
+              setHoverIdx={setHoverIdx} 
+              onDotClick={handleDotClick}
+              containerRef={rightPanelRef}
+            />
+          </div>
+        </div>
       </div>
 
       {/* Hover Label */}
