@@ -129,7 +129,7 @@ export default function HomeHeroV2() {
       <div className="fixed inset-0 bg-gradient-to-br from-green-50/20 to-green-100/10 pointer-events-none" />
       
       {/* Main Grid Layout */}
-      <div className="relative z-10 min-h-screen grid grid-cols-12 gap-4 p-2 md:p-3 lg:p-4">
+      <div className="relative z-10 min-h-screen grid grid-cols-12 gap-4 p-6">
         
         {/* Mobile Layout */}
         {isMobile ? (
@@ -183,7 +183,7 @@ export default function HomeHeroV2() {
                 className="font-medium text-[#008F46]"
                 style={{ 
                   fontFamily: 'PPNeueMontreal, sans-serif',
-                  fontSize: '0.75rem'
+                  fontSize: '0.8rem'
                 }}
               >
                 {currentTime}
@@ -197,9 +197,10 @@ export default function HomeHeroV2() {
                 <img 
                   src="/img/logo.png" 
                   alt="GREENWASH Logo"
-                  className="h-32 object-contain"
+                  className="object-contain"
                   style={{
-                    transform: 'rotate(90deg)'
+                    transform: 'rotate(90deg)',
+                    height: '224px' // 1.75x larger than h-32 (128px)
                   }}
                 />
               </div>
@@ -232,9 +233,8 @@ export default function HomeHeroV2() {
         ) : (
           <>
             {/* Desktop Layout */}
-            {/* Left Rail - Profile (Cols 1-4) */}
-            <div className="col-span-4 flex flex-col">
-              {/* Profile Section */}
+            {/* Profile Section - Top Left */}
+            <div className="absolute top-6 left-6 z-20">
               <div className="relative">
                 <div 
                   className="cursor-pointer"
@@ -277,16 +277,17 @@ export default function HomeHeroV2() {
               </div>
             </div>
 
-            {/* Center Brand Column (Cols 5-8) */}
-            <div className="col-span-4 flex flex-col items-center justify-center relative">
+            {/* Center Brand Column */}
+            <div className="col-span-6 flex flex-col items-center justify-center relative">
               {/* Vertical GREENWASH Logo */}
               <div className="flex items-center justify-center mb-8">
                 <img 
                   src="/img/logo.png" 
                   alt="GREENWASH Logo"
-                  className="h-48 lg:h-64 object-contain"
+                  className="object-contain"
                   style={{
-                    transform: 'rotate(90deg)'
+                    transform: 'rotate(90deg)',
+                    height: '336px' // 1.75x larger than h-48 (192px)
                   }}
                 />
               </div>
@@ -301,8 +302,8 @@ export default function HomeHeroV2() {
               </div>
             </div>
 
-            {/* Right Panel - Ring Container (Cols 9-12) */}
-            <div className="col-span-4 flex items-center justify-center">
+            {/* Right Panel - Ring Container */}
+            <div className="col-span-6 flex items-center justify-center">
               <div 
                 ref={rightPanelRef}
                 className="w-full h-full flex items-center justify-center"
@@ -317,12 +318,12 @@ export default function HomeHeroV2() {
             </div>
 
             {/* Live Time - Top Right */}
-            <div className="absolute top-2 right-2 z-20">
+            <div className="absolute top-6 right-6 z-20">
               <div 
                 className="font-medium text-[#008F46]"
                 style={{ 
                   fontFamily: 'PPNeueMontreal, sans-serif',
-                  fontSize: '0.75rem'
+                  fontSize: '0.8rem'
                 }}
               >
                 {currentTime}
