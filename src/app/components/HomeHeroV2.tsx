@@ -180,7 +180,7 @@ export default function HomeHeroV2() {
       {/* Live Time - Fixed Position */}
       <div 
         className="absolute z-20"
-        style={{ top: '16px', right: '16px' }}
+        style={{ top: '16px', right: '12px' }}
       >
         <div 
           className="font-medium text-[#008F46]"
