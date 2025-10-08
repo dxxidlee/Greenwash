@@ -268,7 +268,7 @@ export default function HomeHeroV2() {
             </div>
 
             {/* Center Brand Column */}
-            <div className="col-span-8 flex flex-col items-center justify-center relative">
+            <div className="col-span-12 flex flex-col items-center justify-center relative">
               {/* Vertical GREENWASH Logo */}
               <div className="flex items-center justify-center w-full">
                 <img 
@@ -283,7 +283,7 @@ export default function HomeHeroV2() {
             </div>
 
             {/* Right Panel - Ring Container */}
-            <div className="col-span-4 flex items-center justify-center">
+            <div className="absolute right-0 top-1/2 transform -translate-y-1/2 w-1/4 h-full flex items-center justify-center z-10">
               <div 
                 ref={rightPanelRef}
                 className="w-full h-full flex items-center justify-center"
