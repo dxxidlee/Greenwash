@@ -135,7 +135,7 @@ export default function HomeHeroV2() {
         {isMobile ? (
           <>
             {/* Top Row - Profile and Time */}
-            <div className="col-span-12 flex justify-between items-start mb-8">
+            <div className="col-span-12 flex justify-between items-start mb-8 px-4">
               {/* Profile Section */}
               <div className="relative">
                 <div 
@@ -224,7 +224,7 @@ export default function HomeHeroV2() {
           <>
             {/* Desktop Layout */}
             {/* Profile Section - Top Left */}
-            <div className="absolute top-8 left-8 z-20">
+            <div className="absolute top-4 left-4 z-20">
               <div className="relative">
                 <div 
                   className="cursor-pointer"
@@ -298,7 +298,7 @@ export default function HomeHeroV2() {
             </div>
 
             {/* Live Time - Top Right */}
-            <div className="absolute top-8 right-8 z-20">
+            <div className="absolute top-4 right-4 z-20">
               <div 
                 className="font-medium text-[#008F46]"
                 style={{ 
