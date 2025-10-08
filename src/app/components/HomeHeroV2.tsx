@@ -159,17 +159,17 @@ export default function HomeHeroV2() {
           {/* Profile Popup */}
           {showProfilePopup && (
               <div 
-                className="absolute top-20 left-2 backdrop-blur-sm shadow-2xl rounded-lg p-4 min-w-[280px] z-50"
+                className="absolute top-18 left-2 backdrop-blur-sm shadow-2xl rounded-lg p-4 min-w-[280px] z-50"
                 style={{ backgroundColor: 'rgba(0, 143, 70, 0.3)' }}
               >
               <div className="text-xs font-medium text-white mb-2">
                 Officer: D. Lee
               </div>
-              <div className="border-t-2 border-white mb-2"></div>
+              <div className="border-t-1 border-white mb-2"></div>
               <div className="text-xs font-medium text-white mb-2">
                 ID: 229-B
               </div>
-              <div className="border-t-2 border-white mb-2"></div>
+              <div className="border-t-1 border-white mb-2"></div>
               <div className="text-xs font-medium text-white mb-2">
                 The Greenwash initiative represents a comprehensive approach to urban environmental compliance. 
                 Through systematic color standardization and visual harmony protocols, we ensure that all public 
