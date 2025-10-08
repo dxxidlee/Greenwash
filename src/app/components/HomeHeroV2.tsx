@@ -129,7 +129,10 @@ export default function HomeHeroV2() {
       <div className="fixed inset-0 bg-gradient-to-br from-green-50/20 to-green-100/10 pointer-events-none" />
       
       {/* Profile and Live Time - Fixed Position */}
-      <div className="absolute top-4 left-4 z-20">
+      <div 
+        className="absolute z-20"
+        style={{ top: '16px', left: '16px' }}
+      >
         <div className="relative">
           <div 
             className="cursor-pointer"
@@ -175,7 +178,10 @@ export default function HomeHeroV2() {
       </div>
 
       {/* Live Time - Fixed Position */}
-      <div className="absolute top-4 right-4 z-20">
+      <div 
+        className="absolute z-20"
+        style={{ top: '16px', right: '16px' }}
+      >
         <div 
           className="font-medium text-[#008F46]"
           style={{ 
