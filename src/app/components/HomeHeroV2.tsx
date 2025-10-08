@@ -131,7 +131,7 @@ export default function HomeHeroV2() {
       {/* Profile - Fixed Position */}
       <div 
         className="absolute z-20"
-        style={{ top: '16px', left: '10px' }}
+        style={{ top: '10px', left: '4px' }}
       >
         <div className="relative">
           <div 
@@ -180,7 +180,7 @@ export default function HomeHeroV2() {
       {/* Live Time - Fixed Position */}
       <div 
         className="absolute z-20"
-        style={{ top: '16px', right: '16px' }}
+        style={{ top: '10px', right: '10px' }}
       >
         <div 
           className="font-medium text-[#008F46]"
