@@ -129,13 +129,13 @@ export default function HomeHeroV2() {
       <div className="fixed inset-0 bg-gradient-to-br from-green-50/20 to-green-100/10 pointer-events-none" />
       
       {/* Main Grid Layout */}
-      <div className="relative z-10 min-h-screen grid grid-cols-12 gap-4 p-6">
+      <div className="relative z-10 min-h-screen grid grid-cols-12 gap-4 p-4">
         
         {/* Mobile Layout */}
         {isMobile ? (
           <>
             {/* Top Row - Profile and Time */}
-            <div className="col-span-12 flex justify-between items-start mb-8 px-4">
+            <div className="col-span-12 flex justify-between items-start mb-8">
               {/* Profile Section */}
               <div className="relative">
                 <div 
