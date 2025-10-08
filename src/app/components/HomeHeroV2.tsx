@@ -195,22 +195,12 @@ export default function HomeHeroV2() {
               {/* Vertical GREENWASH Logo */}
               <div className="flex items-center justify-center mb-8">
                 <img 
-                  src="/img/logo.png" 
+                  src="/img/vertical_logo.png" 
                   alt="GREENWASH Logo"
                   className="object-contain"
                   style={{
-                    transform: 'rotate(90deg)',
-                    height: '224px' // 1.75x larger than h-32 (128px)
+                    height: '224px'
                   }}
-                />
-              </div>
-              
-              {/* Seal at bottom */}
-              <div className="flex items-center justify-center">
-                <img 
-                  src="/img/seal.png" 
-                  alt="Official Seal"
-                  className="w-16 h-16 object-contain"
                 />
               </div>
             </div>
@@ -234,7 +224,7 @@ export default function HomeHeroV2() {
           <>
             {/* Desktop Layout */}
             {/* Profile Section - Top Left */}
-            <div className="absolute top-6 left-6 z-20">
+            <div className="absolute top-3 left-3 z-20">
               <div className="relative">
                 <div 
                   className="cursor-pointer"
@@ -278,32 +268,22 @@ export default function HomeHeroV2() {
             </div>
 
             {/* Center Brand Column */}
-            <div className="col-span-6 flex flex-col items-center justify-center relative">
+            <div className="col-span-12 flex flex-col items-center justify-center relative">
               {/* Vertical GREENWASH Logo */}
               <div className="flex items-center justify-center mb-8">
                 <img 
-                  src="/img/logo.png" 
+                  src="/img/vertical_logo.png" 
                   alt="GREENWASH Logo"
                   className="object-contain"
                   style={{
-                    transform: 'rotate(90deg)',
-                    height: '336px' // 1.75x larger than h-48 (192px)
+                    height: '336px'
                   }}
-                />
-              </div>
-              
-              {/* Seal at bottom of column */}
-              <div className="absolute bottom-0 flex items-center justify-center">
-                <img 
-                  src="/img/seal.png" 
-                  alt="Official Seal"
-                  className="w-20 h-20 object-contain"
                 />
               </div>
             </div>
 
             {/* Right Panel - Ring Container */}
-            <div className="col-span-6 flex items-center justify-center">
+            <div className="col-span-12 flex items-center justify-center">
               <div 
                 ref={rightPanelRef}
                 className="w-full h-full flex items-center justify-center"
@@ -318,7 +298,7 @@ export default function HomeHeroV2() {
             </div>
 
             {/* Live Time - Top Right */}
-            <div className="absolute top-6 right-6 z-20">
+            <div className="absolute top-3 right-3 z-20">
               <div 
                 className="font-medium text-[#008F46]"
                 style={{ 
