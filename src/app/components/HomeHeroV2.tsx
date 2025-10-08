@@ -131,7 +131,7 @@ export default function HomeHeroV2() {
       {/* Profile - Fixed Position */}
       <div 
         className="absolute z-20"
-        style={{ top: '10px', left: '4px' }}
+        style={{ top: '10px', left: '2px' }}
       >
         <div className="relative">
           <div 
