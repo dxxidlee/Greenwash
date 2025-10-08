@@ -270,7 +270,7 @@ export default function HomeHeroV2() {
             {/* Center Brand Column */}
             <div className="col-span-8 flex flex-col items-center justify-center relative">
               {/* Vertical GREENWASH Logo */}
-              <div className="flex items-center justify-center mb-8">
+              <div className="flex items-center justify-center w-full">
                 <img 
                   src="/img/vertical_logo.png" 
                   alt="GREENWASH Logo"
