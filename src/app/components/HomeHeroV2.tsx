@@ -158,7 +158,10 @@ export default function HomeHeroV2() {
           
           {/* Profile Popup */}
           {showProfilePopup && (
-            <div className="absolute top-16 left-0 bg-green-600/80 backdrop-blur-sm shadow-2xl border border-green-600/50 rounded-lg p-4 min-w-[280px] z-50">
+            <div 
+              className="absolute top-16 left-0 backdrop-blur-sm shadow-2xl border border-green-600/50 rounded-lg p-4 min-w-[280px] z-50"
+              style={{ backgroundColor: 'rgba(0, 143, 70, 0.3)' }}
+            >
               <div className="text-sm font-bold text-white mb-2">
                 Officer: D. Lee | ID: 229-B
               </div>
