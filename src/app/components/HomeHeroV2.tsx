@@ -150,7 +150,7 @@ export default function HomeHeroV2() {
             }}
           >
             <img 
-              src="/img/id_photo.png" 
+              src="/img/id_photo.webp" 
               alt="Officer Profile"
               className="w-full h-full object-contain"
             />
@@ -206,7 +206,7 @@ export default function HomeHeroV2() {
           {/* Vertical GREENWASH Logo */}
           <div className="flex items-center justify-center w-full">
             <img 
-              src="/img/vertical_logo.png" 
+              src="/img/vertical_logo.webp" 
               alt="GREENWASH Logo"
               className="object-contain"
               style={{
