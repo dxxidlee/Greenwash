@@ -120,7 +120,7 @@ export default function HomeHeroV2() {
       <div 
         className="fixed inset-0 bg-white"
         style={{
-          backgroundImage: 'url(/img/id_photo.png)',
+          backgroundImage: 'url(/img/id_photo.webp)',
           backgroundSize: 'cover',
           backgroundPosition: 'center',
           opacity: 0.3
