@@ -58,13 +58,13 @@ export default function ProtocolQuickList() {
       className="fixed z-10 pointer-events-auto"
       style={{ 
         bottom: '10px', 
-        left: '2px',
+        left: '10px',
         fontSize: 'var(--liveTimeFontSize, 0.8rem)'
       }}
     >
       <div className="text-[#008F46] font-medium" style={{ fontFamily: 'PPNeueMontreal, sans-serif' }}>
         {/* Header */}
-        <div className="mb-3 font-medium opacity-90">Protocol</div>
+        <div className="mb-3 font-medium">Protocol</div>
         
         {/* List Items */}
         <div className="space-y-2">
@@ -96,10 +96,8 @@ export default function ProtocolQuickList() {
                 </div>
                 
                 {/* Label Column */}
-                <div className="text-[#008F46] font-medium relative group">
+                <div className="text-[#008F46] font-medium">
                   {item.label}
-                  {/* Hover underline */}
-                  <div className="absolute bottom-0 left-0 w-0 h-px bg-[#008F46] transition-all duration-200 group-hover:w-full"></div>
                 </div>
               </div>
               
@@ -107,8 +105,7 @@ export default function ProtocolQuickList() {
               <div 
                 className="mt-1 h-px bg-[#008F46]"
                 style={{ 
-                  width: `${item.label.length * 0.6}em`,
-                  opacity: 0.6
+                  width: '6em'
                 }}
               ></div>
             </div>
