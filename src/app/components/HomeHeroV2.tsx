@@ -215,20 +215,13 @@ export default function HomeHeroV2() {
           </div>
         </div>
 
-        {/* Right Panel - Ring Container */}
-        <div className="absolute right-0 top-1/2 transform -translate-y-1/2 w-1/4 h-full flex items-center justify-center z-10">
-          <div 
-            ref={rightPanelRef}
-            className="w-full h-full flex items-center justify-center"
-          >
-            <Ring 
-              hoverIdx={hoverIdx} 
-              setHoverIdx={setHoverIdx} 
-              onDotClick={handleDotClick}
-              containerRef={rightPanelRef}
-            />
-          </div>
-        </div>
+        {/* Centered Ring Overlay (matches Chrome middle layout) */}
+        <Ring 
+          hoverIdx={hoverIdx} 
+          setHoverIdx={setHoverIdx} 
+          onDotClick={handleDotClick}
+          centered
+        />
       </div>
 
       {/* Hover Label */}

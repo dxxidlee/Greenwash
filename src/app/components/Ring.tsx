@@ -27,11 +27,12 @@ const IMAGE_SOURCES = [
   '/img/selftest-final.webp',  // SelfTest STT-37
 ];
 
-export default function Ring({ hoverIdx, setHoverIdx, onDotClick, containerRef }:{
+export default function Ring({ hoverIdx, setHoverIdx, onDotClick, containerRef, centered }:{
   hoverIdx: number | null;
   setHoverIdx: (i:number|null)=>void;
   onDotClick?: (index: number) => void;
   containerRef?: React.RefObject<HTMLDivElement>;
+  centered?: boolean;
 }) {
   const dots = useMemo(() => Array.from({ length: DOTS }), []);
   const [rotation, setRotation] = useState(0);
@@ -129,12 +130,12 @@ export default function Ring({ hoverIdx, setHoverIdx, onDotClick, containerRef }
     onTouchEnd: isMobile ? () => setHoverIdx(null) : undefined,
   });
 
-  // Calculate ring size based on container
+  // Calculate ring size based on container or viewport (centered)
   const [ringSize, setRingSize] = useState({ width: RADIUS_VMIN * 2, height: RADIUS_VMIN * 2 });
   
   useEffect(() => {
     const updateRingSize = () => {
-      if (containerRef?.current) {
+      if (!centered && containerRef?.current) {
         const container = containerRef.current;
         const containerWidth = container.clientWidth;
         const containerHeight = container.clientHeight;
@@ -145,16 +146,22 @@ export default function Ring({ hoverIdx, setHoverIdx, onDotClick, containerRef }
         const size = Math.min(maxSize * 0.8, minSize); // Use 80% of container or minSize, whichever is smaller
         
         setRingSize({ width: size, height: size });
+      } else {
+        const vw = window.innerWidth;
+        const vh = window.innerHeight;
+        const maxSize = Math.min(vw, vh);
+        const size = Math.max(320, Math.floor(maxSize * 0.62)); // Larger, more spread out
+        setRingSize({ width: size, height: size });
       }
     };
     
     updateRingSize();
     window.addEventListener('resize', updateRingSize);
     return () => window.removeEventListener('resize', updateRingSize);
-  }, [containerRef]);
+  }, [containerRef, centered]);
 
   return (
-    <div className="relative w-full h-full flex items-center justify-center">
+    <div className={centered ? 'fixed left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2' : 'relative w-full h-full flex items-center justify-center'}>
       <div 
         className="relative" 
         style={{ 
