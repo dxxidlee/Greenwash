@@ -127,9 +127,10 @@ export default function ProtocolQuickList() {
         
         {/* Stroke under Protocol */}
         <div 
-          className="mt-1 h-px bg-[#008F46] ml-9"
+          className="mt-1 bg-[#008F46] ml-9"
           style={{ 
-            width: '12em'
+            width: '12em',
+            height: '1px'
           }}
         ></div>
         
@@ -170,9 +171,10 @@ export default function ProtocolQuickList() {
               
               {/* Horizontal Rule */}
               <div 
-                className="mt-1 h-px bg-[#008F46]"
+                className="mt-1 bg-[#008F46]"
                 style={{ 
-                  width: '12em'
+                  width: '12em',
+                  height: '0.5px'
                 }}
               ></div>
             </div>
@@ -184,12 +186,15 @@ export default function ProtocolQuickList() {
       {/* Protocol Popups */}
       {activePopup && (
         <div 
-          className="fixed z-50 backdrop-blur-sm shadow-2xl rounded-lg p-4 max-w-md"
+          className="fixed z-50 backdrop-blur-sm shadow-2xl rounded-lg p-4"
           style={{ 
             backgroundColor: 'rgba(0, 143, 70, 0.3)',
             bottom: '10px',
             left: '220px', // Position to the right of the ProtocolQuickList
-            maxHeight: 'calc(100vh - 20px)' // Don't exceed viewport height
+            maxHeight: 'calc(100vh - 20px)', // Don't exceed viewport height
+            width: 'auto',
+            minWidth: '300px',
+            maxWidth: '600px'
           }}
         >
           <div className="text-white">
