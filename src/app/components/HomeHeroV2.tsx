@@ -1,7 +1,6 @@
 'use client';
 import { useEffect, useRef, useState } from 'react';
 import Ring from './Ring';
-import LiquidGlassOverlay from './LiquidGlassOverlay';
 import HoverLabel from './HoverLabel';
 import GreenwashForms from './GreenwashForms';
 import GreenwashFinder from './GreenwashFinder';
@@ -117,8 +116,6 @@ export default function HomeHeroV2() {
 
   return (
     <main className="min-h-screen relative overflow-hidden select-none bg-white">
-      {/* Liquid glass overlay (shader) */}
-      <LiquidGlassOverlay />
       {/* Background Image with 30% opacity overlay */}
       <div 
         className="fixed inset-0 bg-white"
