@@ -10,7 +10,6 @@ import GreenwashManual from './GreenwashManual';
 
 const DOT_LABELS = [
   'BreakRoom BRK-37',
-  'Protocol PRT-37', 
   'HueScan HUE-37',
   'Report RPT-37',
   'Files FLS-37',

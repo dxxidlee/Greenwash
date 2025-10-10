@@ -2,7 +2,7 @@
 'use client';
 import { useMemo, useEffect, useState, useRef } from 'react';
 
-const DOTS = 7;
+const DOTS = 6;
 const RADIUS_VMIN = 28;    // Less tight radius for better mobile experience
 const DOT = 140;            // Increased size for better video visibility
 const BASE_SPEED = 0.0375; // 75% slower than 0.15 (0.15 * 0.25 = 0.0375)
@@ -10,7 +10,6 @@ const GREEN = '#008F46';
 
 const DOT_LABELS = [
   'BreakRoom BRK-37',
-  'Protocol PRT-37', 
   'HueScan HUE-37',
   'Report RPT-37',
   'Files FLS-37',
@@ -18,15 +17,14 @@ const DOT_LABELS = [
   'SelfTest STT-37'
 ];
 
-// Video sources - replace these paths with actual video files
-const VIDEO_SOURCES = [
-  '/img/video-4.mp4', // BreakRoom BRK-37
-  '/img/video-6.mp4', // Protocol PRT-37
-  '/img/video-1.mp4', // HueScan HUE-37
-  '/img/video-7.mp4', // Report RPT-37
-  '/img/video-2.mp4', // Files FLS-37
-  '/img/video-3.mp4', // Journal JNL-37
-  '/img/video-5.mp4', // SelfTest STT-37
+// Image sources replacing videos
+const IMAGE_SOURCES = [
+  '/img/breakroom-final.webp', // BreakRoom BRK-37
+  '/img/huescan-final.webp',   // HueScan HUE-37
+  '/img/report-final.webp',    // Report RPT-37
+  '/img/files-final.webp',     // Files FLS-37
+  '/img/journal-final.webp',   // Journal JNL-37
+  '/img/selftest-final.webp',  // SelfTest STT-37
 ];
 
 export default function Ring({ hoverIdx, setHoverIdx, onDotClick, containerRef }:{
@@ -198,36 +196,14 @@ export default function Ring({ hoverIdx, setHoverIdx, onDotClick, containerRef }
               role="button"
               aria-label={`${DOT_LABELS[i] || `Option ${i + 1}`}`}
             >
-              {VIDEO_SOURCES[i] ? (
-                <video
+              {IMAGE_SOURCES[i] ? (
+                <img
+                  src={IMAGE_SOURCES[i]}
+                  alt={DOT_LABELS[i] || `Option ${i + 1}`}
                   className="w-full h-full object-contain"
-                  autoPlay
-                  muted
-                  loop
-                  playsInline
-                  preload="auto"
-                  onLoadedData={(e) => {
-                    console.log('Video loaded successfully:', VIDEO_SOURCES[i]);
-                    const video = e.target as HTMLVideoElement;
-                    // Set playback speed to 0.75x (75% of normal speed)
-                    video.playbackRate = 0.75;
-                    // Ensure smooth looping by seeking to a frame slightly before the end
-                    video.addEventListener('timeupdate', () => {
-                      if (video.currentTime >= video.duration - 0.1) {
-                        video.currentTime = 0.05; // Start slightly after beginning to avoid duplicate frames
-                      }
-                    });
-                  }}
-                  onError={(e) => {
-                    console.error('Video failed to load:', VIDEO_SOURCES[i], e);
-                  }}
-                >
-                  <source src={VIDEO_SOURCES[i]} type="video/mp4" />
-                  {/* Fallback if video fails to load */}
-                  Your browser does not support the video tag.
-                </video>
+                  draggable={false}
+                />
               ) : (
-                // Placeholder circle until video is added
                 <div 
                   className="w-full h-full flex items-center justify-center text-gray-400 text-xs font-medium"
                   style={{ backgroundColor: 'white', border: '1px solid #f0f0f0' }}
