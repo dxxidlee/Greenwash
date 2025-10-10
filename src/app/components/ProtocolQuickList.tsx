@@ -1,5 +1,5 @@
 'use client';
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useRef } from 'react';
 
 const PROTOCOL_ITEMS = [
   { id: 'overview', label: 'Overview' },
@@ -59,6 +59,7 @@ export default function ProtocolQuickList() {
   const [liveTimeFontSize, setLiveTimeFontSize] = useState('0.8rem');
   const [isMobile, setIsMobile] = useState(false);
   const [activePopup, setActivePopup] = useState<string | null>(null);
+  const hoverTimeoutRef = useRef<NodeJS.Timeout | null>(null);
 
   // Check for mobile and update font size
   useEffect(() => {
@@ -88,18 +89,43 @@ export default function ProtocolQuickList() {
     return () => window.removeEventListener('resize', updateFontSize);
   }, []);
 
-  const handleItemClick = (id: string) => {
-    // No longer needed - using hover/touch events
+  const handleMouseEnter = (id: string) => {
+    if (hoverTimeoutRef.current) {
+      clearTimeout(hoverTimeoutRef.current);
+    }
+    setActivePopup(id);
+  };
+
+  const handleMouseLeave = () => {
+    hoverTimeoutRef.current = setTimeout(() => {
+      setActivePopup(null);
+    }, 100); // Small delay to prevent flickering
+  };
+
+  const handleTouchStart = (id: string) => {
+    if (hoverTimeoutRef.current) {
+      clearTimeout(hoverTimeoutRef.current);
+    }
+    setActivePopup(id);
+  };
+
+  const handleTouchEnd = () => {
+    hoverTimeoutRef.current = setTimeout(() => {
+      setActivePopup(null);
+    }, 100);
   };
 
   const handleOutsideClick = () => {
+    if (hoverTimeoutRef.current) {
+      clearTimeout(hoverTimeoutRef.current);
+    }
     setActivePopup(null);
   };
 
   const handleKeyDown = (e: React.KeyboardEvent, id: string) => {
     if (e.key === 'Enter' || e.key === ' ') {
       e.preventDefault();
-      handleItemClick(id);
+      // No action needed for keyboard
     }
   };
 
@@ -131,10 +157,10 @@ export default function ProtocolQuickList() {
             <div key={item.id} className="relative">
               <div 
                 className="flex items-center cursor-pointer hover:opacity-100 transition-opacity duration-200"
-                onMouseEnter={() => !isMobile && setActivePopup(item.id)}
-                onMouseLeave={() => !isMobile && setActivePopup(null)}
-                onTouchStart={() => isMobile && setActivePopup(item.id)}
-                onTouchEnd={() => isMobile && setActivePopup(null)}
+                onMouseEnter={() => !isMobile && handleMouseEnter(item.id)}
+                onMouseLeave={() => !isMobile && handleMouseLeave()}
+                onTouchStart={() => isMobile && handleTouchStart(item.id)}
+                onTouchEnd={() => isMobile && handleTouchEnd()}
                 tabIndex={0}
                 role="button"
                 aria-label={`Protocol ${item.label}`}
