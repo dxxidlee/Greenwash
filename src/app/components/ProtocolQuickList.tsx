@@ -123,7 +123,7 @@ export default function ProtocolQuickList() {
       >
       <div className="text-[#008F46] font-medium" style={{ fontFamily: 'PPNeueMontreal, sans-serif' }}>
         {/* Header */}
-        <div className="mb-3 font-medium ml-9">Protocol</div>
+        <div className="mb-2 font-medium ml-9">Protocol</div>
         
         {/* Stroke under Protocol */}
         <div 
@@ -159,7 +159,7 @@ export default function ProtocolQuickList() {
                 }}
               >
                 {/* Number Column */}
-                <div className="text-[#008F46] font-medium mr-3 w-6 text-left">
+                <div className="text-[#008F46] font-medium mr-3 w-6 text-left flex items-start">
                   {String(index + 1).padStart(2, '0')}
                 </div>
                 
