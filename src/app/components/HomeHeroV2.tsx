@@ -199,24 +199,8 @@ export default function HomeHeroV2() {
 
       {/* Main Grid Layout */}
       <div className="relative z-10 min-h-screen grid grid-cols-12 gap-4 p-4">
-        
-        {/* Center Brand Column */}
-        <div className="col-span-12 flex flex-col items-center justify-center relative">
-          {/* Vertical GREENWASH Logo */}
-          <div className="flex items-center justify-center w-full">
-            <img 
-              src="/img/vertical_logo.webp" 
-              alt="GREENWASH Logo"
-              className="object-contain"
-              style={{
-                height: '90vh'
-              }}
-            />
-          </div>
-        </div>
-
-        {/* Right Panel - Ring Container */}
-        <div className="absolute right-0 top-1/2 transform -translate-y-1/2 w-1/4 h-full flex items-center justify-center z-10">
+        {/* Ring - keep on right side but centered vertically */}
+        <div className="absolute right-0 top-1/2 transform -translate-y-1/2 w-1/3 h-full flex items-center justify-center z-10">
           <div 
             ref={rightPanelRef}
             className="w-full h-full flex items-center justify-center"
@@ -228,6 +212,16 @@ export default function HomeHeroV2() {
               containerRef={rightPanelRef}
             />
           </div>
+        </div>
+
+        {/* Logo + Seal on the far right as a single image */}
+        <div className="absolute right-4 top-1/2 -translate-y-1/2 z-20 pointer-events-none">
+          <img 
+            src="/img/logo_with_seal.png"
+            alt="GREENWASH vertical logo with seal"
+            className="object-contain"
+            style={{ height: '85vh' }}
+          />
         </div>
       </div>
 

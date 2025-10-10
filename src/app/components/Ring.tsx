@@ -7,6 +7,7 @@ const RADIUS_VMIN = 28;    // Less tight radius for better mobile experience
 const DOT = 140;            // Increased size for better video visibility
 const BASE_SPEED = 0.0375; // 75% slower than 0.15 (0.15 * 0.25 = 0.0375)
 const GREEN = '#008F46';
+const ANGLE_OFFSET = -Math.PI / 2; // start at top (12 o'clock)
 
 const DOT_LABELS = [
   'BreakRoom BRK-37',
@@ -163,7 +164,7 @@ export default function Ring({ hoverIdx, setHoverIdx, onDotClick, containerRef }
         }}
       >
         {dots.map((_, i) => {
-          const angle = (i/DOTS) * 2*Math.PI + (rotation * Math.PI / 180); // Add rotation to angle
+          const angle = ANGLE_OFFSET + (i/DOTS) * 2*Math.PI + (rotation * Math.PI / 180); // top-first layout
           const radius = ringSize.width / 2 - DOT / 2; // Dynamic radius based on container size
           const x = Math.cos(angle) * radius;
           const y = Math.sin(angle) * radius;
