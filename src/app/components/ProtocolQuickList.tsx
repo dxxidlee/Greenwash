@@ -89,7 +89,7 @@ export default function ProtocolQuickList() {
   }, []);
 
   const handleItemClick = (id: string) => {
-    setActivePopup(activePopup === id ? null : id);
+    // No longer needed - using hover/touch events
   };
 
   const handleOutsideClick = () => {
@@ -125,23 +125,16 @@ export default function ProtocolQuickList() {
         {/* Header */}
         <div className="mb-1 font-medium ml-9">Protocol</div>
         
-        {/* Stroke under Protocol */}
-        <div 
-          className="mt-1 bg-[#008F46] ml-9"
-          style={{ 
-            width: '12em',
-            height: '1px'
-          }}
-        ></div>
-        
         {/* List Items */}
         <div className="space-y-1">
           {PROTOCOL_ITEMS.map((item, index) => (
             <div key={item.id} className="relative">
               <div 
                 className="flex items-center cursor-pointer hover:opacity-100 transition-opacity duration-200"
-                onClick={() => handleItemClick(item.id)}
-                onKeyDown={(e) => handleKeyDown(e, item.id)}
+                onMouseEnter={() => !isMobile && setActivePopup(item.id)}
+                onMouseLeave={() => !isMobile && setActivePopup(null)}
+                onTouchStart={() => isMobile && setActivePopup(item.id)}
+                onTouchEnd={() => isMobile && setActivePopup(null)}
                 tabIndex={0}
                 role="button"
                 aria-label={`Protocol ${item.label}`}
@@ -198,12 +191,6 @@ export default function ProtocolQuickList() {
           }}
         >
           <div className="text-white">
-            {/* Header */}
-            <div className="text-xs font-medium text-white mb-3">
-              Greenwash Compliance Manual
-            </div>
-            <div className="border-t border-white mb-3"></div>
-            
             {/* Section Title */}
             <div className="text-xs font-medium text-white mb-2">
               {PROTOCOL_ITEMS.find(item => item.id === activePopup)?.label}
