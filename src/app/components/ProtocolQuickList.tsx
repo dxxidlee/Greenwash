@@ -123,11 +123,11 @@ export default function ProtocolQuickList() {
       >
       <div className="text-[#008F46] font-medium" style={{ fontFamily: 'PPNeueMontreal, sans-serif' }}>
         {/* Header */}
-        <div className="mb-2 font-medium ml-9">Protocol</div>
+        <div className="mb-3 font-medium ml-9">Protocol</div>
         
         {/* Stroke under Protocol */}
         <div 
-          className="mt-1 bg-[#008F46]"
+          className="mt-1 bg-[#008F46] ml-9"
           style={{ 
             width: '12em',
             height: '1px'
@@ -135,7 +135,7 @@ export default function ProtocolQuickList() {
         ></div>
         
         {/* List Items */}
-        <div className="space-y-2 mt-0">
+        <div className="space-y-2">
           {PROTOCOL_ITEMS.map((item, index) => (
             <div key={item.id} className="relative">
               <div 
@@ -166,17 +166,16 @@ export default function ProtocolQuickList() {
                 {/* Label Column */}
                 <div className="text-[#008F46] font-medium">
                   {item.label}
+                  {/* Horizontal Rule */}
+                  <div 
+                    className="mt-1 bg-[#008F46]"
+                    style={{ 
+                      width: '12em',
+                      height: '0.5px'
+                    }}
+                  ></div>
                 </div>
               </div>
-              
-              {/* Horizontal Rule */}
-              <div 
-                className="mt-1 bg-[#008F46]"
-                style={{ 
-                  width: '12em',
-                  height: '0.5px'
-                }}
-              ></div>
             </div>
           ))}
         </div>
