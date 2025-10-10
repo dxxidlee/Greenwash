@@ -186,7 +186,7 @@ export default function Ring({ hoverIdx, setHoverIdx, onDotClick, containerRef, 
           return (
             <div
               key={i}
-              className={`absolute transition-transform duration-200 cursor-pointer will-change-transform ${
+              className={`absolute transform-gpu transition-transform duration-200 cursor-pointer will-change-transform ${
                 isHovered && !isMobile ? 'scale-110' : isHovered && isMobile ? 'scale-105' : inactive ? 'opacity-60' : ''
               }`}
               style={{
@@ -195,7 +195,8 @@ export default function Ring({ hoverIdx, setHoverIdx, onDotClick, containerRef, 
                 left:`calc(50% + ${x}px - ${DOT/2}px)`,
                 top: `calc(50% + ${y}px - ${DOT/2}px)`,
                 boxShadow: 'none', // Remove any shadows
-                outline: 'none' // Remove focus outline
+                outline: 'none', // Remove focus outline
+                transformOrigin: 'center'
               }}
               {...handleSphereInteraction(i)}
               onClick={() => onDotClick?.(i)}
