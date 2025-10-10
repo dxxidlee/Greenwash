@@ -187,7 +187,7 @@ export default function HomeHeroV2() {
       {/* Live Time - Fixed Position */}
       <div 
         className="fixed z-20"
-        style={{ top: '10px', left: '80px' }}
+        style={{ top: '10px', left: '75px' }}
       >
         <div 
           className="font-medium text-[#008F46] text-left"

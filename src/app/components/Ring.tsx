@@ -70,7 +70,7 @@ export default function Ring({ hoverIdx, setHoverIdx, onDotClick, containerRef, 
     }
 
     setVisibleDots([]);
-    const delays = Array.from({ length: DOTS }, (_, i) => i * 150); // 150ms between each dot
+    const delays = Array.from({ length: DOTS }, (_, i) => i * 250); // 250ms between each dot
     
     delays.forEach((delay, index) => {
       setTimeout(() => {
@@ -205,9 +205,9 @@ export default function Ring({ hoverIdx, setHoverIdx, onDotClick, containerRef, 
           return (
             <div
               key={i}
-              className={`absolute transform-gpu transition-all duration-300 cursor-pointer will-change-transform ${
+              className={`absolute transform-gpu transition-all duration-500 ease-out cursor-pointer will-change-transform ${
                 isHovered && !isMobile ? 'scale-110' : isHovered && isMobile ? 'scale-105' : inactive ? 'opacity-60' : ''
-              } ${isVisible ? 'opacity-100 scale-100' : 'opacity-0 scale-50'}`}
+              } ${isVisible ? 'opacity-100 scale-100' : 'opacity-0 scale-75'}`}
               style={{
                 width: DOT, 
                 height: DOT, 
