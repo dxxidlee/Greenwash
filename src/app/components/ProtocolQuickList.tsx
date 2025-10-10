@@ -64,7 +64,7 @@ export default function ProtocolQuickList() {
     >
       <div className="text-[#008F46] font-medium" style={{ fontFamily: 'PPNeueMontreal, sans-serif' }}>
         {/* Header */}
-        <div className="mb-3 font-medium">Protocol</div>
+        <div className="mb-3 font-medium ml-9">Protocol</div>
         
         {/* List Items */}
         <div className="space-y-2">
@@ -105,7 +105,7 @@ export default function ProtocolQuickList() {
               <div 
                 className="mt-1 h-px bg-[#008F46]"
                 style={{ 
-                  width: '6em'
+                  width: '12em'
                 }}
               ></div>
             </div>
