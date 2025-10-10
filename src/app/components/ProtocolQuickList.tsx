@@ -130,13 +130,12 @@ export default function ProtocolQuickList() {
           className="mt-1 bg-[#008F46]"
           style={{ 
             width: '12em',
-            height: '1px',
-            marginLeft: '36px' // Same as ml-9 (9 * 4px = 36px)
+            height: '1px'
           }}
         ></div>
         
         {/* List Items */}
-        <div className="space-y-2 mt-3">
+        <div className="space-y-2 mt-0">
           {PROTOCOL_ITEMS.map((item, index) => (
             <div key={item.id} className="relative">
               <div 
