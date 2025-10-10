@@ -7,6 +7,7 @@ import GreenwashFinder from './GreenwashFinder';
 import JournalModal from '../../components/JournalModal';
 import GreenwashQuiz from './GreenwashQuiz';
 import GreenwashManual from './GreenwashManual';
+import ProtocolQuickList from './ProtocolQuickList';
 
 const DOT_LABELS = [
   'BreakRoom BRK-37',
@@ -187,10 +188,11 @@ export default function HomeHeroV2() {
       {/* Live Time - Fixed Position */}
       <div 
         className="fixed z-20"
-        style={{ top: '10px', left: '75px' }}
+        style={{ top: '10px', left: '70px' }}
       >
         <div 
           className="font-medium text-[#008F46] text-left"
+          data-live-time
           style={{ 
             fontFamily: 'PPNeueMontreal, sans-serif',
             fontSize: '0.8rem'
@@ -221,6 +223,9 @@ export default function HomeHeroV2() {
           centered
         />
       </div>
+
+      {/* Protocol Quick List */}
+      <ProtocolQuickList />
 
       {/* Hover Label */}
       {hoverIdx !== null && anchor && (
