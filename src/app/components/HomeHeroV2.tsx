@@ -72,6 +72,9 @@ export default function HomeHeroV2() {
       const centerX = rect.left + rect.width / 2;
       const centerY = rect.top + rect.height / 2;
       setAnchor({ x: centerX, y: centerY });
+    } else {
+      // Centered ring mode – anchor at viewport center
+      setAnchor({ x: window.innerWidth / 2, y: window.innerHeight / 2 });
     }
   }, [hoverIdx]);
 
@@ -225,7 +228,9 @@ export default function HomeHeroV2() {
       </div>
 
       {/* Hover Label */}
-      {hoverIdx !== null && <HoverLabel text={DOT_LABELS[hoverIdx] || "Lorem Ipsum"} anchor={anchor} />}
+      {hoverIdx !== null && anchor && (
+        <HoverLabel text={DOT_LABELS[hoverIdx] || ""} anchor={anchor} />
+      )}
       
       {/* Modals */}
       <GreenwashForms isOpen={isFormsOpen} onClose={() => setIsFormsOpen(false)} />

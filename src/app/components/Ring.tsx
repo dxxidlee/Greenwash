@@ -150,7 +150,7 @@ export default function Ring({ hoverIdx, setHoverIdx, onDotClick, containerRef, 
         const vw = window.innerWidth;
         const vh = window.innerHeight;
         const maxSize = Math.min(vw, vh);
-        const size = Math.max(320, Math.floor(maxSize * 0.62)); // Larger, more spread out
+        const size = Math.max(360, Math.floor(maxSize * 0.78)); // Increase overall ring size without changing icon size
         setRingSize({ width: size, height: size });
       }
     };
