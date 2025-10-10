@@ -203,19 +203,14 @@ export default function HomeHeroV2() {
       {/* Main Grid Layout */}
       <div className="relative z-10 min-h-screen grid grid-cols-12 gap-4 p-4">
         
-        {/* Center Brand Column */}
-        <div className="col-span-12 flex flex-col items-center justify-center relative">
-          {/* Vertical GREENWASH Logo */}
-          <div className="flex items-center justify-center w-full">
-            <img 
-              src="/img/vertical_logo.webp" 
-              alt="GREENWASH Logo"
-              className="object-contain"
-              style={{
-                height: '90vh'
-              }}
-            />
-          </div>
+        {/* Right-side Vertical Logo */}
+        <div className="fixed right-2 top-1/2 -translate-y-1/2 z-10 pointer-events-none">
+          <img 
+            src="/img/vertical_logo.webp" 
+            alt="GREENWASH Logo"
+            className="object-contain"
+            style={{ height: '90vh' }}
+          />
         </div>
 
         {/* Centered Ring Overlay (matches Chrome middle layout) */}
