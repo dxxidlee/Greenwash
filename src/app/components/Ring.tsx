@@ -4,7 +4,7 @@ import { useMemo, useEffect, useState, useRef, useLayoutEffect } from 'react';
 
 const DOTS = 6;
 const RADIUS_VMIN = 28;    // Less tight radius for better mobile experience
-const DOT = 140;            // Increased size for better video visibility
+const DOT = 126;            // 140 * 0.9 = 126 (90% of original size)
 const BASE_SPEED = 0.0375; // 75% slower than 0.15 (0.15 * 0.25 = 0.0375)
 const GREEN = '#008F46';
 
@@ -39,6 +39,9 @@ export default function Ring({ hoverIdx, setHoverIdx, onDotClick, containerRef, 
   const [rotationSpeed, setRotationSpeed] = useState(BASE_SPEED);
   const [isMobile, setIsMobile] = useState(false);
   const [prefersReducedMotion, setPrefersReducedMotion] = useState(false);
+  const [visibleDots, setVisibleDots] = useState<number[]>([]);
+  const [ringSize, setRingSize] = useState<{ width:number; height:number } | null>(null);
+  const [isReady, setIsReady] = useState(false);
   const speedDecayRef = useRef<NodeJS.Timeout | null>(null);
   const animationRef = useRef<number | null>(null);
 
@@ -58,6 +61,23 @@ export default function Ring({ hoverIdx, setHoverIdx, onDotClick, containerRef, 
     mediaQuery.addEventListener('change', handleChange);
     return () => mediaQuery.removeEventListener('change', handleChange);
   }, []);
+
+  // Sequential dot appearance animation
+  useEffect(() => {
+    if (!isReady || prefersReducedMotion) {
+      setVisibleDots(Array.from({ length: DOTS }, (_, i) => i));
+      return;
+    }
+
+    setVisibleDots([]);
+    const delays = Array.from({ length: DOTS }, (_, i) => i * 150); // 150ms between each dot
+    
+    delays.forEach((delay, index) => {
+      setTimeout(() => {
+        setVisibleDots(prev => [...prev, index]);
+      }, delay);
+    });
+  }, [isReady, prefersReducedMotion]);
 
   // Handle scroll to increase rotation speed
   useEffect(() => {
@@ -132,8 +152,6 @@ export default function Ring({ hoverIdx, setHoverIdx, onDotClick, containerRef, 
   });
 
   // Calculate ring size based on container or viewport (centered)
-  const [ringSize, setRingSize] = useState<{ width:number; height:number } | null>(null);
-  const [isReady, setIsReady] = useState(false);
   
   useLayoutEffect(() => {
     const updateRingSize = () => {
@@ -182,13 +200,14 @@ export default function Ring({ hoverIdx, setHoverIdx, onDotClick, containerRef, 
           const y = Math.sin(angle) * radius;
           const isHovered = hoverIdx === i;
           const inactive = hoverIdx !== null && hoverIdx !== i;
+          const isVisible = visibleDots.includes(i);
           
           return (
             <div
               key={i}
-              className={`absolute transform-gpu transition-transform duration-200 cursor-pointer will-change-transform ${
+              className={`absolute transform-gpu transition-all duration-300 cursor-pointer will-change-transform ${
                 isHovered && !isMobile ? 'scale-110' : isHovered && isMobile ? 'scale-105' : inactive ? 'opacity-60' : ''
-              }`}
+              } ${isVisible ? 'opacity-100 scale-100' : 'opacity-0 scale-50'}`}
               style={{
                 width: DOT, 
                 height: DOT, 

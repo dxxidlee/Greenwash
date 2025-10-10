@@ -132,7 +132,7 @@ export default function HomeHeroV2() {
       
       {/* Profile - Fixed Position */}
       <div 
-        className="absolute z-20"
+        className="fixed z-20"
         style={{ top: '10px', left: '2px' }}
       >
         <div className="relative">
@@ -186,11 +186,11 @@ export default function HomeHeroV2() {
 
       {/* Live Time - Fixed Position */}
       <div 
-        className="absolute z-20"
-        style={{ top: '10px', right: '10px' }}
+        className="fixed z-20"
+        style={{ top: '10px', left: '80px' }}
       >
         <div 
-          className="font-medium text-[#008F46]"
+          className="font-medium text-[#008F46] text-left"
           style={{ 
             fontFamily: 'PPNeueMontreal, sans-serif',
             fontSize: '0.8rem'
@@ -204,12 +204,12 @@ export default function HomeHeroV2() {
       <div className="relative z-10 min-h-screen grid grid-cols-12 gap-4 p-4">
         
         {/* Right-side Vertical Logo */}
-        <div className="fixed right-2 top-1/2 -translate-y-1/2 z-10 pointer-events-none">
+        <div className="fixed z-10 pointer-events-none" style={{ bottom: '10px', right: '10px' }}>
           <img 
             src="/img/vertical_logo.webp" 
             alt="GREENWASH Logo"
             className="object-contain"
-            style={{ height: '90vh' }}
+            style={{ height: '45vh' }}
           />
         </div>
 
