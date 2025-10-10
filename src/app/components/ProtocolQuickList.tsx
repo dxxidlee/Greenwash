@@ -135,7 +135,7 @@ export default function ProtocolQuickList() {
         ></div>
         
         {/* List Items */}
-        <div className="space-y-2">
+        <div className="space-y-1">
           {PROTOCOL_ITEMS.map((item, index) => (
             <div key={item.id} className="relative">
               <div 
