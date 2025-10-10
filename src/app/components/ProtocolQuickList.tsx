@@ -59,7 +59,6 @@ export default function ProtocolQuickList() {
   const [liveTimeFontSize, setLiveTimeFontSize] = useState('0.8rem');
   const [isMobile, setIsMobile] = useState(false);
   const [activePopup, setActivePopup] = useState<string | null>(null);
-  const hoverTimeoutRef = useRef<NodeJS.Timeout | null>(null);
 
   // Check for mobile and update font size
   useEffect(() => {
@@ -90,35 +89,22 @@ export default function ProtocolQuickList() {
   }, []);
 
   const handleMouseEnter = (id: string) => {
-    if (hoverTimeoutRef.current) {
-      clearTimeout(hoverTimeoutRef.current);
-    }
     setActivePopup(id);
   };
 
   const handleMouseLeave = () => {
-    hoverTimeoutRef.current = setTimeout(() => {
-      setActivePopup(null);
-    }, 100); // Small delay to prevent flickering
+    setActivePopup(null);
   };
 
   const handleTouchStart = (id: string) => {
-    if (hoverTimeoutRef.current) {
-      clearTimeout(hoverTimeoutRef.current);
-    }
     setActivePopup(id);
   };
 
   const handleTouchEnd = () => {
-    hoverTimeoutRef.current = setTimeout(() => {
-      setActivePopup(null);
-    }, 100);
+    setActivePopup(null);
   };
 
   const handleOutsideClick = () => {
-    if (hoverTimeoutRef.current) {
-      clearTimeout(hoverTimeoutRef.current);
-    }
     setActivePopup(null);
   };
 
