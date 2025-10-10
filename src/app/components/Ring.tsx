@@ -1,6 +1,6 @@
 // app/components/Ring.tsx
 'use client';
-import { useMemo, useEffect, useState, useRef } from 'react';
+import { useMemo, useEffect, useState, useRef, useLayoutEffect } from 'react';
 
 const DOTS = 6;
 const RADIUS_VMIN = 28;    // Less tight radius for better mobile experience
@@ -37,7 +37,6 @@ export default function Ring({ hoverIdx, setHoverIdx, onDotClick, containerRef, 
   const dots = useMemo(() => Array.from({ length: DOTS }), []);
   const [rotation, setRotation] = useState(0);
   const [rotationSpeed, setRotationSpeed] = useState(BASE_SPEED);
-  const [isPaused, setIsPaused] = useState(false);
   const [isMobile, setIsMobile] = useState(false);
   const [prefersReducedMotion, setPrefersReducedMotion] = useState(false);
   const speedDecayRef = useRef<NodeJS.Timeout | null>(null);
@@ -63,7 +62,8 @@ export default function Ring({ hoverIdx, setHoverIdx, onDotClick, containerRef, 
   // Handle scroll to increase rotation speed
   useEffect(() => {
     const handleWheel = (e: WheelEvent) => {
-      if (isPaused) return;
+      // Ignore while reduced motion preferred
+      if (prefersReducedMotion) return;
       
       const scrollDelta = Math.abs(e.deltaY);
       const speedBoost = Math.min(scrollDelta / 100, 2);
@@ -92,12 +92,12 @@ export default function Ring({ hoverIdx, setHoverIdx, onDotClick, containerRef, 
       window.removeEventListener('wheel', handleWheel);
       if (speedDecayRef.current) clearTimeout(speedDecayRef.current);
     };
-  }, [isPaused]);
+  }, [prefersReducedMotion]);
 
   // Smooth animation loop
   useEffect(() => {
     const animate = () => {
-      if (!isPaused && !prefersReducedMotion) {
+      if (!prefersReducedMotion) {
         setRotation(prev => {
           const newRotation = prev + rotationSpeed;
           // Keep rotation between 0 and 360 to prevent infinite growth
@@ -114,12 +114,13 @@ export default function Ring({ hoverIdx, setHoverIdx, onDotClick, containerRef, 
         cancelAnimationFrame(animationRef.current);
       }
     };
-  }, [rotationSpeed, isPaused, prefersReducedMotion]);
+  }, [rotationSpeed, prefersReducedMotion]);
 
-  // Pause rotation on hover
+  // On hover, slow down instead of pausing to keep RAF smooth
   useEffect(() => {
-    setIsPaused(hoverIdx !== null);
-  }, [hoverIdx]);
+    if (prefersReducedMotion) return;
+    setRotationSpeed(hoverIdx !== null ? 0.003 : BASE_SPEED);
+  }, [hoverIdx, prefersReducedMotion]);
 
   const handleSphereInteraction = (index: number) => ({
     // Desktop: hover
@@ -131,9 +132,10 @@ export default function Ring({ hoverIdx, setHoverIdx, onDotClick, containerRef, 
   });
 
   // Calculate ring size based on container or viewport (centered)
-  const [ringSize, setRingSize] = useState({ width: RADIUS_VMIN * 2, height: RADIUS_VMIN * 2 });
+  const [ringSize, setRingSize] = useState<{ width:number; height:number } | null>(null);
+  const [isReady, setIsReady] = useState(false);
   
-  useEffect(() => {
+  useLayoutEffect(() => {
     const updateRingSize = () => {
       if (!centered && containerRef?.current) {
         const container = containerRef.current;
@@ -146,12 +148,14 @@ export default function Ring({ hoverIdx, setHoverIdx, onDotClick, containerRef, 
         const size = Math.min(maxSize * 0.8, minSize); // Use 80% of container or minSize, whichever is smaller
         
         setRingSize({ width: size, height: size });
+        setIsReady(true);
       } else {
         const vw = window.innerWidth;
         const vh = window.innerHeight;
         const maxSize = Math.min(vw, vh);
         const size = Math.max(360, Math.floor(maxSize * 0.78)); // Increase overall ring size without changing icon size
         setRingSize({ width: size, height: size });
+        setIsReady(true);
       }
     };
     
@@ -159,6 +163,8 @@ export default function Ring({ hoverIdx, setHoverIdx, onDotClick, containerRef, 
     window.addEventListener('resize', updateRingSize);
     return () => window.removeEventListener('resize', updateRingSize);
   }, [containerRef, centered]);
+
+  if (!isReady || !ringSize) return null; // avoid clustered first paint
 
   return (
     <div className={centered ? 'fixed left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2' : 'relative w-full h-full flex items-center justify-center'}>
@@ -180,8 +186,8 @@ export default function Ring({ hoverIdx, setHoverIdx, onDotClick, containerRef, 
           return (
             <div
               key={i}
-              className={`absolute transition-all duration-200 cursor-pointer ${
-                isHovered && !isMobile ? 'scale-110' : isHovered && isMobile ? 'scale-105' : inactive ? 'blur-[2px] opacity-60' : ''
+              className={`absolute transition-transform duration-200 cursor-pointer will-change-transform ${
+                isHovered && !isMobile ? 'scale-110' : isHovered && isMobile ? 'scale-105' : inactive ? 'opacity-60' : ''
               }`}
               style={{
                 width: DOT, 
