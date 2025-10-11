@@ -117,16 +117,10 @@ export default function ProtocolQuickList() {
 
   return (
     <>
-      {/* Click outside handler */}
-      {activePopup && (
-        <div 
-          className="fixed inset-0 z-40"
-          onClick={handleOutsideClick}
-        />
-      )}
       
       <div 
         className="fixed z-10 pointer-events-auto"
+        data-protocol-list
         style={{ 
           bottom: '10px', 
           left: '10px',
@@ -191,15 +185,23 @@ export default function ProtocolQuickList() {
       {/* Protocol Popups */}
       {activePopup && (
         <div 
-          className="fixed z-50 backdrop-blur-sm shadow-2xl rounded-lg p-4"
+          className="fixed z-50 backdrop-blur-sm shadow-2xl rounded-lg p-4 pointer-events-none overflow-y-auto"
           style={{ 
             backgroundColor: 'rgba(0, 143, 70, 0.3)',
             bottom: '10px',
-            left: '220px', // Position to the right of the ProtocolQuickList
-            maxHeight: 'calc(100vh - 20px)', // Don't exceed viewport height
+            left: '200px', // Closer to the ProtocolQuickList
+            height: 'auto', // Fixed height matching ProtocolQuickList
             width: 'auto',
             minWidth: '300px',
             maxWidth: '600px'
+          }}
+          ref={(el) => {
+            if (el) {
+              const protocolList = document.querySelector('[data-protocol-list]');
+              if (protocolList) {
+                el.style.height = `${protocolList.clientHeight}px`;
+              }
+            }
           }}
         >
           <div className="text-white">
