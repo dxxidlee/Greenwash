@@ -174,7 +174,7 @@ export default function HomeHeroV2() {
               </div>
               <div className="border-t border-white mb-2"></div>
               <div className="text-xs font-medium text-white mb-2">
-                The GREENWASH initiative represents a comprehensive approach to urban environmental compliance. 
+                The Greenwash initiative represents a comprehensive approach to urban environmental compliance. 
                 Through systematic color standardization and visual harmony protocols, we ensure that all public 
                 and commercial spaces adhere to the established green palette guidelines. This project aims to 
                 create a unified, peaceful urban environment while maintaining strict compliance standards 

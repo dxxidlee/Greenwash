@@ -12,6 +12,15 @@ const GreenwashForms: React.FC<GreenwashFormsProps> = ({ isOpen, onClose }) => {
   const [activeTab, setActiveTab] = useState('auth');
   const [authLoaded, setAuthLoaded] = useState(false);
   const [violationLoaded, setViolationLoaded] = useState(false);
+  const [isMobile, setIsMobile] = useState(false);
+
+  // Check if mobile
+  React.useEffect(() => {
+    const checkMobile = () => setIsMobile(window.innerWidth < 768);
+    checkMobile();
+    window.addEventListener('resize', checkMobile);
+    return () => window.removeEventListener('resize', checkMobile);
+  }, []);
   const [authForm, setAuthForm] = useState({
     permitId: '',
     dateIssued: '',
@@ -148,7 +157,7 @@ const GreenwashForms: React.FC<GreenwashFormsProps> = ({ isOpen, onClose }) => {
     backgroundColor: 'rgba(0, 143, 70, 0.3)',
     backdropFilter: 'blur(10px)',
     WebkitBackdropFilter: 'blur(10px)',
-    border: '1px solid #FFFFFF',
+    border: 'none',
     color: '#FFFFFF',
     borderRadius: '8px',
     fontFamily: 'PPNeueMontreal, sans-serif'
@@ -162,7 +171,7 @@ const GreenwashForms: React.FC<GreenwashFormsProps> = ({ isOpen, onClose }) => {
     WebkitBackdropFilter: 'blur(10px)',
     boxShadow: '0 4px 10px rgba(0,0,0,0.15)',
     letterSpacing: '0.3px',
-    border: '1px solid #FFFFFF',
+    border: 'none',
     borderRadius: '8px',
     fontFamily: 'PPNeueMontreal, sans-serif'
   };
@@ -171,11 +180,11 @@ const GreenwashForms: React.FC<GreenwashFormsProps> = ({ isOpen, onClose }) => {
 
   return (
     <div 
-      className="fixed inset-0 z-50 bg-white/90 backdrop-blur-md flex items-center justify-center p-4"
+      className="fixed inset-0 z-50 bg-black bg-opacity-50 flex items-center justify-center p-4"
       onClick={onClose}
     >
       <div 
-        className="relative w-full max-w-4xl max-h-[90vh] overflow-y-auto"
+        className={`relative w-full ${isMobile ? 'max-w-4xl' : 'max-w-7xl'} max-h-[90vh] overflow-y-auto`}
         onClick={(e) => e.stopPropagation()}
         style={{ fontFamily: 'PPNeueMontreal, sans-serif' }}
       >
@@ -193,7 +202,8 @@ const GreenwashForms: React.FC<GreenwashFormsProps> = ({ isOpen, onClose }) => {
           <X size={20} color="#FFFFFF" />
         </button>
 
-        {/* Tab Navigation */}
+        {/* Tab Navigation - Only show on mobile */}
+        {isMobile && (
         <div className="flex gap-2 mb-4">
           <button
             onClick={() => setActiveTab('auth')}
@@ -202,7 +212,7 @@ const GreenwashForms: React.FC<GreenwashFormsProps> = ({ isOpen, onClose }) => {
             }`}
             style={{
               ...buttonStyle,
-              border: activeTab === 'auth' ? '2px solid #FFFFFF' : '1px solid #FFFFFF'
+              border: 'none'
             }}
           >
             <FileText size={18} />
@@ -215,29 +225,33 @@ const GreenwashForms: React.FC<GreenwashFormsProps> = ({ isOpen, onClose }) => {
             }`}
             style={{
               ...buttonStyle,
-              border: activeTab === 'violation' ? '2px solid #FFFFFF' : '1px solid #FFFFFF'
+              border: 'none'
             }}
           >
             <AlertTriangle size={18} />
             <span className="text-xs tracking-wider">VIOLATION TICKET</span>
           </button>
         </div>
+        )}
 
         {/* Forms Container */}
         <div 
-          className="rounded-lg border border-white overflow-hidden"
-          style={{
-            backgroundColor: 'rgba(0, 143, 70, 0.3)',
-            backdropFilter: 'blur(10px)',
-            WebkitBackdropFilter: 'blur(10px)'
-          }}
+          className={`rounded-lg overflow-hidden ${isMobile ? '' : 'grid grid-cols-2 gap-4'}`}
         >
           {/* Authorization Form */}
-          {activeTab === 'auth' && (
+          {(isMobile ? activeTab === 'auth' : true) && (
+          <div 
+            className="rounded-lg overflow-hidden"
+            style={{
+              backgroundColor: 'rgba(0, 143, 70, 0.3)',
+              backdropFilter: 'blur(10px)',
+              WebkitBackdropFilter: 'blur(10px)'
+            }}
+          >
             <div className="p-6">
               <div className="flex justify-between items-start mb-6">
                 <h2 className="text-2xl tracking-widest text-white" style={{ fontFamily: 'PPNeueMontreal, sans-serif' }}>
-                  AUTHORIZATION FORM
+                  Authorization Form
                 </h2>
               </div>
 
@@ -429,10 +443,10 @@ const GreenwashForms: React.FC<GreenwashFormsProps> = ({ isOpen, onClose }) => {
               <div className="mt-6">
                 <button
                   onClick={handleAuthSubmit}
-                  className="w-full font-bold tracking-widest transition-all duration-300 rounded-lg"
+                  className="w-full font-medium tracking-widest transition-all duration-300 rounded-lg"
                   style={{
                     ...buttonStyle,
-                    border: '2px solid #FFFFFF',
+                    border: 'none',
                     padding: '12px'
                   }}
                 >
@@ -440,14 +454,23 @@ const GreenwashForms: React.FC<GreenwashFormsProps> = ({ isOpen, onClose }) => {
                 </button>
               </div>
             </div>
+          </div>
           )}
 
           {/* Violation Form */}
-          {activeTab === 'violation' && (
+          {(isMobile ? activeTab === 'violation' : true) && (
+          <div 
+            className="rounded-lg overflow-hidden"
+            style={{
+              backgroundColor: 'rgba(0, 143, 70, 0.3)',
+              backdropFilter: 'blur(10px)',
+              WebkitBackdropFilter: 'blur(10px)'
+            }}
+          >
             <div className="p-6">
               <div className="flex justify-between items-start mb-6">
                 <h2 className="text-2xl tracking-widest text-white" style={{ fontFamily: 'PPNeueMontreal, sans-serif' }}>
-                  NONCOMPLIANCE VIOLATION TICKET
+                  Noncompliance Violation Ticket
                 </h2>
               </div>
 
@@ -642,10 +665,10 @@ const GreenwashForms: React.FC<GreenwashFormsProps> = ({ isOpen, onClose }) => {
               <div className="mt-6">
                 <button
                   onClick={handleViolationSubmit}
-                  className="w-full font-bold tracking-widest transition-all duration-300 rounded-lg"
+                  className="w-full font-medium tracking-widest transition-all duration-300 rounded-lg"
                   style={{
                     ...buttonStyle,
-                    border: '2px solid #FFFFFF',
+                    border: 'none',
                     padding: '12px'
                   }}
                 >
@@ -653,6 +676,7 @@ const GreenwashForms: React.FC<GreenwashFormsProps> = ({ isOpen, onClose }) => {
                 </button>
               </div>
             </div>
+          </div>
           )}
         </div>
       </div>
