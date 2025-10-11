@@ -8,6 +8,9 @@ export const metadata: Metadata = {
   keywords: ['compliance', 'government', '2037', 'dystopian'],
   authors: [{ name: 'Ministry of Environmental Compliance' }],
   robots: 'noindex, nofollow', // Dystopian theme - hidden from search
+  icons: {
+    icon: '/img/favicon.ico',
+  },
 }
 
 export default function RootLayout({
