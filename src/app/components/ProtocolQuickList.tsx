@@ -10,16 +10,10 @@ const PROTOCOL_ITEMS = [
 ];
 
 const PROTOCOL_CONTENT = {
-  overview: `Greenwash safeguards unity through chromatic order.
-It exists to uphold visual consistency across the city's modified environments.
-This digital manual serves as an orientation for all active personnel under the Metropolitan Office of Urban Colorization (MOUC).
-Familiarity with these protocols is mandatory.`,
+  overview: `Greenwash safeguards unity through chromatic order. It exists to uphold visual consistency across the city's modified environments.
+This digital manual serves as an orientation for all active personnel under the Metropolitan Office of Urban Colorization (MOUC). Familiarity with these protocols is mandatory.`,
   
-  access: `All personnel are required to access the Greenwash Portal at the start of each shift.
-
-Core Modules:
-
-Journal: Record task logs, field observations, and daily reflections.
+  access: `Journal: Record task logs, field observations, and daily reflections.
 
 Reports: Submit violation tickets and permit slips for administrative review.
 
