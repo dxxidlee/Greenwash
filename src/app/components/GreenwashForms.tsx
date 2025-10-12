@@ -190,15 +190,15 @@ const GreenwashForms: React.FC<GreenwashFormsProps> = ({ isOpen, onClose }) => {
       
       {/* Content */}
       <div 
-        className={`relative w-full ${isMobile ? 'max-w-md' : 'max-w-4xl'} h-[90vh] z-10 flex flex-col`}
+        className={`relative w-full ${isMobile ? 'max-w-md' : 'max-w-4xl'} h-screen z-10`}
         onClick={(e) => e.stopPropagation()}
         style={{ fontFamily: 'PPNeueMontreal, sans-serif' }}
       >
         {/* Close button */}
-        <button
+            <button
           onClick={onClose}
           className="fixed top-4 right-4 z-60 p-3 rounded-full transition-all"
-          style={{
+        style={{
             backgroundColor: 'rgba(0, 143, 70, 0.3)',
             backdropFilter: 'blur(10px)',
             WebkitBackdropFilter: 'blur(10px)',
@@ -206,17 +206,11 @@ const GreenwashForms: React.FC<GreenwashFormsProps> = ({ isOpen, onClose }) => {
           }}
         >
           <X size={20} color="#FFFFFF" />
-        </button>
+      </button>
 
-        {/* Tab Navigation - Only show on mobile - Sticky */}
+        {/* Tab Navigation - Only show on mobile */}
         {isMobile && (
-        <div className="flex gap-2 p-4 pb-2 sticky top-0 z-20"
-          style={{
-            backgroundColor: 'rgba(0, 143, 70, 0.3)',
-            backdropFilter: 'blur(10px)',
-            WebkitBackdropFilter: 'blur(10px)'
-          }}
-        >
+        <div className="flex gap-2 p-4 pb-2">
           <button
             onClick={() => setActiveTab('auth')}
             className={`flex items-center gap-2 px-4 py-3 transition-all rounded-lg ${
@@ -246,10 +240,11 @@ const GreenwashForms: React.FC<GreenwashFormsProps> = ({ isOpen, onClose }) => {
         </div>
         )}
 
-        {/* Forms Container - Scrollable */}
+        {/* Forms Container - Scrollable with calculated height */}
         <div 
-          className={`flex-1 overflow-y-auto px-4 pt-8 pb-8 hide-scrollbar ${isMobile ? '' : 'grid grid-cols-2 gap-3 items-start'}`}
+          className={`overflow-y-auto p-6 hide-scrollbar ${isMobile ? '' : 'grid grid-cols-2 gap-3 items-start content-start'}`}
           style={{
+            height: isMobile ? 'calc(100vh - 80px)' : '100vh',
             scrollbarWidth: 'none',
             msOverflowStyle: 'none'
           }}
