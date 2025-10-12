@@ -190,7 +190,7 @@ const GreenwashForms: React.FC<GreenwashFormsProps> = ({ isOpen, onClose }) => {
       
       {/* Content */}
       <div 
-        className={`relative w-full ${isMobile ? 'max-w-md' : 'max-w-4xl'} h-screen z-10`}
+        className={`relative w-full ${isMobile ? 'max-w-md' : 'max-w-4xl'} h-[90vh] z-10`}
         onClick={(e) => e.stopPropagation()}
         style={{ fontFamily: 'PPNeueMontreal, sans-serif' }}
       >
@@ -244,7 +244,7 @@ const GreenwashForms: React.FC<GreenwashFormsProps> = ({ isOpen, onClose }) => {
         <div 
           className={`overflow-y-auto hide-scrollbar`}
           style={{
-            height: isMobile ? 'calc(100vh - 80px)' : '100vh',
+            height: isMobile ? 'calc(90vh - 80px)' : '90vh',
             scrollbarWidth: 'none',
             msOverflowStyle: 'none'
           }}
