@@ -180,17 +180,11 @@ const GreenwashForms: React.FC<GreenwashFormsProps> = ({ isOpen, onClose }) => {
 
   return (
     <div 
-      className="fixed inset-0 z-50 flex items-center justify-center bg-transparent"
+      className="fixed inset-0 z-50 bg-black bg-opacity-50 flex items-center justify-center p-4"
+      onClick={onClose}
     >
-      {/* Blur backdrop layer */}
       <div 
-        className="fixed inset-0 bg-black bg-opacity-50 backdrop-blur-md"
-        onClick={onClose}
-      />
-      
-      {/* Content */}
-      <div 
-        className={`relative w-full ${isMobile ? 'max-w-4xl' : 'max-w-7xl'} max-h-[90vh] overflow-y-auto p-4 z-10`}
+        className={`relative w-full ${isMobile ? 'max-w-4xl' : 'max-w-7xl'} max-h-[90vh] overflow-y-auto`}
         onClick={(e) => e.stopPropagation()}
         style={{ fontFamily: 'PPNeueMontreal, sans-serif' }}
       >
