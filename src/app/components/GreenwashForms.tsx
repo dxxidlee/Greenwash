@@ -248,7 +248,11 @@ const GreenwashForms: React.FC<GreenwashFormsProps> = ({ isOpen, onClose }) => {
 
         {/* Forms Container - Scrollable */}
         <div 
-          className={`flex-1 overflow-y-auto p-4 ${isMobile ? '' : 'grid grid-cols-2 gap-3 items-start'}`}
+          className={`flex-1 overflow-y-auto px-4 pt-8 pb-8 hide-scrollbar ${isMobile ? '' : 'grid grid-cols-2 gap-3 items-start'}`}
+          style={{
+            scrollbarWidth: 'none',
+            msOverflowStyle: 'none'
+          }}
         >
           {/* Authorization Form */}
           {(isMobile ? activeTab === 'auth' : true) && (
