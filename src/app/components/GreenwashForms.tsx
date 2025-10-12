@@ -242,13 +242,14 @@ const GreenwashForms: React.FC<GreenwashFormsProps> = ({ isOpen, onClose }) => {
 
         {/* Forms Container - Scrollable with calculated height */}
         <div 
-          className={`overflow-y-auto p-6 hide-scrollbar ${isMobile ? '' : 'grid grid-cols-2 gap-3 items-start content-start'}`}
+          className={`overflow-y-auto hide-scrollbar ${isMobile ? 'p-6' : ''}`}
           style={{
             height: isMobile ? 'calc(100vh - 80px)' : '100vh',
             scrollbarWidth: 'none',
             msOverflowStyle: 'none'
           }}
         >
+          <div className={isMobile ? '' : 'grid grid-cols-2 gap-3 items-start content-start p-6'}>
           {/* Authorization Form */}
           {(isMobile ? activeTab === 'auth' : true) && (
           <div 
@@ -689,6 +690,7 @@ const GreenwashForms: React.FC<GreenwashFormsProps> = ({ isOpen, onClose }) => {
             </div>
           </div>
           )}
+          </div>
         </div>
       </div>
     </div>
