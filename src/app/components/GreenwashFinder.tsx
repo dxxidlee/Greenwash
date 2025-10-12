@@ -101,29 +101,32 @@ const GreenwashFinder: React.FC<GreenwashFinderProps> = ({ isOpen, onClose }) =>
               </div>
 
             {/* Filter Pills */}
-            <div className="flex justify-center mb-12 gap-3 flex-wrap">
-              {/* Main trigger button */}
+            <div className={`flex mb-12 gap-3 flex-wrap transition-all duration-500 ${
+              showFilters ? 'justify-start' : 'justify-center'
+            }`}>
+              {/* Main trigger button - moves to left when filters show */}
               <button
                 onClick={() => setShowFilters(!showFilters)}
-                className="px-6 py-3 rounded-full transition-all font-medium"
+                className="px-6 py-3 rounded-full font-medium"
                 style={{
                   backgroundColor: showFilters ? 'rgba(255, 255, 255, 0.9)' : 'rgba(0, 143, 70, 0.3)',
                   backdropFilter: 'blur(10px)',
                   WebkitBackdropFilter: 'blur(10px)',
                   border: showFilters ? '1px solid #008F46' : '1px solid rgba(255, 255, 255, 0.3)',
-                  color: showFilters ? '#008F46' : '#FFFFFF'
+                  color: showFilters ? '#008F46' : '#FFFFFF',
+                  transition: 'all 0.5s cubic-bezier(0.34, 1.56, 0.64, 1)'
                 }}
               >
                 What are you looking for? →
               </button>
 
-              {/* Filter options - animate in from right */}
+              {/* Filter options - staggered spring fade-up reveal */}
               {filters.map((filter, index) => (
                 <button
                   key={filter.id}
                   onClick={() => setSelectedFilter(filter.id)}
-                  className={`px-6 py-3 rounded-full transition-all duration-300 font-medium ${
-                    showFilters ? 'opacity-100 translate-x-0' : 'opacity-0 translate-x-4 pointer-events-none'
+                  className={`px-6 py-3 rounded-full font-medium ${
+                    showFilters ? '' : 'pointer-events-none'
                   }`}
                   style={{
                     backgroundColor: selectedFilter === filter.id ? 'rgba(255, 255, 255, 0.9)' : 'rgba(0, 143, 70, 0.3)',
@@ -131,7 +134,10 @@ const GreenwashFinder: React.FC<GreenwashFinderProps> = ({ isOpen, onClose }) =>
                     WebkitBackdropFilter: 'blur(10px)',
                     border: selectedFilter === filter.id ? '1px solid #008F46' : '1px solid rgba(255, 255, 255, 0.3)',
                     color: selectedFilter === filter.id ? '#008F46' : '#FFFFFF',
-                    transitionDelay: showFilters ? `${index * 50}ms` : '0ms'
+                    opacity: showFilters ? 1 : 0,
+                    transform: showFilters ? 'translateY(0)' : 'translateY(10px)',
+                    transition: `all 0.5s cubic-bezier(0.34, 1.56, 0.64, 1)`,
+                    transitionDelay: showFilters ? `${(index + 1) * 80}ms` : '0ms'
                   }}
                 >
                   {filter.label}
