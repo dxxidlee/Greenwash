@@ -249,7 +249,7 @@ const GreenwashForms: React.FC<GreenwashFormsProps> = ({ isOpen, onClose }) => {
             msOverflowStyle: 'none'
           }}
         >
-          <div className={isMobile ? 'p-6' : 'grid grid-cols-2 gap-3 items-start content-start py-12 px-6'}>
+          <div className={isMobile ? 'p-6' : 'grid grid-cols-2 gap-3 items-start content-start p-6'}>
           {/* Authorization Form */}
           {(isMobile ? activeTab === 'auth' : true) && (
           <div 
