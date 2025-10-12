@@ -101,11 +101,14 @@ const GreenwashFinder: React.FC<GreenwashFinderProps> = ({ isOpen, onClose }) =>
               </div>
 
             {/* Filter Pills */}
-            <div className="flex justify-center mb-12 w-full">
-              <div className={`flex gap-3 flex-wrap transition-all duration-300 ease-out max-w-5xl w-full ${
-                showFilters ? 'justify-start' : 'justify-center'
-              }`}>
-              {/* Main trigger button - moves to left when filters show */}
+            <div 
+              className="flex gap-3 flex-wrap mb-12 transition-all duration-300 ease-out"
+              style={{
+                justifyContent: showFilters ? 'flex-start' : 'center',
+                transition: 'all 0.3s cubic-bezier(0.16, 1, 0.3, 1)'
+              }}
+            >
+              {/* Main trigger button */}
               <button
                 onClick={() => setShowFilters(!showFilters)}
                 className="px-6 py-3 rounded-full font-medium"
@@ -144,7 +147,6 @@ const GreenwashFinder: React.FC<GreenwashFinderProps> = ({ isOpen, onClose }) =>
                   {filter.label}
                 </button>
               ))}
-              </div>
             </div>
 
             {/* Grid of items */}
