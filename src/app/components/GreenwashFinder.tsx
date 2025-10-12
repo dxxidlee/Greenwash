@@ -102,7 +102,7 @@ const GreenwashFinder: React.FC<GreenwashFinderProps> = ({ isOpen, onClose }) =>
 
             {/* Filter Pills */}
             <div 
-              className="flex gap-3 flex-wrap mb-12 transition-all duration-300 ease-out"
+              className="flex gap-3 flex-wrap mb-12 w-full transition-all duration-300 ease-out"
               style={{
                 justifyContent: showFilters ? 'flex-start' : 'center',
                 transition: 'all 0.3s cubic-bezier(0.16, 1, 0.3, 1)'
