@@ -242,9 +242,8 @@ const GreenwashForms: React.FC<GreenwashFormsProps> = ({ isOpen, onClose }) => {
 
         {/* Forms Container - Scrollable with calculated height */}
         <div 
-          className={`overflow-y-auto hide-scrollbar`}
+          className={`overflow-y-auto hide-scrollbar h-full`}
           style={{
-            height: isMobile ? 'calc(90vh - 80px)' : '90vh',
             scrollbarWidth: 'none',
             msOverflowStyle: 'none'
           }}
