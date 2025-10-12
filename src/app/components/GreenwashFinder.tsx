@@ -101,8 +101,8 @@ const GreenwashFinder: React.FC<GreenwashFinderProps> = ({ isOpen, onClose }) =>
               </div>
 
             {/* Filter Pills */}
-            <div className="flex justify-center mb-12">
-              <div className={`flex gap-3 flex-wrap transition-all duration-300 ease-out ${
+            <div className="flex justify-center mb-12 w-full">
+              <div className={`flex gap-3 flex-wrap transition-all duration-300 ease-out max-w-5xl w-full ${
                 showFilters ? 'justify-start' : 'justify-center'
               }`}>
               {/* Main trigger button - moves to left when filters show */}
