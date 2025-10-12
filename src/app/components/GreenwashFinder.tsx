@@ -19,15 +19,14 @@ interface Item {
 
 const GreenwashFinder: React.FC<GreenwashFinderProps> = ({ isOpen, onClose }) => {
   const [selectedFilter, setSelectedFilter] = useState<string>('all');
-  const [showFilterDropdown, setShowFilterDropdown] = useState(false);
+  const [showFilters, setShowFilters] = useState(false);
 
   const filters = [
-    { id: 'all', label: 'All Items' },
     { id: 'violations', label: 'Violations' },
     { id: 'authorizations', label: 'Authorizations' },
-    { id: 'reports', label: 'Compliance Reports' },
-    { id: 'evidence', label: 'Evidence Photos' },
-    { id: 'codes', label: 'Green Codes' },
+    { id: 'reports', label: 'Reports' },
+    { id: 'evidence', label: 'Evidence' },
+    { id: 'codes', label: 'Codes' },
     { id: 'archived', label: 'Archived' }
   ];
 
@@ -69,10 +68,10 @@ const GreenwashFinder: React.FC<GreenwashFinderProps> = ({ isOpen, onClose }) =>
         style={{ fontFamily: 'PPNeueMontreal, sans-serif' }}
       >
         {/* Close button */}
-        <button
+      <button
           onClick={onClose}
           className="fixed top-4 right-4 z-60 p-3 rounded-full transition-all"
-          style={{
+        style={{
             backgroundColor: 'rgba(0, 143, 70, 0.3)',
             backdropFilter: 'blur(10px)',
             WebkitBackdropFilter: 'blur(10px)',
@@ -80,7 +79,7 @@ const GreenwashFinder: React.FC<GreenwashFinderProps> = ({ isOpen, onClose }) =>
           }}
         >
           <X size={20} color="#FFFFFF" />
-        </button>
+      </button>
 
         {/* Scrollable content */}
         <div 
@@ -99,55 +98,45 @@ const GreenwashFinder: React.FC<GreenwashFinderProps> = ({ isOpen, onClose }) =>
               <p className="text-sm text-white opacity-80">
                 Compliance Files & Records
               </p>
-            </div>
+              </div>
 
-            {/* Filter Dropdown */}
-            <div className="flex justify-center mb-12">
-              <div className="relative">
+            {/* Filter Pills */}
+            <div className="flex justify-center mb-12 gap-3 flex-wrap">
+              {/* Main trigger button */}
+              <button
+                onClick={() => setShowFilters(!showFilters)}
+                className="px-6 py-3 rounded-full transition-all font-medium"
+                style={{
+                  backgroundColor: showFilters ? 'rgba(255, 255, 255, 0.9)' : 'rgba(0, 143, 70, 0.3)',
+                  backdropFilter: 'blur(10px)',
+                  WebkitBackdropFilter: 'blur(10px)',
+                  border: showFilters ? '1px solid #008F46' : '1px solid rgba(255, 255, 255, 0.3)',
+                  color: showFilters ? '#008F46' : '#FFFFFF'
+                }}
+              >
+                What are you looking for? →
+              </button>
+
+              {/* Filter options - animate in from right */}
+              {filters.map((filter, index) => (
                 <button
-                  onClick={() => setShowFilterDropdown(!showFilterDropdown)}
-                  className="flex items-center gap-2 px-6 py-3 rounded-full transition-all"
+                  key={filter.id}
+                  onClick={() => setSelectedFilter(filter.id)}
+                  className={`px-6 py-3 rounded-full transition-all duration-300 font-medium ${
+                    showFilters ? 'opacity-100 translate-x-0' : 'opacity-0 translate-x-4 pointer-events-none'
+                  }`}
                   style={{
-                    backgroundColor: 'rgba(0, 143, 70, 0.3)',
+                    backgroundColor: selectedFilter === filter.id ? 'rgba(255, 255, 255, 0.9)' : 'rgba(0, 143, 70, 0.3)',
                     backdropFilter: 'blur(10px)',
                     WebkitBackdropFilter: 'blur(10px)',
-                    border: '1px solid rgba(255, 255, 255, 0.3)'
+                    border: selectedFilter === filter.id ? '1px solid #008F46' : '1px solid rgba(255, 255, 255, 0.3)',
+                    color: selectedFilter === filter.id ? '#008F46' : '#FFFFFF',
+                    transitionDelay: showFilters ? `${index * 50}ms` : '0ms'
                   }}
                 >
-                  <span className="text-white font-medium">
-                    What are you looking for?
-                  </span>
-                  <ChevronDown size={16} color="#FFFFFF" className={`transition-transform ${showFilterDropdown ? 'rotate-180' : ''}`} />
+                  {filter.label}
                 </button>
-
-                {/* Dropdown */}
-                {showFilterDropdown && (
-                  <div 
-                    className="absolute top-full mt-2 left-0 right-0 rounded-lg overflow-hidden"
-                    style={{
-                      backgroundColor: 'rgba(0, 143, 70, 0.3)',
-                      backdropFilter: 'blur(10px)',
-                      WebkitBackdropFilter: 'blur(10px)',
-                      border: '1px solid rgba(255, 255, 255, 0.3)'
-                    }}
-                  >
-                    {filters.map((filter) => (
-                      <button
-                        key={filter.id}
-                        onClick={() => {
-                          setSelectedFilter(filter.id);
-                          setShowFilterDropdown(false);
-                        }}
-                        className={`w-full text-left px-6 py-3 text-white transition-all ${
-                          selectedFilter === filter.id ? 'bg-white bg-opacity-10' : 'hover:bg-white hover:bg-opacity-5'
-                        }`}
-                      >
-                        {filter.label}
-                      </button>
-                    ))}
-                  </div>
-                )}
-              </div>
+              ))}
             </div>
 
             {/* Grid of items */}
@@ -183,7 +172,7 @@ const GreenwashFinder: React.FC<GreenwashFinderProps> = ({ isOpen, onClose }) =>
                         }}
                       >
                         {item.status}
-                      </div>
+                  </div>
                     )}
                   </div>
 
@@ -213,8 +202,8 @@ const GreenwashFinder: React.FC<GreenwashFinderProps> = ({ isOpen, onClose }) =>
             )}
           </div>
         </div>
+        </div>
       </div>
-    </div>
   );
 };
 
