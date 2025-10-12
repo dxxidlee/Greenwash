@@ -154,19 +154,21 @@ const GreenwashForms: React.FC<GreenwashFormsProps> = ({ isOpen, onClose }) => {
   };
 
   const inputStyle = {
-    backgroundColor: 'rgba(0, 143, 70, 0.1)',
+    backgroundColor: 'rgba(0, 143, 70, 0.3)',
     backdropFilter: 'blur(10px)',
     WebkitBackdropFilter: 'blur(10px)',
-    border: '1px solid rgba(0, 143, 70, 0.3)',
-    color: '#008F46',
+    border: 'none',
+    color: '#FFFFFF',
     borderRadius: '8px',
     fontFamily: 'PPNeueMontreal, sans-serif'
   };
 
   const buttonStyle = {
     padding: '8px 14px',
-    backgroundColor: '#008F46',
+    backgroundColor: 'rgba(0, 143, 70, 0.3)',
     color: '#FFFFFF',
+    backdropFilter: 'blur(10px)',
+    WebkitBackdropFilter: 'blur(10px)',
     boxShadow: '0 4px 10px rgba(0,0,0,0.15)',
     letterSpacing: '0.3px',
     border: 'none',
@@ -191,8 +193,10 @@ const GreenwashForms: React.FC<GreenwashFormsProps> = ({ isOpen, onClose }) => {
           onClick={onClose}
           className="fixed top-4 right-4 z-60 p-3 rounded-full transition-all"
         style={{
-            backgroundColor: '#008F46',
-            border: 'none'
+            backgroundColor: 'rgba(0, 143, 70, 0.3)',
+            backdropFilter: 'blur(10px)',
+            WebkitBackdropFilter: 'blur(10px)',
+            border: '1px solid #FFFFFF'
           }}
         >
           <X size={20} color="#FFFFFF" />
@@ -237,11 +241,16 @@ const GreenwashForms: React.FC<GreenwashFormsProps> = ({ isOpen, onClose }) => {
           {/* Authorization Form */}
           {(isMobile ? activeTab === 'auth' : true) && (
           <div 
-            className="rounded-lg overflow-hidden bg-white shadow-2xl"
+            className="rounded-lg overflow-hidden"
+            style={{
+              backgroundColor: 'rgba(0, 143, 70, 0.3)',
+              backdropFilter: 'blur(10px)',
+              WebkitBackdropFilter: 'blur(10px)'
+            }}
           >
             <div className="p-6">
               <div className="flex justify-between items-start mb-6">
-                <h2 className="text-2xl tracking-widest text-green-700" style={{ fontFamily: 'PPNeueMontreal, sans-serif' }}>
+                <h2 className="text-2xl tracking-widest text-white" style={{ fontFamily: 'PPNeueMontreal, sans-serif' }}>
                   Authorization Form
                 </h2>
               </div>
@@ -257,7 +266,7 @@ const GreenwashForms: React.FC<GreenwashFormsProps> = ({ isOpen, onClose }) => {
               <div className="space-y-4">
                 <div className="grid grid-cols-2 gap-4">
                       <div>
-                    <label className="block text-xs mb-2 text-green-700 font-medium" style={{ fontFamily: 'PPNeueMontreal, sans-serif' }}>PERMIT ID NO:</label>
+                    <label className="block text-xs mb-2 text-white" style={{ fontFamily: 'PPNeueMontreal, sans-serif' }}>PERMIT ID NO:</label>
                         <input
                           type="text"
                           value={authForm.permitId}
@@ -267,7 +276,7 @@ const GreenwashForms: React.FC<GreenwashFormsProps> = ({ isOpen, onClose }) => {
                     />
                   </div>
                   <div>
-                    <label className="block text-xs mb-2 text-green-700 font-medium" style={{ fontFamily: 'PPNeueMontreal, sans-serif' }}>DATE ISSUED:</label>
+                    <label className="block text-xs mb-2 text-white" style={{ fontFamily: 'PPNeueMontreal, sans-serif' }}>DATE ISSUED:</label>
                     <input
                       type="text"
                       value={authForm.dateIssued}
@@ -280,7 +289,7 @@ const GreenwashForms: React.FC<GreenwashFormsProps> = ({ isOpen, onClose }) => {
 
                 <div className="grid grid-cols-2 gap-4">
                   <div>
-                    <label className="block text-xs mb-2 text-green-700 font-medium" style={{ fontFamily: 'PPNeueMontreal, sans-serif' }}>FIELD OFFICER:</label>
+                    <label className="block text-xs mb-2 text-white" style={{ fontFamily: 'PPNeueMontreal, sans-serif' }}>FIELD OFFICER:</label>
                     <input
                       type="text"
                       value={authForm.fieldOfficer}
@@ -290,7 +299,7 @@ const GreenwashForms: React.FC<GreenwashFormsProps> = ({ isOpen, onClose }) => {
                         />
                       </div>
                       <div>
-                    <label className="block text-xs mb-2 text-green-700 font-medium" style={{ fontFamily: 'PPNeueMontreal, sans-serif' }}>WORKER ID:</label>
+                    <label className="block text-xs mb-2 text-white" style={{ fontFamily: 'PPNeueMontreal, sans-serif' }}>WORKER ID:</label>
                     <input
                       type="text"
                       value={authForm.workerId}
@@ -302,7 +311,7 @@ const GreenwashForms: React.FC<GreenwashFormsProps> = ({ isOpen, onClose }) => {
                 </div>
 
                 <div>
-                  <label className="block text-xs mb-2 text-green-700 font-medium" style={{ fontFamily: 'PPNeueMontreal, sans-serif' }}>ASSIGNED ZONE:</label>
+                  <label className="block text-xs mb-2 text-white" style={{ fontFamily: 'PPNeueMontreal, sans-serif' }}>ASSIGNED ZONE:</label>
                       <input
                         type="text"
                     value={authForm.assignedZone}
@@ -313,7 +322,7 @@ const GreenwashForms: React.FC<GreenwashFormsProps> = ({ isOpen, onClose }) => {
                 </div>
 
                 <div>
-                  <label className="block text-xs mb-2 text-green-700 font-medium" style={{ fontFamily: 'PPNeueMontreal, sans-serif' }}>TYPE OF OBJECT:</label>
+                  <label className="block text-xs mb-2 text-white" style={{ fontFamily: 'PPNeueMontreal, sans-serif' }}>TYPE OF OBJECT:</label>
                   <div className="space-y-2">
                     {['vehicle', 'bench', 'billboard', 'building', 'other'].map(type => (
                       <label key={type} className="flex items-center space-x-3 cursor-pointer p-2 rounded" style={inputStyle}>
@@ -326,14 +335,14 @@ const GreenwashForms: React.FC<GreenwashFormsProps> = ({ isOpen, onClose }) => {
                           className="w-4 h-4"
                           style={{accentColor: '#FFFFFF'}}
                         />
-                        <span className="text-sm uppercase text-green-700" style={{ fontFamily: 'PPNeueMontreal, sans-serif' }}>{type}</span>
+                        <span className="text-sm uppercase text-white" style={{ fontFamily: 'PPNeueMontreal, sans-serif' }}>{type}</span>
                       </label>
                     ))}
                   </div>
                 </div>
 
                 <div>
-                  <label className="block text-xs mb-2 text-green-700 font-medium" style={{ fontFamily: 'PPNeueMontreal, sans-serif' }}>LOCATION ADDRESS:</label>
+                  <label className="block text-xs mb-2 text-white" style={{ fontFamily: 'PPNeueMontreal, sans-serif' }}>LOCATION ADDRESS:</label>
                   <input
                     type="text"
                     value={authForm.locationAddress}
@@ -344,7 +353,7 @@ const GreenwashForms: React.FC<GreenwashFormsProps> = ({ isOpen, onClose }) => {
                 </div>
 
                 <div>
-                  <label className="block text-xs mb-2 text-green-700 font-medium" style={{ fontFamily: 'PPNeueMontreal, sans-serif' }}>DIMENSIONS/SIZE:</label>
+                  <label className="block text-xs mb-2 text-white" style={{ fontFamily: 'PPNeueMontreal, sans-serif' }}>DIMENSIONS/SIZE:</label>
                   <input
                     type="text"
                     value={authForm.dimensions}
@@ -355,7 +364,7 @@ const GreenwashForms: React.FC<GreenwashFormsProps> = ({ isOpen, onClose }) => {
                 </div>
 
                 <div>
-                  <label className="block text-xs mb-2 text-green-700 font-medium" style={{ fontFamily: 'PPNeueMontreal, sans-serif' }}>EXISTING COLOR:</label>
+                  <label className="block text-xs mb-2 text-white" style={{ fontFamily: 'PPNeueMontreal, sans-serif' }}>EXISTING COLOR:</label>
                   <input
                     type="text"
                     value={authForm.existingColor}
@@ -366,7 +375,7 @@ const GreenwashForms: React.FC<GreenwashFormsProps> = ({ isOpen, onClose }) => {
                       </div>
 
                       <div>
-                  <label className="block text-xs mb-2 text-green-700 font-medium" style={{ fontFamily: 'PPNeueMontreal, sans-serif' }}>APPROVED GREEN CODE:</label>
+                  <label className="block text-xs mb-2 text-white" style={{ fontFamily: 'PPNeueMontreal, sans-serif' }}>APPROVED GREEN CODE:</label>
                       <input
                         type="text"
                     value={authForm.approvedCode}
@@ -377,7 +386,7 @@ const GreenwashForms: React.FC<GreenwashFormsProps> = ({ isOpen, onClose }) => {
                 </div>
 
                 <div>
-                  <label className="block text-xs mb-2 text-green-700 font-medium" style={{ fontFamily: 'PPNeueMontreal, sans-serif' }}>AUTHORIZED ACTION:</label>
+                  <label className="block text-xs mb-2 text-white" style={{ fontFamily: 'PPNeueMontreal, sans-serif' }}>AUTHORIZED ACTION:</label>
                   <div className="space-y-2">
                     {['apply', 'replace', 'confiscate', 'other'].map(action => (
                       <label key={action} className="flex items-center space-x-3 cursor-pointer p-2 rounded" style={inputStyle}>
@@ -390,7 +399,7 @@ const GreenwashForms: React.FC<GreenwashFormsProps> = ({ isOpen, onClose }) => {
                           className="w-4 h-4"
                           style={{accentColor: '#FFFFFF'}}
                         />
-                        <span className="text-sm uppercase text-green-700" style={{ fontFamily: 'PPNeueMontreal, sans-serif' }}>{action === 'apply' ? 'Apply Green Paint' : action === 'replace' ? 'Replace Object' : action === 'confiscate' ? 'Confiscate Object' : 'Other'}</span>
+                        <span className="text-sm uppercase text-white" style={{ fontFamily: 'PPNeueMontreal, sans-serif' }}>{action === 'apply' ? 'Apply Green Paint' : action === 'replace' ? 'Replace Object' : action === 'confiscate' ? 'Confiscate Object' : 'Other'}</span>
                       </label>
                     ))}
                   </div>
@@ -398,7 +407,7 @@ const GreenwashForms: React.FC<GreenwashFormsProps> = ({ isOpen, onClose }) => {
 
                 <div className="grid grid-cols-2 gap-4">
                   <div>
-                    <label className="block text-xs mb-2 text-green-700 font-medium" style={{ fontFamily: 'PPNeueMontreal, sans-serif' }}>ESTIMATED COST:</label>
+                    <label className="block text-xs mb-2 text-white" style={{ fontFamily: 'PPNeueMontreal, sans-serif' }}>ESTIMATED COST:</label>
                     <input
                       type="text"
                       value={authForm.estimatedCost}
@@ -408,7 +417,7 @@ const GreenwashForms: React.FC<GreenwashFormsProps> = ({ isOpen, onClose }) => {
                     />
                   </div>
                   <div>
-                    <label className="block text-xs mb-2 text-green-700 font-medium" style={{ fontFamily: 'PPNeueMontreal, sans-serif' }}>EXPECTED DATE:</label>
+                    <label className="block text-xs mb-2 text-white" style={{ fontFamily: 'PPNeueMontreal, sans-serif' }}>EXPECTED DATE:</label>
                     <input
                       type="text"
                       value={authForm.expectedDate}
@@ -420,7 +429,7 @@ const GreenwashForms: React.FC<GreenwashFormsProps> = ({ isOpen, onClose }) => {
                 </div>
 
                 <div>
-                  <label className="block text-xs mb-2 text-green-700 font-medium" style={{ fontFamily: 'PPNeueMontreal, sans-serif' }}>INSPECTOR OBSERVATIONS:</label>
+                  <label className="block text-xs mb-2 text-white" style={{ fontFamily: 'PPNeueMontreal, sans-serif' }}>INSPECTOR OBSERVATIONS:</label>
                   <textarea
                     value={authForm.observations}
                     onChange={(e) => setAuthForm({...authForm, observations: e.target.value})}
@@ -451,11 +460,16 @@ const GreenwashForms: React.FC<GreenwashFormsProps> = ({ isOpen, onClose }) => {
             {/* Violation Form */}
           {(isMobile ? activeTab === 'violation' : true) && (
           <div 
-            className="rounded-lg overflow-hidden bg-white shadow-2xl"
+            className="rounded-lg overflow-hidden"
+            style={{
+              backgroundColor: 'rgba(0, 143, 70, 0.3)',
+              backdropFilter: 'blur(10px)',
+              WebkitBackdropFilter: 'blur(10px)'
+            }}
           >
             <div className="p-6">
               <div className="flex justify-between items-start mb-6">
-                <h2 className="text-2xl tracking-widest text-green-700" style={{ fontFamily: 'PPNeueMontreal, sans-serif' }}>
+                <h2 className="text-2xl tracking-widest text-white" style={{ fontFamily: 'PPNeueMontreal, sans-serif' }}>
                   Noncompliance Violation Ticket
                 </h2>
               </div>
@@ -471,7 +485,7 @@ const GreenwashForms: React.FC<GreenwashFormsProps> = ({ isOpen, onClose }) => {
               <div className="space-y-4">
                 <div className="grid grid-cols-3 gap-4">
                       <div>
-                    <label className="block text-xs mb-2 text-green-700 font-medium" style={{ fontFamily: 'PPNeueMontreal, sans-serif' }}>TICKET NO:</label>
+                    <label className="block text-xs mb-2 text-white" style={{ fontFamily: 'PPNeueMontreal, sans-serif' }}>TICKET NO:</label>
                         <input
                           type="text"
                           value={violationForm.ticketNo}
@@ -481,7 +495,7 @@ const GreenwashForms: React.FC<GreenwashFormsProps> = ({ isOpen, onClose }) => {
                     />
                   </div>
                   <div>
-                    <label className="block text-xs mb-2 text-green-700 font-medium" style={{ fontFamily: 'PPNeueMontreal, sans-serif' }}>DATE:</label>
+                    <label className="block text-xs mb-2 text-white" style={{ fontFamily: 'PPNeueMontreal, sans-serif' }}>DATE:</label>
                     <input
                       type="text"
                       value={violationForm.date}
@@ -491,7 +505,7 @@ const GreenwashForms: React.FC<GreenwashFormsProps> = ({ isOpen, onClose }) => {
                         />
                       </div>
                       <div>
-                    <label className="block text-xs mb-2 text-green-700 font-medium" style={{ fontFamily: 'PPNeueMontreal, sans-serif' }}>ZONE:</label>
+                    <label className="block text-xs mb-2 text-white" style={{ fontFamily: 'PPNeueMontreal, sans-serif' }}>ZONE:</label>
                     <input
                       type="text"
                       value={violationForm.zone}
@@ -503,7 +517,7 @@ const GreenwashForms: React.FC<GreenwashFormsProps> = ({ isOpen, onClose }) => {
                 </div>
 
                 <div>
-                  <label className="block text-xs mb-2 text-green-700 font-medium" style={{ fontFamily: 'PPNeueMontreal, sans-serif' }}>NAME:</label>
+                  <label className="block text-xs mb-2 text-white" style={{ fontFamily: 'PPNeueMontreal, sans-serif' }}>NAME:</label>
                   <input
                     type="text"
                     value={violationForm.name}
@@ -514,7 +528,7 @@ const GreenwashForms: React.FC<GreenwashFormsProps> = ({ isOpen, onClose }) => {
                 </div>
 
                 <div>
-                  <label className="block text-xs mb-2 text-green-700 font-medium" style={{ fontFamily: 'PPNeueMontreal, sans-serif' }}>LOCATION:</label>
+                  <label className="block text-xs mb-2 text-white" style={{ fontFamily: 'PPNeueMontreal, sans-serif' }}>LOCATION:</label>
                       <input
                         type="text"
                         value={violationForm.location}
@@ -526,7 +540,7 @@ const GreenwashForms: React.FC<GreenwashFormsProps> = ({ isOpen, onClose }) => {
 
                 <div className="grid grid-cols-2 gap-4">
                   <div>
-                    <label className="block text-xs mb-2 text-green-700 font-medium" style={{ fontFamily: 'PPNeueMontreal, sans-serif' }}>CURRENT COLOR:</label>
+                    <label className="block text-xs mb-2 text-white" style={{ fontFamily: 'PPNeueMontreal, sans-serif' }}>CURRENT COLOR:</label>
                     <input
                       type="text"
                       value={violationForm.currentColor}
@@ -536,7 +550,7 @@ const GreenwashForms: React.FC<GreenwashFormsProps> = ({ isOpen, onClose }) => {
                         />
                       </div>
                       <div>
-                    <label className="block text-xs mb-2 text-green-700 font-medium" style={{ fontFamily: 'PPNeueMontreal, sans-serif' }}>APPROVED GREEN CODE:</label>
+                    <label className="block text-xs mb-2 text-white" style={{ fontFamily: 'PPNeueMontreal, sans-serif' }}>APPROVED GREEN CODE:</label>
                     <input
                       type="text"
                       value={violationForm.approvedCode}
@@ -548,7 +562,7 @@ const GreenwashForms: React.FC<GreenwashFormsProps> = ({ isOpen, onClose }) => {
                 </div>
 
                 <div>
-                  <label className="block text-xs mb-2 text-green-700 font-medium" style={{ fontFamily: 'PPNeueMontreal, sans-serif' }}>NATURE OF VIOLATION:</label>
+                  <label className="block text-xs mb-2 text-white" style={{ fontFamily: 'PPNeueMontreal, sans-serif' }}>NATURE OF VIOLATION:</label>
                   <div className="space-y-2">
                     <label className="flex items-center space-x-3 cursor-pointer p-2 rounded" style={inputStyle}>
                       <input
@@ -561,7 +575,7 @@ const GreenwashForms: React.FC<GreenwashFormsProps> = ({ isOpen, onClose }) => {
                         className="w-4 h-4"
                         style={{accentColor: '#FFFFFF'}}
                       />
-                      <span className="text-sm text-green-700" style={{ fontFamily: 'PPNeueMontreal, sans-serif' }}>Object not painted green</span>
+                      <span className="text-sm text-white" style={{ fontFamily: 'PPNeueMontreal, sans-serif' }}>Object not painted green</span>
                     </label>
                     <label className="flex items-center space-x-3 cursor-pointer p-2 rounded" style={inputStyle}>
                       <input
@@ -574,7 +588,7 @@ const GreenwashForms: React.FC<GreenwashFormsProps> = ({ isOpen, onClose }) => {
                         className="w-4 h-4"
                         style={{accentColor: '#FFFFFF'}}
                       />
-                      <span className="text-sm text-green-700" style={{ fontFamily: 'PPNeueMontreal, sans-serif' }}>Unauthorized non-green replacement</span>
+                      <span className="text-sm text-white" style={{ fontFamily: 'PPNeueMontreal, sans-serif' }}>Unauthorized non-green replacement</span>
                     </label>
                     <label className="flex items-center space-x-3 cursor-pointer p-2 rounded" style={inputStyle}>
                       <input
@@ -587,7 +601,7 @@ const GreenwashForms: React.FC<GreenwashFormsProps> = ({ isOpen, onClose }) => {
                         className="w-4 h-4"
                         style={{accentColor: '#FFFFFF'}}
                       />
-                      <span className="text-sm text-green-700" style={{ fontFamily: 'PPNeueMontreal, sans-serif' }}>Display of competing colors</span>
+                      <span className="text-sm text-white" style={{ fontFamily: 'PPNeueMontreal, sans-serif' }}>Display of competing colors</span>
                     </label>
                     <label className="flex items-center space-x-3 cursor-pointer p-2 rounded" style={inputStyle}>
                       <input
@@ -600,13 +614,13 @@ const GreenwashForms: React.FC<GreenwashFormsProps> = ({ isOpen, onClose }) => {
                         className="w-4 h-4"
                         style={{accentColor: '#FFFFFF'}}
                       />
-                      <span className="text-sm text-green-700" style={{ fontFamily: 'PPNeueMontreal, sans-serif' }}>Obstruction of greening operations</span>
+                      <span className="text-sm text-white" style={{ fontFamily: 'PPNeueMontreal, sans-serif' }}>Obstruction of greening operations</span>
                     </label>
                   </div>
                 </div>
 
                 <div>
-                  <label className="block text-xs mb-2 text-green-700 font-medium" style={{ fontFamily: 'PPNeueMontreal, sans-serif' }}>FINE AMOUNT ($):</label>
+                  <label className="block text-xs mb-2 text-white" style={{ fontFamily: 'PPNeueMontreal, sans-serif' }}>FINE AMOUNT ($):</label>
                       <input
                         type="text"
                         value={violationForm.fine}
@@ -617,7 +631,7 @@ const GreenwashForms: React.FC<GreenwashFormsProps> = ({ isOpen, onClose }) => {
                     </div>
 
                 <div>
-                  <label className="block text-xs mb-2 text-green-700 font-medium" style={{ fontFamily: 'PPNeueMontreal, sans-serif' }}>BRIEF DESCRIPTION:</label>
+                  <label className="block text-xs mb-2 text-white" style={{ fontFamily: 'PPNeueMontreal, sans-serif' }}>BRIEF DESCRIPTION:</label>
                   <textarea
                     value={violationForm.description}
                     onChange={(e) => setViolationForm({...violationForm, description: e.target.value})}
@@ -628,7 +642,7 @@ const GreenwashForms: React.FC<GreenwashFormsProps> = ({ isOpen, onClose }) => {
                     </div>
 
                 <div>
-                  <label className="block text-xs mb-2 text-green-700 font-medium" style={{ fontFamily: 'PPNeueMontreal, sans-serif' }}>SEVERITY:</label>
+                  <label className="block text-xs mb-2 text-white" style={{ fontFamily: 'PPNeueMontreal, sans-serif' }}>SEVERITY:</label>
                   <div className="space-y-2">
                     {['minor', 'major', 'critical'].map(sev => (
                       <label key={sev} className="flex items-center space-x-3 cursor-pointer p-2 rounded" style={inputStyle}>
@@ -641,7 +655,7 @@ const GreenwashForms: React.FC<GreenwashFormsProps> = ({ isOpen, onClose }) => {
                           className="w-4 h-4"
                           style={{accentColor: '#FFFFFF'}}
                         />
-                        <span className="text-sm uppercase text-green-700" style={{ fontFamily: 'PPNeueMontreal, sans-serif' }}>{sev}</span>
+                        <span className="text-sm uppercase text-white" style={{ fontFamily: 'PPNeueMontreal, sans-serif' }}>{sev}</span>
                       </label>
                     ))}
                   </div>
