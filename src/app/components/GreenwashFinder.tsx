@@ -101,9 +101,10 @@ const GreenwashFinder: React.FC<GreenwashFinderProps> = ({ isOpen, onClose }) =>
               </div>
 
             {/* Filter Pills */}
-            <div className={`flex mb-12 gap-3 flex-wrap transition-all duration-500 ${
-              showFilters ? 'justify-start' : 'justify-center'
-            }`}>
+            <div className="flex justify-center mb-12">
+              <div className={`flex gap-3 flex-wrap transition-all duration-300 ease-out ${
+                showFilters ? 'justify-start' : 'justify-center'
+              }`}>
               {/* Main trigger button - moves to left when filters show */}
               <button
                 onClick={() => setShowFilters(!showFilters)}
@@ -114,7 +115,7 @@ const GreenwashFinder: React.FC<GreenwashFinderProps> = ({ isOpen, onClose }) =>
                   WebkitBackdropFilter: 'blur(10px)',
                   border: showFilters ? '1px solid #008F46' : '1px solid rgba(255, 255, 255, 0.3)',
                   color: showFilters ? '#008F46' : '#FFFFFF',
-                  transition: 'all 0.5s cubic-bezier(0.34, 1.56, 0.64, 1)'
+                  transition: 'all 0.3s cubic-bezier(0.16, 1, 0.3, 1)'
                 }}
               >
                 What are you looking for? →
@@ -135,14 +136,15 @@ const GreenwashFinder: React.FC<GreenwashFinderProps> = ({ isOpen, onClose }) =>
                     border: selectedFilter === filter.id ? '1px solid #008F46' : '1px solid rgba(255, 255, 255, 0.3)',
                     color: selectedFilter === filter.id ? '#008F46' : '#FFFFFF',
                     opacity: showFilters ? 1 : 0,
-                    transform: showFilters ? 'translateY(0)' : 'translateY(10px)',
-                    transition: `all 0.5s cubic-bezier(0.34, 1.56, 0.64, 1)`,
-                    transitionDelay: showFilters ? `${(index + 1) * 80}ms` : '0ms'
+                    transform: showFilters ? 'translateY(0)' : 'translateY(6px)',
+                    transition: `all 0.3s cubic-bezier(0.16, 1, 0.3, 1)`,
+                    transitionDelay: showFilters ? `${(index + 1) * 40}ms` : `${(filters.length - index) * 20}ms`
                   }}
                 >
                   {filter.label}
                 </button>
               ))}
+              </div>
             </div>
 
             {/* Grid of items */}
