@@ -190,15 +190,15 @@ const GreenwashForms: React.FC<GreenwashFormsProps> = ({ isOpen, onClose }) => {
       
       {/* Content */}
       <div 
-        className={`relative w-full ${isMobile ? 'max-w-4xl' : 'max-w-7xl'} max-h-[90vh] overflow-y-auto p-4 z-10`}
+        className={`relative w-full ${isMobile ? 'max-w-md' : 'max-w-4xl'} h-[90vh] z-10 flex flex-col`}
         onClick={(e) => e.stopPropagation()}
         style={{ fontFamily: 'PPNeueMontreal, sans-serif' }}
       >
         {/* Close button */}
-            <button
+        <button
           onClick={onClose}
           className="fixed top-4 right-4 z-60 p-3 rounded-full transition-all"
-        style={{
+          style={{
             backgroundColor: 'rgba(0, 143, 70, 0.3)',
             backdropFilter: 'blur(10px)',
             WebkitBackdropFilter: 'blur(10px)',
@@ -206,11 +206,17 @@ const GreenwashForms: React.FC<GreenwashFormsProps> = ({ isOpen, onClose }) => {
           }}
         >
           <X size={20} color="#FFFFFF" />
-      </button>
+        </button>
 
-        {/* Tab Navigation - Only show on mobile */}
+        {/* Tab Navigation - Only show on mobile - Sticky */}
         {isMobile && (
-        <div className="flex gap-2 mb-4">
+        <div className="flex gap-2 p-4 pb-2 sticky top-0 z-20"
+          style={{
+            backgroundColor: 'rgba(0, 143, 70, 0.3)',
+            backdropFilter: 'blur(10px)',
+            WebkitBackdropFilter: 'blur(10px)'
+          }}
+        >
           <button
             onClick={() => setActiveTab('auth')}
             className={`flex items-center gap-2 px-4 py-3 transition-all rounded-lg ${
@@ -240,9 +246,9 @@ const GreenwashForms: React.FC<GreenwashFormsProps> = ({ isOpen, onClose }) => {
         </div>
         )}
 
-        {/* Forms Container */}
+        {/* Forms Container - Scrollable */}
         <div 
-          className={`rounded-lg overflow-hidden ${isMobile ? '' : 'grid grid-cols-2 gap-4'}`}
+          className={`flex-1 overflow-y-auto p-4 ${isMobile ? '' : 'grid grid-cols-2 gap-3 items-start'}`}
         >
           {/* Authorization Form */}
           {(isMobile ? activeTab === 'auth' : true) && (
