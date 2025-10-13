@@ -211,7 +211,7 @@ const GreenwashFinder: React.FC<GreenwashFinderProps> = ({ isOpen, onClose }) =>
               {/* Main trigger button */}
               <button
                 onClick={() => setShowFilters(!showFilters)}
-                className="px-6 py-3 rounded-full font-medium focus:outline-none"
+                className="px-6 py-3 rounded-full font-medium focus:outline-none flex items-center gap-2"
                 style={{
                   backgroundColor: showFilters ? 'rgba(255, 255, 255, 0.9)' : 'rgba(0, 143, 70, 0.3)',
                   backdropFilter: 'blur(10px)',
@@ -221,7 +221,23 @@ const GreenwashFinder: React.FC<GreenwashFinderProps> = ({ isOpen, onClose }) =>
                   transition: 'all 0.3s cubic-bezier(0.16, 1, 0.3, 1)'
                 }}
               >
-                What are you looking for? →
+                <span>What are you looking for? →</span>
+                {selectedFilter !== 'all' && (
+                  <button
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      setSelectedFilter('all');
+                    }}
+                    className="ml-2 hover:opacity-70 transition-opacity"
+                    style={{
+                      display: 'flex',
+                      alignItems: 'center',
+                      justifyContent: 'center'
+                    }}
+                  >
+                    <X size={16} />
+                  </button>
+                )}
               </button>
 
               {/* Filter options - staggered spring fade-up reveal */}
@@ -237,8 +253,8 @@ const GreenwashFinder: React.FC<GreenwashFinderProps> = ({ isOpen, onClose }) =>
                     border: selectedFilter === filter.id ? 'none' : '1px solid rgba(255, 255, 255, 0.3)',
                     color: selectedFilter === filter.id ? '#008F46' : '#FFFFFF',
                     opacity: 0,
-                    transform: 'translateY(6px)',
-                    animation: `fadeInUp 0.3s cubic-bezier(0.16, 1, 0.3, 1) ${(index + 1) * 40}ms forwards`
+                    transform: 'translateY(12px)',
+                    animation: `fadeInUp 0.6s cubic-bezier(0.34, 1.56, 0.64, 1) ${(index + 1) * 80}ms forwards`
                   }}
                 >
                   {filter.label}
