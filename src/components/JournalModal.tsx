@@ -37,7 +37,7 @@ export default function JournalModal({ open, onClose, entries }: Props) {
     setTimeout(() => {
       onClose();
       setIsClosing(false);
-    }, 400); // Match animation duration (500ms / 1.25 = 400ms)
+    }, 350); // Match animation duration for smooth exit
   }, [onClose]);
 
   // ESC to close
@@ -71,6 +71,9 @@ export default function JournalModal({ open, onClose, entries }: Props) {
           transform: 'translateX(-50%)',
           zIndex: 200
         }}
+        className={`
+          ${isClosing ? 'animate-[fadeOutScale_0.3s_ease-in_forwards]' : 'opacity-0 scale-95 animate-[fadeInScale_0.4s_ease-out_0.08s_forwards]'}
+        `}
       >
         <img 
           src="/img/journal-final.webp" 
@@ -101,9 +104,9 @@ export default function JournalModal({ open, onClose, entries }: Props) {
           noise-surface
           text-white
           hover:bg-[rgba(0,143,70,0.4)]
-          transition-all duration-500 ease-out
+          transition-all duration-300 ease-out
           focus:outline-none focus:ring-2 focus:ring-white/30
-          ${isClosing ? 'animate-[fadeOutScale_0.4s_ease-in_forwards]' : 'opacity-0 scale-95 animate-[fadeInScale_0.4s_ease-out_0.08s_forwards]'}
+          ${isClosing ? 'animate-[fadeOutScale_0.3s_ease-in_forwards]' : 'opacity-0 scale-95 animate-[fadeInScale_0.4s_ease-out_0.08s_forwards]'}
         `}
       >
         <svg viewBox="0 0 24 24" width="18" height="18" aria-hidden="true">
@@ -127,7 +130,7 @@ export default function JournalModal({ open, onClose, entries }: Props) {
             supports-[backdrop-filter]:backdrop-saturate-150
             supports-[backdrop-filter]:backdrop-contrast-100
             backdrop-boost no-blur-fallback
-            ${isClosing ? 'animate-[fadeOut_0.32s_ease-in_forwards]' : 'opacity-0 animate-[fadeIn_0.32s_ease-out_forwards]'}
+            ${isClosing ? 'animate-[fadeOut_0.3s_ease-in_forwards]' : 'opacity-0 animate-[fadeIn_0.4s_ease-out_forwards]'}
           `}
         />
 
@@ -142,7 +145,7 @@ export default function JournalModal({ open, onClose, entries }: Props) {
             h-screen
             max-w-[32rem] md:max-w-[34rem]
             focus:outline-none
-            ${isClosing ? 'animate-[fadeOutScaleDown_0.4s_ease-in_forwards]' : 'opacity-0 scale-95 translate-y-4 animate-[fadeInScaleUp_0.4s_ease-out_0.16s_forwards]'}
+            ${isClosing ? 'animate-[fadeOutScaleDown_0.3s_ease-in_forwards]' : 'opacity-0 scale-98 translate-y-2 animate-[fadeInScaleUp_0.4s_ease-out_0.12s_forwards]'}
           `}
         >
         {/* Scrollable column of journal entries with top/bottom spacing */}
@@ -159,10 +162,10 @@ export default function JournalModal({ open, onClose, entries }: Props) {
                   noise-surface
                   p-4 sm:p-5 md:p-6
                   scroll-mt-6
-                  ${isClosing ? 'animate-[fadeOutDown_0.32s_ease-in_forwards]' : 'opacity-0 translate-y-4 animate-[fadeInUp_0.32s_ease-out_forwards]'}
+                  ${isClosing ? 'animate-[fadeOutDown_0.25s_ease-in_forwards]' : 'opacity-0 translate-y-3 animate-[fadeInUp_0.35s_ease-out_forwards]'}
                 `}
                 style={{
-                  animationDelay: `${300 + (index * 100)}ms`
+                  animationDelay: isClosing ? `${index * 40}ms` : `${200 + (index * 60)}ms`
                 }}
               >
                 <div className="text-xs tracking-wide uppercase text-white mb-2">
