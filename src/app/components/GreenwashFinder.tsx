@@ -180,7 +180,7 @@ const GreenwashFinder: React.FC<GreenwashFinderProps> = ({ isOpen, onClose }) =>
           onClick={(e) => e.stopPropagation()}
           className={`
             relative z-10
-            w-[92vw] sm:w-[86vw] md:w-auto
+            w-[92vw] sm:w-[86vw] md:w-[86vw]
             h-screen
             max-w-[32rem] md:max-w-[68rem] lg:max-w-[80rem]
             focus:outline-none
