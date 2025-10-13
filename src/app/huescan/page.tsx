@@ -130,7 +130,7 @@ export default function HueScan() {
     const canvas = overlayCanvasRef.current;
     if (!canvas) return;
     
-    const ctx = canvas.getContext('2d');
+    const ctx = canvas.getContext('2d', { alpha: true, desynchronized: true });
     if (!ctx) return;
     
     const width = canvas.width;
@@ -140,95 +140,46 @@ export default function HueScan() {
     
     ctx.clearRect(0, 0, width, height);
     
-    // Animated horizontal scanning line
-    const time = Date.now();
-    const scanLineY = (time / 20) % height;
-    
-    // Main scan line
-    ctx.strokeStyle = match === 'perfect' 
-      ? 'rgba(0, 255, 100, 0.6)' 
-      : match === 'close'
-      ? 'rgba(255, 200, 0, 0.5)'
-      : 'rgba(255, 100, 100, 0.4)';
-    ctx.lineWidth = 3;
-    ctx.shadowBlur = 10;
-    ctx.shadowColor = ctx.strokeStyle;
-    ctx.beginPath();
-    ctx.moveTo(0, scanLineY);
-    ctx.lineTo(width, scanLineY);
-    ctx.stroke();
-    ctx.shadowBlur = 0;
-    
-    // Subtle grid pattern
-    ctx.strokeStyle = 'rgba(0, 255, 100, 0.05)';
-    ctx.lineWidth = 1;
-    for (let i = 0; i < height; i += 40) {
-      ctx.beginPath();
-      ctx.moveTo(0, i);
-      ctx.lineTo(width, i);
-      ctx.stroke();
-    }
-    for (let i = 0; i < width; i += 40) {
-      ctx.beginPath();
-      ctx.moveTo(i, 0);
-      ctx.lineTo(i, height);
-      ctx.stroke();
-    }
-    
-    // Corner brackets
     const centerX = width / 2;
     const centerY = height / 2;
     const size = 140;
     const bracketLength = 40;
-    const thickness = 4;
     
-    // Match color changes based on detection
+    // Match color - cached
     const matchColor = match === 'perfect' ? 'rgba(0, 255, 100, 1)' : 
                        match === 'close' ? 'rgba(255, 200, 0, 1)' : 
                        'rgba(255, 100, 100, 0.8)';
     
+    // Optimized: Draw all brackets in one path
     ctx.strokeStyle = matchColor;
-    ctx.lineWidth = thickness;
+    ctx.lineWidth = 4;
     ctx.lineCap = 'round';
     ctx.lineJoin = 'round';
     
-    // Draw pulsing effect for perfect match
-    const pulseScale = match === 'perfect' ? 1 + Math.sin(Date.now() / 200) * 0.05 : 1;
+    const pulseScale = match === 'perfect' ? 1 + Math.sin(Date.now() / 200) * 0.03 : 1;
     const adjustedSize = size * pulseScale;
     
-    // Top-left bracket
     ctx.beginPath();
+    // Top-left
     ctx.moveTo(centerX - adjustedSize, centerY - adjustedSize + bracketLength);
     ctx.lineTo(centerX - adjustedSize, centerY - adjustedSize);
     ctx.lineTo(centerX - adjustedSize + bracketLength, centerY - adjustedSize);
-    ctx.stroke();
-    
-    // Top-right bracket
-    ctx.beginPath();
+    // Top-right
     ctx.moveTo(centerX + adjustedSize - bracketLength, centerY - adjustedSize);
     ctx.lineTo(centerX + adjustedSize, centerY - adjustedSize);
     ctx.lineTo(centerX + adjustedSize, centerY - adjustedSize + bracketLength);
-    ctx.stroke();
-    
-    // Bottom-left bracket
-    ctx.beginPath();
+    // Bottom-left
     ctx.moveTo(centerX - adjustedSize, centerY + adjustedSize - bracketLength);
     ctx.lineTo(centerX - adjustedSize, centerY + adjustedSize);
     ctx.lineTo(centerX - adjustedSize + bracketLength, centerY + adjustedSize);
-    ctx.stroke();
-    
-    // Bottom-right bracket
-    ctx.beginPath();
+    // Bottom-right
     ctx.moveTo(centerX + adjustedSize - bracketLength, centerY + adjustedSize);
     ctx.lineTo(centerX + adjustedSize, centerY + adjustedSize);
     ctx.lineTo(centerX + adjustedSize, centerY + adjustedSize - bracketLength);
     ctx.stroke();
     
-    // Center crosshair with glow
-    ctx.strokeStyle = matchColor;
+    // Optimized crosshair
     ctx.lineWidth = 3;
-    ctx.shadowBlur = match === 'perfect' ? 15 : 8;
-    ctx.shadowColor = matchColor;
     const crossSize = 20;
     ctx.beginPath();
     ctx.moveTo(centerX - crossSize, centerY);
@@ -236,13 +187,10 @@ export default function HueScan() {
     ctx.moveTo(centerX, centerY - crossSize);
     ctx.lineTo(centerX, centerY + crossSize);
     ctx.stroke();
-    ctx.shadowBlur = 0;
     
-    // Draw center circle
-    ctx.beginPath();
-    ctx.arc(centerX, centerY, 5, 0, Math.PI * 2);
+    // Center dot
     ctx.fillStyle = matchColor;
-    ctx.fill();
+    ctx.fillRect(centerX - 3, centerY - 3, 6, 6);
   }, [match]);
 
   const analyzeFrame = useCallback(() => {
@@ -253,21 +201,35 @@ export default function HueScan() {
 
     const video = videoRef.current;
     const canvas = canvasRef.current;
-    const ctx = canvas.getContext('2d');
-    if (!ctx) {
+    
+    if (video.readyState !== video.HAVE_ENOUGH_DATA) {
       animationRef.current = requestAnimationFrame(analyzeFrame);
       return;
     }
 
-    if (video.readyState === video.HAVE_ENOUGH_DATA) {
+    // Performance optimization: only update canvas size if it changed
+    if (canvas.width !== video.videoWidth || canvas.height !== video.videoHeight) {
       canvas.width = video.videoWidth;
       canvas.height = video.videoHeight;
+      
+      // Also update overlay canvas size
+      if (overlayCanvasRef.current) {
+        overlayCanvasRef.current.width = video.videoWidth;
+        overlayCanvasRef.current.height = video.videoHeight;
+      }
+    }
+    
+    const ctx = canvas.getContext('2d', { willReadFrequently: true });
+    if (!ctx) {
+      animationRef.current = requestAnimationFrame(analyzeFrame);
+      return;
+    }
       
       ctx.drawImage(video, 0, 0);
       
       const centerX = Math.floor(canvas.width / 2);
       const centerY = Math.floor(canvas.height / 2);
-      const sampleSize = 80;
+    const sampleSize = 60; // Reduced for better performance
       
       const imageData = ctx.getImageData(
         centerX - sampleSize,
@@ -278,52 +240,50 @@ export default function HueScan() {
       
       let totalR = 0, totalG = 0, totalB = 0;
       let totalDistance = 0;
-      let pixelCount = 0;
-      
-      for (let i = 0; i < imageData.data.length; i += 4) {
-        const r = imageData.data[i];
-        const g = imageData.data[i + 1];
-        const b = imageData.data[i + 2];
+    const data = imageData.data;
+    const pixelCount = data.length / 4;
+    
+    // Optimized loop - process every other pixel for speed
+    for (let i = 0; i < data.length; i += 8) {
+      const r = data[i];
+      const g = data[i + 1];
+      const b = data[i + 2];
         
         totalR += r;
         totalG += g;
         totalB += b;
         
-        const distance = colorDistance({ r, g, b }, targetColor);
-        totalDistance += distance;
-        pixelCount++;
-      }
-      
-      const avgR = Math.round(totalR / pixelCount);
-      const avgG = Math.round(totalG / pixelCount);
-      const avgB = Math.round(totalB / pixelCount);
+      // Inline distance calculation for speed
+      const dr = r - targetColor.r;
+      const dg = g - targetColor.g;
+      const db = b - targetColor.b;
+      totalDistance += Math.sqrt(dr * dr + dg * dg + db * db);
+    }
+    
+    const sampledPixels = pixelCount / 2;
+    const avgR = Math.round(totalR / sampledPixels);
+    const avgG = Math.round(totalG / sampledPixels);
+    const avgB = Math.round(totalB / sampledPixels);
       
       setRgbValues({ r: avgR, g: avgG, b: avgB });
       setCoordinates({ x: centerX, y: centerY });
       
-      const avgDistance = totalDistance / pixelCount;
+    const avgDistance = totalDistance / sampledPixels;
       const maxDistance = 441.67;
       const similarity = Math.max(0, 100 - (avgDistance / maxDistance) * 100);
       
       setMatchPercentage(Math.round(similarity));
       
-      // More lenient thresholds for better detection
-      if (similarity >= 75) {
+    // Threshold detection
+    if (similarity >= 75) {
         setMatch('perfect');
-      } else if (similarity >= 50) {
+    } else if (similarity >= 50) {
         setMatch('close');
       } else {
         setMatch('no');
       }
       
-      // Update overlay canvas size
-      if (overlayCanvasRef.current) {
-        overlayCanvasRef.current.width = video.videoWidth;
-        overlayCanvasRef.current.height = video.videoHeight;
-      }
-      
       drawOverlay();
-    }
     
     animationRef.current = requestAnimationFrame(analyzeFrame);
   }, [scanning, targetColor, drawOverlay]);
@@ -367,15 +327,23 @@ export default function HueScan() {
         autoPlay
         playsInline
         muted
-        className={`absolute inset-0 w-full h-full object-cover ${
-          isFlipped ? 'scale-x-[-1]' : ''
-        }`}
+        className="absolute inset-0 w-full h-full object-cover"
+        style={{
+          transform: isFlipped ? 'scaleX(-1) translateZ(0)' : 'translateZ(0)',
+          willChange: 'transform',
+          backfaceVisibility: 'hidden'
+        }}
       />
       
       {/* Overlay Canvas */}
       <canvas
         ref={overlayCanvasRef}
         className="absolute inset-0 w-full h-full object-cover pointer-events-none"
+        style={{ 
+          willChange: 'contents',
+          transform: 'translateZ(0)',
+          backfaceVisibility: 'hidden'
+        }}
       />
       
       {/* HUD Overlay */}
