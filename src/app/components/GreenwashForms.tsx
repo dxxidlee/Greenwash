@@ -213,6 +213,39 @@ const GreenwashForms: React.FC<GreenwashFormsProps> = ({ isOpen, onClose }) => {
 
   return (
     <>
+      <style jsx>{`
+        input[type="checkbox"],
+        input[type="radio"] {
+          appearance: none;
+          -webkit-appearance: none;
+          width: 16px;
+          height: 16px;
+          border: 1px solid #FFFFFF;
+          border-radius: 2px;
+          background: transparent;
+          cursor: pointer;
+          position: relative;
+          flex-shrink: 0;
+        }
+        
+        input[type="checkbox"]:checked,
+        input[type="radio"]:checked {
+          background: transparent;
+        }
+        
+        input[type="checkbox"]:checked::after,
+        input[type="radio"]:checked::after {
+          content: '✕';
+          position: absolute;
+          top: 50%;
+          left: 50%;
+          transform: translate(-50%, -50%);
+          color: #FFFFFF;
+          font-size: 14px;
+          font-weight: bold;
+          line-height: 1;
+        }
+      `}</style>
       {/* Report Icon — positioned at top center */}
       <div
         style={{
@@ -300,7 +333,7 @@ const GreenwashForms: React.FC<GreenwashFormsProps> = ({ isOpen, onClose }) => {
             relative z-10
             w-[92vw] sm:w-[86vw] md:w-auto
             h-screen
-            ${isMobile ? 'max-w-[32rem]' : 'max-w-[68rem]'}
+            max-w-[32rem] md:max-w-[68rem]
             focus:outline-none
             ${isClosing ? 'animate-[fadeOutScaleDown_0.3s_ease-in_forwards]' : 'opacity-0 scale-98 translate-y-2 animate-[fadeInScaleUp_0.4s_ease-out_0.12s_forwards]'}
           `}
@@ -327,7 +360,7 @@ const GreenwashForms: React.FC<GreenwashFormsProps> = ({ isOpen, onClose }) => {
                   }}
                 >
                   <FileText size={18} />
-                  <span className="text-xs tracking-wider">AUTHORIZATION FORM</span>
+                  <span className="text-xs tracking-wider">AUT-37</span>
                 </button>
                 <button
                   onClick={() => setActiveTab('violation')}
@@ -340,7 +373,7 @@ const GreenwashForms: React.FC<GreenwashFormsProps> = ({ isOpen, onClose }) => {
                   }}
                 >
                   <AlertTriangle size={18} />
-                  <span className="text-xs tracking-wider">VIOLATION TICKET</span>
+                  <span className="text-xs tracking-wider">VLT-37</span>
                 </button>
               </div>
             )}
@@ -359,8 +392,8 @@ const GreenwashForms: React.FC<GreenwashFormsProps> = ({ isOpen, onClose }) => {
           >
             <div className="p-6">
               <div className="flex justify-between items-start mb-6">
-                <h2 className="text-2xl tracking-widest text-white" style={{ fontFamily: 'PPNeueMontreal, sans-serif' }}>
-                  Authorization Form
+                <h2 className="text-lg font-medium text-white" style={{ fontFamily: 'PPNeueMontreal, sans-serif', letterSpacing: '0.025em' }}>
+                  Authorization Form AUT-37
                 </h2>
               </div>
 
@@ -369,7 +402,7 @@ const GreenwashForms: React.FC<GreenwashFormsProps> = ({ isOpen, onClose }) => {
                 className="w-full mb-6 transition-all text-xs tracking-wider rounded-lg"
                 style={buttonStyle}
               >
-                {authLoaded ? 'CLEAR EXAMPLE' : 'LOAD AUTH EXAMPLE'}
+                {authLoaded ? 'CLEAR EXAMPLE' : 'LOAD EXAMPLE'}
                   </button>
 
               <div className="space-y-4">
@@ -441,8 +474,6 @@ const GreenwashForms: React.FC<GreenwashFormsProps> = ({ isOpen, onClose }) => {
                           value={type}
                           checked={authForm.objectType === type}
                           onChange={(e) => setAuthForm({...authForm, objectType: e.target.value})}
-                          className="w-4 h-4"
-                          style={{accentColor: '#FFFFFF'}}
                         />
                         <span className="text-sm uppercase text-white" style={{ fontFamily: 'PPNeueMontreal, sans-serif' }}>{type}</span>
                       </label>
@@ -505,8 +536,6 @@ const GreenwashForms: React.FC<GreenwashFormsProps> = ({ isOpen, onClose }) => {
                           value={action}
                           checked={authForm.authorizedAction === action}
                           onChange={(e) => setAuthForm({...authForm, authorizedAction: e.target.value})}
-                          className="w-4 h-4"
-                          style={{accentColor: '#FFFFFF'}}
                         />
                         <span className="text-sm uppercase text-white" style={{ fontFamily: 'PPNeueMontreal, sans-serif' }}>{action === 'apply' ? 'Apply Green Paint' : action === 'replace' ? 'Replace Object' : action === 'confiscate' ? 'Confiscate Object' : 'Other'}</span>
                       </label>
@@ -556,10 +585,10 @@ const GreenwashForms: React.FC<GreenwashFormsProps> = ({ isOpen, onClose }) => {
                   style={{
                     ...buttonStyle,
                     border: 'none',
-                    padding: '12px'
+                        padding: '12px'
                   }}
                 >
-                  SUBMIT AUTHORIZATION
+                  SUBMIT
                       </button>
                     </div>
                   </div>
@@ -578,8 +607,8 @@ const GreenwashForms: React.FC<GreenwashFormsProps> = ({ isOpen, onClose }) => {
           >
             <div className="p-6">
               <div className="flex justify-between items-start mb-6">
-                <h2 className="text-2xl tracking-widest text-white" style={{ fontFamily: 'PPNeueMontreal, sans-serif' }}>
-                  Noncompliance Violation Ticket
+                <h2 className="text-lg font-medium text-white" style={{ fontFamily: 'PPNeueMontreal, sans-serif', letterSpacing: '0.025em' }}>
+                  Violation Ticket VLT-37
                 </h2>
               </div>
 
@@ -588,7 +617,7 @@ const GreenwashForms: React.FC<GreenwashFormsProps> = ({ isOpen, onClose }) => {
                 className="w-full mb-6 transition-all text-xs tracking-wider rounded-lg"
                 style={buttonStyle}
               >
-                {violationLoaded ? 'CLEAR EXAMPLE' : 'LOAD VIOLATION EXAMPLE'}
+                {violationLoaded ? 'CLEAR EXAMPLE' : 'LOAD EXAMPLE'}
               </button>
 
               <div className="space-y-4">
@@ -681,8 +710,6 @@ const GreenwashForms: React.FC<GreenwashFormsProps> = ({ isOpen, onClose }) => {
                           ...violationForm,
                           violations: {...violationForm.violations, notPaintedGreen: e.target.checked}
                         })}
-                        className="w-4 h-4"
-                        style={{accentColor: '#FFFFFF'}}
                       />
                       <span className="text-sm text-white" style={{ fontFamily: 'PPNeueMontreal, sans-serif' }}>Object not painted green</span>
                     </label>
@@ -694,8 +721,6 @@ const GreenwashForms: React.FC<GreenwashFormsProps> = ({ isOpen, onClose }) => {
                           ...violationForm,
                           violations: {...violationForm.violations, unauthorizedReplacement: e.target.checked}
                         })}
-                        className="w-4 h-4"
-                        style={{accentColor: '#FFFFFF'}}
                       />
                       <span className="text-sm text-white" style={{ fontFamily: 'PPNeueMontreal, sans-serif' }}>Unauthorized non-green replacement</span>
                     </label>
@@ -707,8 +732,6 @@ const GreenwashForms: React.FC<GreenwashFormsProps> = ({ isOpen, onClose }) => {
                           ...violationForm,
                           violations: {...violationForm.violations, competingColors: e.target.checked}
                         })}
-                        className="w-4 h-4"
-                        style={{accentColor: '#FFFFFF'}}
                       />
                       <span className="text-sm text-white" style={{ fontFamily: 'PPNeueMontreal, sans-serif' }}>Display of competing colors</span>
                     </label>
@@ -720,8 +743,6 @@ const GreenwashForms: React.FC<GreenwashFormsProps> = ({ isOpen, onClose }) => {
                           ...violationForm,
                           violations: {...violationForm.violations, obstruction: e.target.checked}
                         })}
-                        className="w-4 h-4"
-                        style={{accentColor: '#FFFFFF'}}
                       />
                       <span className="text-sm text-white" style={{ fontFamily: 'PPNeueMontreal, sans-serif' }}>Obstruction of greening operations</span>
                     </label>
@@ -761,8 +782,6 @@ const GreenwashForms: React.FC<GreenwashFormsProps> = ({ isOpen, onClose }) => {
                           value={sev}
                           checked={violationForm.severity === sev}
                           onChange={(e) => setViolationForm({...violationForm, severity: e.target.value})}
-                          className="w-4 h-4"
-                          style={{accentColor: '#FFFFFF'}}
                         />
                         <span className="text-sm uppercase text-white" style={{ fontFamily: 'PPNeueMontreal, sans-serif' }}>{sev}</span>
                       </label>
@@ -781,7 +800,7 @@ const GreenwashForms: React.FC<GreenwashFormsProps> = ({ isOpen, onClose }) => {
                     padding: '12px'
                   }}
                 >
-                  SUBMIT VIOLATION
+                  SUBMIT
                 </button>
               </div>
             </div>
