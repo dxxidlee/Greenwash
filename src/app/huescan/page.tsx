@@ -278,12 +278,24 @@ export default function HueScan() {
       const avgDistance = totalDistance / sampleCount;
       const similarity = Math.max(0, Math.min(100, 100 - (avgDistance / 441.67) * 100));
       
-      setMatchPercentage(Math.round(similarity));
+      // GREEN CHECK: Ensure it's actually greenish
+      // For #008f46: G should be much higher than R and B
+      const isGreenish = avgG > avgR && avgG > avgB && avgG > 80; // Must have strong green channel
+      const greenDominance = avgG - Math.max(avgR, avgB); // Green should dominate by a lot
       
-      // Threshold detection with smooth transitions
-      if (similarity >= 75) {
+      // Stricter similarity calculation for green compliance
+      let adjustedSimilarity = similarity;
+      if (!isGreenish || greenDominance < 30) {
+        // Not even green-ish, severely penalize
+        adjustedSimilarity = Math.min(adjustedSimilarity, 40);
+      }
+      
+      setMatchPercentage(Math.round(adjustedSimilarity));
+      
+      // MUCH STRICTER thresholds - only actual greens close to #008f46
+      if (adjustedSimilarity >= 90 && isGreenish) {
         setMatch('perfect');
-      } else if (similarity >= 50) {
+      } else if (adjustedSimilarity >= 70 && isGreenish) {
         setMatch('close');
       } else {
         setMatch('no');
