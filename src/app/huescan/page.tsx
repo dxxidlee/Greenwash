@@ -60,7 +60,7 @@ export default function HueScan() {
         
         // Fallback timeout in case onloadedmetadata doesn't fire
         setTimeout(() => {
-          setScanning(true);
+            setScanning(true);
         }, 1000);
       }
     } catch (err) {
@@ -109,7 +109,7 @@ export default function HueScan() {
       }
       
       if (event.key.toLowerCase() === 'f') {
-        toggleFlip();
+          toggleFlip();
       }
     };
     
@@ -332,76 +332,84 @@ export default function HueScan() {
       
       {/* HUD Overlay */}
       {!error && (
-        <div className="absolute inset-0 pointer-events-none select-none font-mono">
+        <div className="absolute inset-0 pointer-events-none select-none">
           {/* Top Left Info */}
-          <div className="absolute top-4 left-4 text-green-400 text-xs tracking-wider space-y-1">
+          <div className="absolute top-4 left-4">
+            <div className="bg-[rgba(0,143,70,0.3)] backdrop-blur-sm rounded-2xl p-4 text-white text-xs tracking-wider space-y-2">
             <div className="flex items-center gap-2">
-              <span className="text-green-500">SYSTEM:</span>
-              <span className="text-white">HUESCAN_v2.1</span>
+                <span className="opacity-70">SYSTEM:</span>
+                <span>HUESCAN_v2.1</span>
             </div>
             <div className="flex items-center gap-2">
-              <span className="text-green-500">TARGET:</span>
-              <span className="text-white">#008F46</span>
+                <span className="opacity-70">TARGET:</span>
+                <span>#008F46</span>
             </div>
             <div className="flex items-center gap-2">
-              <span className="text-green-500">MODE:</span>
-              <span className="text-white">{facingMode === 'environment' ? 'REAR' : 'FRONT'}</span>
+                <span className="opacity-70">MODE:</span>
+                <span>{facingMode === 'environment' ? 'REAR' : 'FRONT'}</span>
             </div>
-            <div className="flex items-center gap-2">
-              <span className="text-green-500">FLIP:</span>
-              <span className="text-white">{isFlipped ? 'ON' : 'OFF'}</span>
+              <div className="flex items-center gap-2">
+                <span className="opacity-70">FLIP:</span>
+                <span>{isFlipped ? 'ON' : 'OFF'}</span>
+              </div>
             </div>
           </div>
           
           {/* Top Right Status */}
-          <div className="absolute top-4 right-4 text-right text-xs tracking-wider">
+          <div className="absolute top-4 right-20">
+            <div className="bg-[rgba(0,143,70,0.3)] backdrop-blur-sm rounded-2xl p-4 text-right text-xs tracking-wider text-white">
             <div className={`text-2xl font-bold mb-2 ${
-              match === 'perfect' ? 'text-green-400' : 
-              match === 'close' ? 'text-yellow-400' : 
-              'text-red-400'
+                match === 'perfect' ? 'text-white' : 
+                match === 'close' ? 'text-yellow-300' : 
+                'text-red-300'
             }`}>
               {matchPercentage}%
             </div>
-            <div className="text-green-400">
+              <div className="opacity-70">
               {match === 'perfect' ? 'MATCH_CONFIRMED' : 
                match === 'close' ? 'PARTIAL_MATCH' : 
                'SCANNING...'}
+              </div>
             </div>
           </div>
           
           {/* Bottom Left RGB Values */}
-          <div className="absolute bottom-4 left-4 text-green-400 text-xs tracking-wider space-y-1">
+          <div className="absolute bottom-24 left-4">
+            <div className="bg-[rgba(0,143,70,0.3)] backdrop-blur-sm rounded-2xl p-4 text-white text-xs tracking-wider space-y-2">
+              <div className="opacity-70">COORDINATES</div>
             <div>X: {coordinates.x}</div>
             <div>Y: {coordinates.y}</div>
-            <div className="mt-2">
+              <div className="mt-3 opacity-70">COLOR VALUES</div>
               <div>R: {rgbValues.r}</div>
               <div>G: {rgbValues.g}</div>
               <div>B: {rgbValues.b}</div>
-            </div>
-            <div className="mt-2">
+              <div className="mt-3">
               <div className="flex items-center gap-2">
-                <span>HEX:</span>
-                <span className="text-white">
+                  <span className="opacity-70">HEX:</span>
+                  <span>
                   #{rgbValues.r.toString(16).padStart(2, '0')}
                   {rgbValues.g.toString(16).padStart(2, '0')}
                   {rgbValues.b.toString(16).padStart(2, '0')}
                 </span>
+                </div>
               </div>
             </div>
           </div>
           
           {/* Bottom Right Color Preview */}
-          <div className="absolute bottom-4 right-4">
-            <div className="text-green-400 text-xs tracking-wider mb-2 text-right">
+          <div className="absolute bottom-24 right-4">
+            <div className="bg-[rgba(0,143,70,0.3)] backdrop-blur-sm rounded-2xl p-4 text-white">
+              <div className="text-xs tracking-wider mb-3 text-center opacity-70">
               DETECTED
             </div>
             <div 
-              className="w-16 h-16 border-2 border-green-400"
+                className="w-16 h-16 rounded-lg border-2 border-white/30"
               style={{ 
                 backgroundColor: `rgb(${rgbValues.r}, ${rgbValues.g}, ${rgbValues.b})` 
               }}
             />
           </div>
+            </div>
         </div>
       )}
       
