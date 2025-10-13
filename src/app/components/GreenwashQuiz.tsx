@@ -260,25 +260,25 @@ const GreenwashQuiz: React.FC<GreenwashQuizProps> = ({ isOpen, onClose }) => {
     if (score >= 80) {
       return {
         title: "Exemplary Compliance Officer",
-        message: "You demonstrate exceptional understanding of Greenwash protocols and visual uniformity principles.",
+        message: "Exceptional understanding of protocols and visual uniformity.",
         color: "green"
       };
     } else if (score >= 50) {
       return {
         title: "Adequate Field Officer",
-        message: "You understand the basics but show room for improvement in protocol execution.",
+        message: "Basics understood but room for protocol improvement.",
         color: "yellow"
       };
     } else if (score >= 20) {
       return {
         title: "Probationary Status",
-        message: "Your responses indicate insufficient commitment and require mandatory retraining.",
+        message: "Insufficient commitment requires mandatory retraining.",
         color: "orange"
       };
     } else {
       return {
         title: "Compliance Failure",
-        message: "You are fundamentally unsuited for Compliance Division work.",
+        message: "Fundamentally unsuited for Compliance Division work.",
         color: "red"
       };
     }
@@ -397,7 +397,7 @@ const GreenwashQuiz: React.FC<GreenwashQuizProps> = ({ isOpen, onClose }) => {
           onTouchMove={(e) => e.stopPropagation()}
         >
           {showResults ? (
-            <div className="h-full w-full flex items-center justify-center px-4">
+            <div className="h-full w-full flex items-center justify-center">
               <div className="w-full space-y-4 sm:space-y-5 md:space-y-6">
                 {(() => {
                   const score = calculateScore();
@@ -419,13 +419,13 @@ const GreenwashQuiz: React.FC<GreenwashQuizProps> = ({ isOpen, onClose }) => {
                     >
                       <div className="text-center mb-6">
                         <div className="text-4xl font-medium mb-2 text-white">{score}%</div>
-                        <div className="text-lg font-medium mb-2 text-white">
+                        <div className="text-lg font-medium mb-3 text-white">
                           {result.title}
                         </div>
-                        <div className="border-t border-white my-3 mx-auto max-w-[80%]"></div>
-                        <div className="text-sm text-white leading-relaxed">
+                        <div className="text-sm text-white leading-relaxed mb-4">
                           {result.message}
                         </div>
+                        <div className="border-t border-white"></div>
                       </div>
 
                       {timeRemaining !== null && timeRemaining > 0 ? (
@@ -489,7 +489,7 @@ const GreenwashQuiz: React.FC<GreenwashQuizProps> = ({ isOpen, onClose }) => {
                   `}
                   style={{ animationDelay: '100ms' }}
                 >
-                  <h2 className="text-lg font-medium text-white mb-6 leading-relaxed">
+                  <h2 className="text-lg font-medium text-white mb-6 leading-6">
                     {questions[currentQuestion].question}
                   </h2>
 
