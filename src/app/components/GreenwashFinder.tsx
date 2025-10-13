@@ -202,7 +202,7 @@ const GreenwashFinder: React.FC<GreenwashFinderProps> = ({ isOpen, onClose }) =>
               style={{
                 width: '100%',
                 display: 'flex',
-                justifyContent: showFilters ? 'flex-start' : 'center',
+                justifyContent: 'center',
                 alignItems: 'center',
                 marginBottom: showFilters ? '24px' : '12px',
                 transition: 'all 0.3s cubic-bezier(0.16, 1, 0.3, 1)'
