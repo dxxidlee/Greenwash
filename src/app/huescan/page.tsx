@@ -905,13 +905,16 @@ export default function HueScan() {
             </button>
           </div>
 
-      {/* Back Button */}
+      {/* Exit X Button */}
           <div className="absolute top-4 right-4 pointer-events-auto z-50">
         <a
           href="/"
-          className="bg-green-600 hover:bg-green-700 text-white px-4 py-2 rounded text-sm font-medium transition-colors tracking-wider"
+          aria-label="Close"
+          className="inline-flex items-center justify-center h-12 w-12 rounded-full shadow-[0_2px_12px_rgba(0,0,0,0.06)] bg-[rgba(0,143,70,0.3)] text-white hover:bg-[rgba(0,143,70,0.4)] transition-all duration-300 ease-out focus:outline-none focus:ring-2 focus:ring-white/30"
         >
-          ← BACK TO HOME
+          <svg viewBox="0 0 24 24" width="18" height="18" aria-hidden="true">
+            <path d="M6 6l12 12M18 6L6 18" stroke="currentColor" strokeWidth="2" strokeLinecap="round"/>
+          </svg>
         </a>
       </div>
         </>
