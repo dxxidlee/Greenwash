@@ -16,6 +16,7 @@ interface Item {
   category: string;
   date: string;
   status?: string;
+  image?: string;
 }
 
 const GreenwashFinder: React.FC<GreenwashFinderProps> = ({ isOpen, onClose }) => {
@@ -75,27 +76,40 @@ const GreenwashFinder: React.FC<GreenwashFinderProps> = ({ isOpen, onClose }) =>
   }, []);
 
   const filters = [
-    { id: 'violations', label: 'Violations' },
-    { id: 'authorizations', label: 'Authorizations' },
-    { id: 'reports', label: 'Reports' },
-    { id: 'evidence', label: 'Evidence' },
-    { id: 'codes', label: 'Codes' },
-    { id: 'archived', label: 'Archived' }
+    { id: 'approved-object', label: 'Approved Object' },
+    { id: 'campaign-poster', label: 'Campaign Poster' },
+    { id: 'violation-ticket', label: 'Violation Ticket' },
+    { id: 'authorization-form', label: 'Authorization Form' }
   ];
 
   const items: Item[] = [
-    { id: 1, title: 'Vendor Cart Violation', subtitle: 'UN-2037-032', category: 'violations', date: '01.28.37', status: 'New' },
-    { id: 2, title: 'Billboard Authorization', subtitle: '002942-GM', category: 'authorizations', date: '01.22.37' },
-    { id: 3, title: 'Canal Street Evidence', subtitle: 'Photo Documentation', category: 'evidence', date: '01.28.37' },
-    { id: 4, title: 'Q1 Compliance Report', subtitle: 'Zone B-East River', category: 'reports', date: '01.31.37' },
-    { id: 5, title: 'Green Code G-41', subtitle: 'Canopy Green', category: 'codes', date: '12.01.36' },
-    { id: 6, title: 'Pike Slip Authorization', subtitle: '002943-GM', category: 'authorizations', date: '01.23.37' },
-    { id: 7, title: 'Violation Stats Q1', subtitle: 'Spreadsheet', category: 'reports', date: '01.15.37' },
-    { id: 8, title: 'Chinatown Zone Report', subtitle: 'Compliance Analysis', category: 'reports', date: '01.30.37' },
-    { id: 9, title: 'Green Code G-05', subtitle: 'Vendor Green', category: 'codes', date: '12.01.36' },
-    { id: 10, title: 'Evidence Photo 001', subtitle: 'IMG_2037_0128_001', category: 'evidence', date: '01.28.37' },
-    { id: 11, title: 'Evidence Photo 002', subtitle: 'IMG_2037_0128_002', category: 'evidence', date: '01.28.37' },
-    { id: 12, title: 'Monthly Summary Jan', subtitle: 'Text Document', category: 'archived', date: '01.31.37' }
+    // Approved Objects (15 items)
+    { id: 1, title: 'Vendor Cart Violation', subtitle: 'UN-2037-032', category: 'approved-object', date: '01.28.37', image: '/img/approv-obj-1.webp', status: 'New' },
+    { id: 2, title: 'Billboard Authorization', subtitle: '002942-GM', category: 'approved-object', date: '01.22.37', image: '/img/approv-obj-2.webp' },
+    { id: 3, title: 'Canal Street Evidence', subtitle: 'Photo Documentation', category: 'approved-object', date: '01.28.37', image: '/img/approv-obj-3.webp' },
+    { id: 4, title: 'Q1 Compliance Report', subtitle: 'Zone B-East River', category: 'approved-object', date: '01.31.37', image: '/img/approv-obj-4.webp' },
+    { id: 5, title: 'Green Code G-41', subtitle: 'Canopy Green', category: 'approved-object', date: '12.01.36', image: '/img/approv-obj-5.webp' },
+    { id: 6, title: 'Pike Slip Authorization', subtitle: '002943-GM', category: 'approved-object', date: '01.23.37', image: '/img/approv-obj-6.webp' },
+    { id: 7, title: 'Violation Stats Q1', subtitle: 'Spreadsheet', category: 'approved-object', date: '01.15.37', image: '/img/approv-obj-7.webp' },
+    { id: 8, title: 'Chinatown Zone Report', subtitle: 'Compliance Analysis', category: 'approved-object', date: '01.30.37', image: '/img/approv-obj-8.webp' },
+    { id: 9, title: 'Green Code G-05', subtitle: 'Vendor Green', category: 'approved-object', date: '12.01.36', image: '/img/approv-obj-9.webp' },
+    { id: 10, title: 'Evidence Photo 001', subtitle: 'IMG_2037_0128_001', category: 'approved-object', date: '01.28.37', image: '/img/approv-obj-10.webp' },
+    { id: 11, title: 'Evidence Photo 002', subtitle: 'IMG_2037_0128_002', category: 'approved-object', date: '01.28.37', image: '/img/approv-obj-11.webp' },
+    { id: 12, title: 'Monthly Summary Jan', subtitle: 'Text Document', category: 'approved-object', date: '01.31.37', image: '/img/approv-obj-12.webp' },
+    { id: 13, title: 'Monthly Summary Jan', subtitle: 'Text Document', category: 'approved-object', date: '01.31.37', image: '/img/approv-obj-13.webp' },
+    { id: 14, title: 'Monthly Summary Jan', subtitle: 'Text Document', category: 'approved-object', date: '01.31.37', image: '/img/approv-obj-14.webp' },
+    { id: 15, title: 'Monthly Summary Jan', subtitle: 'Text Document', category: 'approved-object', date: '01.31.37', image: '/img/approv-obj-15.webp' },
+    // Campaign Posters (3 items)
+    { id: 16, title: 'Monthly Summary Jan', subtitle: 'Text Document', category: 'campaign-poster', date: '01.31.37', image: '/img/poster-1.webp' },
+    { id: 17, title: 'Monthly Summary Jan', subtitle: 'Text Document', category: 'campaign-poster', date: '01.31.37', image: '/img/poster-2.webp' },
+    { id: 18, title: 'Monthly Summary Jan', subtitle: 'Text Document', category: 'campaign-poster', date: '01.31.37', image: '/img/poster-3.webp' },
+    // Violation Tickets (2 items)
+    { id: 19, title: 'Monthly Summary Jan', subtitle: 'Text Document', category: 'violation-ticket', date: '01.31.37', image: '/img/violation-ticket-1.webp' },
+    { id: 20, title: 'Monthly Summary Jan', subtitle: 'Text Document', category: 'violation-ticket', date: '01.31.37', image: '/img/violation-ticket-2.webp' },
+    // Authorization Forms (3 items)
+    { id: 21, title: 'Monthly Summary Jan', subtitle: 'Text Document', category: 'authorization-form', date: '01.31.37', image: '/img/auth-form-1.webp' },
+    { id: 22, title: 'Monthly Summary Jan', subtitle: 'Text Document', category: 'authorization-form', date: '01.31.37', image: '/img/auth-form-2.webp' },
+    { id: 23, title: 'Monthly Summary Jan', subtitle: 'Text Document', category: 'authorization-form', date: '01.31.37', image: '/img/auth-form-3.webp' }
   ];
 
   const filteredItems = selectedFilter === 'all' 
@@ -303,12 +317,26 @@ const GreenwashFinder: React.FC<GreenwashFinderProps> = ({ isOpen, onClose }) =>
                       aspectRatio: '1/1'
                     }}
                   >
-                    {/* Placeholder for image */}
-                    <div className="w-full h-full flex items-center justify-center">
-                      <div className="text-white opacity-50 text-xs">
-                        {item.category.toUpperCase()}
+                    {/* Image with padding */}
+                    {item.image ? (
+                      <div className="w-full h-full p-4 flex items-center justify-center">
+                        <img
+                          src={item.image}
+                          alt={item.title}
+                          style={{
+                            width: '100%',
+                            height: '100%',
+                            objectFit: 'contain'
+                          }}
+                        />
                       </div>
-                    </div>
+                    ) : (
+                      <div className="w-full h-full flex items-center justify-center">
+                        <div className="text-white opacity-50 text-xs">
+                          {item.category.toUpperCase()}
+                        </div>
+                      </div>
+                    )}
 
                     {/* Status badge */}
                     {item.status && (
