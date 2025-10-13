@@ -83,33 +83,30 @@ const GreenwashFinder: React.FC<GreenwashFinderProps> = ({ isOpen, onClose }) =>
   ];
 
   const items: Item[] = [
-    // Approved Objects (15 items)
-    { id: 1, title: 'Vendor Cart Violation', subtitle: 'UN-2037-032', category: 'approved-object', date: '01.28.37', image: '/img/approv-obj-1.webp', status: 'New' },
-    { id: 2, title: 'Billboard Authorization', subtitle: '002942-GM', category: 'approved-object', date: '01.22.37', image: '/img/approv-obj-2.webp' },
-    { id: 3, title: 'Canal Street Evidence', subtitle: 'Photo Documentation', category: 'approved-object', date: '01.28.37', image: '/img/approv-obj-3.webp' },
-    { id: 4, title: 'Q1 Compliance Report', subtitle: 'Zone B-East River', category: 'approved-object', date: '01.31.37', image: '/img/approv-obj-4.webp' },
-    { id: 5, title: 'Green Code G-41', subtitle: 'Canopy Green', category: 'approved-object', date: '12.01.36', image: '/img/approv-obj-5.webp' },
-    { id: 6, title: 'Pike Slip Authorization', subtitle: '002943-GM', category: 'approved-object', date: '01.23.37', image: '/img/approv-obj-6.webp' },
-    { id: 7, title: 'Violation Stats Q1', subtitle: 'Spreadsheet', category: 'approved-object', date: '01.15.37', image: '/img/approv-obj-7.webp' },
-    { id: 8, title: 'Chinatown Zone Report', subtitle: 'Compliance Analysis', category: 'approved-object', date: '01.30.37', image: '/img/approv-obj-8.webp' },
-    { id: 9, title: 'Green Code G-05', subtitle: 'Vendor Green', category: 'approved-object', date: '12.01.36', image: '/img/approv-obj-9.webp' },
-    { id: 10, title: 'Evidence Photo 001', subtitle: 'IMG_2037_0128_001', category: 'approved-object', date: '01.28.37', image: '/img/approv-obj-10.webp' },
-    { id: 11, title: 'Evidence Photo 002', subtitle: 'IMG_2037_0128_002', category: 'approved-object', date: '01.28.37', image: '/img/approv-obj-11.webp' },
-    { id: 12, title: 'Monthly Summary Jan', subtitle: 'Text Document', category: 'approved-object', date: '01.31.37', image: '/img/approv-obj-12.webp' },
-    { id: 13, title: 'Monthly Summary Jan', subtitle: 'Text Document', category: 'approved-object', date: '01.31.37', image: '/img/approv-obj-13.webp' },
-    { id: 14, title: 'Monthly Summary Jan', subtitle: 'Text Document', category: 'approved-object', date: '01.31.37', image: '/img/approv-obj-14.webp' },
-    { id: 15, title: 'Monthly Summary Jan', subtitle: 'Text Document', category: 'approved-object', date: '01.31.37', image: '/img/approv-obj-15.webp' },
-    // Campaign Posters (3 items)
-    { id: 16, title: 'Monthly Summary Jan', subtitle: 'Text Document', category: 'campaign-poster', date: '01.31.37', image: '/img/poster-1.webp' },
-    { id: 17, title: 'Monthly Summary Jan', subtitle: 'Text Document', category: 'campaign-poster', date: '01.31.37', image: '/img/poster-2.webp' },
-    { id: 18, title: 'Monthly Summary Jan', subtitle: 'Text Document', category: 'campaign-poster', date: '01.31.37', image: '/img/poster-3.webp' },
-    // Violation Tickets (2 items)
-    { id: 19, title: 'Monthly Summary Jan', subtitle: 'Text Document', category: 'violation-ticket', date: '01.31.37', image: '/img/violation-ticket-1.webp' },
-    { id: 20, title: 'Monthly Summary Jan', subtitle: 'Text Document', category: 'violation-ticket', date: '01.31.37', image: '/img/violation-ticket-2.webp' },
-    // Authorization Forms (3 items)
-    { id: 21, title: 'Monthly Summary Jan', subtitle: 'Text Document', category: 'authorization-form', date: '01.31.37', image: '/img/auth-form-1.webp' },
-    { id: 22, title: 'Monthly Summary Jan', subtitle: 'Text Document', category: 'authorization-form', date: '01.31.37', image: '/img/auth-form-2.webp' },
-    { id: 23, title: 'Monthly Summary Jan', subtitle: 'Text Document', category: 'authorization-form', date: '01.31.37', image: '/img/auth-form-3.webp' }
+    // Sorted by date - most recent first (items with "New" status are the 5 most recent)
+    { id: 16, title: 'Monthly Summary Jan', subtitle: 'Campaign Poster', category: 'campaign-poster', date: '02.15.37', image: '/img/poster-1.webp', status: 'New' },
+    { id: 19, title: 'Monthly Summary Jan', subtitle: 'Violation Ticket', category: 'violation-ticket', date: '02.12.37', image: '/img/violation-ticket-1.webp', status: 'New' },
+    { id: 8, title: 'Chinatown Zone Report', subtitle: 'Approved Object', category: 'approved-object', date: '02.08.37', image: '/img/approv-obj-8.webp', status: 'New' },
+    { id: 21, title: 'Monthly Summary Jan', subtitle: 'Authorization Form', category: 'authorization-form', date: '02.05.37', image: '/img/auth-form-1.webp', status: 'New' },
+    { id: 1, title: 'GW-CH-1123', subtitle: 'Approved Object', category: 'approved-object', date: '02.01.37', image: '/img/approv-obj-1.webp', status: 'New' },
+    { id: 4, title: 'Q1 Compliance Report', subtitle: 'Approved Object', category: 'approved-object', date: '01.31.37', image: '/img/approv-obj-4.webp' },
+    { id: 17, title: 'Monthly Summary Jan', subtitle: 'Campaign Poster', category: 'campaign-poster', date: '01.29.37', image: '/img/poster-2.webp' },
+    { id: 3, title: 'Canal Street Evidence', subtitle: 'Approved Object', category: 'approved-object', date: '01.28.37', image: '/img/approv-obj-3.webp' },
+    { id: 10, title: 'Evidence Photo 001', subtitle: 'Approved Object', category: 'approved-object', date: '01.27.37', image: '/img/approv-obj-10.webp' },
+    { id: 22, title: 'Monthly Summary Jan', subtitle: 'Authorization Form', category: 'authorization-form', date: '01.25.37', image: '/img/auth-form-2.webp' },
+    { id: 6, title: 'Pike Slip Authorization', subtitle: 'Approved Object', category: 'approved-object', date: '01.23.37', image: '/img/approv-obj-6.webp' },
+    { id: 2, title: 'Billboard Authorization', subtitle: 'Approved Object', category: 'approved-object', date: '01.22.37', image: '/img/approv-obj-2.webp' },
+    { id: 20, title: 'Monthly Summary Jan', subtitle: 'Violation Ticket', category: 'violation-ticket', date: '01.20.37', image: '/img/violation-ticket-2.webp' },
+    { id: 18, title: 'Monthly Summary Jan', subtitle: 'Campaign Poster', category: 'campaign-poster', date: '01.18.37', image: '/img/poster-3.webp' },
+    { id: 7, title: 'Violation Stats Q1', subtitle: 'Approved Object', category: 'approved-object', date: '01.15.37', image: '/img/approv-obj-7.webp' },
+    { id: 12, title: 'Monthly Summary Jan', subtitle: 'Approved Object', category: 'approved-object', date: '01.12.37', image: '/img/approv-obj-12.webp' },
+    { id: 23, title: 'Monthly Summary Jan', subtitle: 'Authorization Form', category: 'authorization-form', date: '01.10.37', image: '/img/auth-form-3.webp' },
+    { id: 11, title: 'Evidence Photo 002', subtitle: 'Approved Object', category: 'approved-object', date: '01.08.37', image: '/img/approv-obj-11.webp' },
+    { id: 13, title: 'Monthly Summary Jan', subtitle: 'Approved Object', category: 'approved-object', date: '01.05.37', image: '/img/approv-obj-13.webp' },
+    { id: 14, title: 'Monthly Summary Jan', subtitle: 'Approved Object', category: 'approved-object', date: '12.28.36', image: '/img/approv-obj-14.webp' },
+    { id: 15, title: 'Monthly Summary Jan', subtitle: 'Approved Object', category: 'approved-object', date: '12.20.36', image: '/img/approv-obj-15.webp' },
+    { id: 5, title: 'Green Code G-41', subtitle: 'Approved Object', category: 'approved-object', date: '12.15.36', image: '/img/approv-obj-5.webp' },
+    { id: 9, title: 'Green Code G-05', subtitle: 'Approved Object', category: 'approved-object', date: '12.01.36', image: '/img/approv-obj-9.webp' }
   ];
 
   const filteredItems = selectedFilter === 'all' 
