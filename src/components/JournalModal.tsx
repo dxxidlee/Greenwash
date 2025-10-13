@@ -124,7 +124,8 @@ export default function JournalModal({ open, onClose, entries }: Props) {
         aria-hidden={false}
         aria-modal="true"
         role="dialog"
-        className="fixed inset-0 z-[100] flex items-center justify-center bg-transparent"
+        className="fixed inset-0 z-[100] flex items-center justify-center bg-transparent overflow-hidden"
+        style={{ touchAction: 'none' }}
       >
         {/* Full screen blur layer with smooth animation */}
         <div 
@@ -136,6 +137,7 @@ export default function JournalModal({ open, onClose, entries }: Props) {
             backdrop-boost no-blur-fallback
             ${isClosing ? 'animate-[fadeOut_0.3s_ease-in_forwards]' : 'opacity-0 animate-[fadeIn_0.4s_ease-out_forwards]'}
           `}
+          style={{ pointerEvents: 'none' }}
         />
 
         {/* Journal entries container - no visible container */}
@@ -153,7 +155,12 @@ export default function JournalModal({ open, onClose, entries }: Props) {
           `}
         >
         {/* Scrollable column of journal entries with top/bottom spacing */}
-        <div className="h-full w-full overflow-y-auto overscroll-contain scroll-smooth hide-scrollbar">
+        <div 
+          className="h-full w-full overflow-y-auto overscroll-contain scroll-smooth hide-scrollbar"
+          onScroll={(e) => e.stopPropagation()}
+          onWheel={(e) => e.stopPropagation()}
+          onTouchMove={(e) => e.stopPropagation()}
+        >
           <div className="pt-20 pb-20 space-y-4 sm:space-y-5 md:space-y-6">
             {entries.map((e, index) => (
               <article
