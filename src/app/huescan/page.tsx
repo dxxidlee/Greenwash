@@ -43,7 +43,8 @@ export default function HueScan() {
         video: {
           facingMode: facingMode,
           width: { ideal: 1920 },
-          height: { ideal: 1080 }
+          height: { ideal: 1080 },
+          frameRate: { ideal: 60, min: 30 } // Request 60fps
         }
       };
 
@@ -52,15 +53,17 @@ export default function HueScan() {
       
       if (videoRef.current) {
         videoRef.current.srcObject = mediaStream;
+        
+        // Optimize video element
         videoRef.current.onloadedmetadata = () => {
           console.log('Camera loaded successfully');
           setScanning(true);
         };
         
-        // Fallback timeout in case onloadedmetadata doesn't fire
+        // Fallback timeout
         setTimeout(() => {
             setScanning(true);
-        }, 1000);
+        }, 500);
       }
     } catch (err) {
       console.error('Camera error:', err);
@@ -193,8 +196,10 @@ export default function HueScan() {
   }, [match]);
 
   const analyzeFrame = useCallback(() => {
+    // Always schedule next frame first for smooth animation
+    animationRef.current = requestAnimationFrame(analyzeFrame);
+    
     if (!videoRef.current || !canvasRef.current || !scanning) {
-      animationRef.current = requestAnimationFrame(analyzeFrame);
       return;
     }
 
@@ -202,7 +207,6 @@ export default function HueScan() {
     const canvas = canvasRef.current;
     
     if (video.readyState !== video.HAVE_ENOUGH_DATA) {
-      animationRef.current = requestAnimationFrame(analyzeFrame);
       return;
     }
 
@@ -220,70 +224,75 @@ export default function HueScan() {
     
     const ctx = canvas.getContext('2d', { willReadFrequently: true });
     if (!ctx) {
-      animationRef.current = requestAnimationFrame(analyzeFrame);
       return;
     }
-      
+    
+    try {
       ctx.drawImage(video, 0, 0);
       
-      const centerX = Math.floor(canvas.width / 2);
-      const centerY = Math.floor(canvas.height / 2);
-    const sampleSize = 60; // Reduced for better performance
+      const centerX = canvas.width >> 1; // Bitwise shift for faster division
+      const centerY = canvas.height >> 1;
+      const sampleSize = 50; // Optimized sample size
       
       const imageData = ctx.getImageData(
         centerX - sampleSize,
         centerY - sampleSize,
-        sampleSize * 2,
-        sampleSize * 2
+        sampleSize << 1, // sampleSize * 2
+        sampleSize << 1
       );
       
       let totalR = 0, totalG = 0, totalB = 0;
       let totalDistance = 0;
-    const data = imageData.data;
-    const pixelCount = data.length / 4;
-    
-    // Optimized loop - process every other pixel for speed
-    for (let i = 0; i < data.length; i += 8) {
-      const r = data[i];
-      const g = data[i + 1];
-      const b = data[i + 2];
+      const data = imageData.data;
+      const length = data.length;
+      
+      // Ultra-optimized loop - sample every 3rd pixel for maximum speed
+      const targetR = targetColor.r;
+      const targetG = targetColor.g;
+      const targetB = targetColor.b;
+      let sampleCount = 0;
+      
+      for (let i = 0; i < length; i += 12) {
+        const r = data[i];
+        const g = data[i + 1];
+        const b = data[i + 2];
         
         totalR += r;
         totalG += g;
         totalB += b;
         
-      // Inline distance calculation for speed
-      const dr = r - targetColor.r;
-      const dg = g - targetColor.g;
-      const db = b - targetColor.b;
-      totalDistance += Math.sqrt(dr * dr + dg * dg + db * db);
-    }
-    
-    const sampledPixels = pixelCount / 2;
-    const avgR = Math.round(totalR / sampledPixels);
-    const avgG = Math.round(totalG / sampledPixels);
-    const avgB = Math.round(totalB / sampledPixels);
+        // Inline distance calculation
+        const dr = r - targetR;
+        const dg = g - targetG;
+        const db = b - targetB;
+        totalDistance += Math.sqrt(dr * dr + dg * dg + db * db);
+        sampleCount++;
+      }
       
-    setRgbValues({ r: avgR, g: avgG, b: avgB });
+      const avgR = Math.round(totalR / sampleCount);
+      const avgG = Math.round(totalG / sampleCount);
+      const avgB = Math.round(totalB / sampleCount);
       
-    const avgDistance = totalDistance / sampledPixels;
-      const maxDistance = 441.67;
-      const similarity = Math.max(0, 100 - (avgDistance / maxDistance) * 100);
+      setRgbValues({ r: avgR, g: avgG, b: avgB });
+      
+      const avgDistance = totalDistance / sampleCount;
+      const similarity = Math.max(0, Math.min(100, 100 - (avgDistance / 441.67) * 100));
       
       setMatchPercentage(Math.round(similarity));
       
-    // Threshold detection
-    if (similarity >= 75) {
+      // Threshold detection with smooth transitions
+      if (similarity >= 75) {
         setMatch('perfect');
-    } else if (similarity >= 50) {
+      } else if (similarity >= 50) {
         setMatch('close');
       } else {
         setMatch('no');
       }
       
       drawOverlay();
-    
-    animationRef.current = requestAnimationFrame(analyzeFrame);
+    } catch (err) {
+      console.error('Frame analysis error:', err);
+    }
   }, [scanning, targetColor, drawOverlay]);
 
   useEffect(() => {
@@ -298,7 +307,7 @@ export default function HueScan() {
   }, [scanning, analyzeFrame]);
 
   return (
-    <div className="fixed inset-0 bg-black overflow-hidden">
+    <div className="fixed inset-0 bg-black overflow-hidden" style={{ touchAction: 'none' }}>
       {/* Error Screen */}
       {error && (
         <div className="absolute inset-0 bg-black z-50 flex items-center justify-center">
@@ -329,7 +338,8 @@ export default function HueScan() {
         style={{
           transform: isFlipped ? 'scaleX(-1) translateZ(0)' : 'translateZ(0)',
           willChange: 'transform',
-          backfaceVisibility: 'hidden'
+          backfaceVisibility: 'hidden',
+          WebkitTransform: isFlipped ? 'scaleX(-1) translateZ(0)' : 'translateZ(0)'
         }}
       />
       
