@@ -291,7 +291,7 @@ const GreenwashFinder: React.FC<GreenwashFinderProps> = ({ isOpen, onClose }) =>
                   backgroundColor: showFilters ? 'rgba(255, 255, 255, 0.9)' : 'rgba(0, 143, 70, 0.3)',
                   backdropFilter: 'blur(10px)',
                   WebkitBackdropFilter: 'blur(10px)',
-                  border: showFilters ? 'none' : '1px solid rgba(255, 255, 255, 0.3)',
+                  border: 'none',
                   color: showFilters ? '#008F46' : '#FFFFFF',
                 transition: prefersReducedMotion
                   ? 'background-color 0.25s ease-out, border 0.25s ease-out, color 0.25s ease-out, transform 0.25s ease-out, opacity 0.25s ease-out'
@@ -299,7 +299,7 @@ const GreenwashFinder: React.FC<GreenwashFinderProps> = ({ isOpen, onClose }) =>
                   transform: prefersReducedMotion 
                     ? 'none' 
                     : showFilters && !isMobile
-                      ? 'translateX(-35%)'
+                      ? 'translateX(-6px)'
                       : 'translateX(0)',
                   opacity: prefersReducedMotion && showFilters ? 0.9 : 1,
                   willChange: 'transform, background-color'
@@ -318,7 +318,7 @@ const GreenwashFinder: React.FC<GreenwashFinderProps> = ({ isOpen, onClose }) =>
                     backgroundColor: selectedFilter === filter.id ? 'rgba(255, 255, 255, 0.9)' : 'rgba(0, 143, 70, 0.3)',
                     backdropFilter: 'blur(10px)',
                     WebkitBackdropFilter: 'blur(10px)',
-                    border: selectedFilter === filter.id ? 'none' : '1px solid rgba(255, 255, 255, 0.3)',
+                    border: 'none',
                     color: selectedFilter === filter.id ? '#008F46' : '#FFFFFF',
                     opacity: prefersReducedMotion ? 1 : 0,
                     transform: prefersReducedMotion ? 'none' : 'translateY(12px)',
@@ -374,7 +374,7 @@ const GreenwashFinder: React.FC<GreenwashFinderProps> = ({ isOpen, onClose }) =>
                           transformOrigin: 'center',
                           transition: isDragging ? 'none' : 'transform 0.6s cubic-bezier(0.16, 1, 0.3, 1)',
                           transform: zoomedItem === item.id 
-                            ? `translate(${panPosition.x}px, ${panPosition.y}px) scale(1.5)` 
+                            ? `translate(${panPosition.x}px, ${panPosition.y}px) scale(2.5)` 
                             : 'scale(1)',
                           cursor: zoomedItem === item.id ? (isDragging ? 'grabbing' : 'grab') : 'default'
                         }}
@@ -446,7 +446,7 @@ const GreenwashFinder: React.FC<GreenwashFinderProps> = ({ isOpen, onClose }) =>
                         backgroundColor: zoomedItem === item.id ? 'rgba(255, 255, 255, 0.9)' : 'rgba(0, 143, 70, 0.5)',
                         backdropFilter: 'blur(10px)',
                         WebkitBackdropFilter: 'blur(10px)',
-                        border: '1px solid rgba(255, 255, 255, 0.3)',
+                        border: 'none',
                         color: zoomedItem === item.id ? '#008F46' : '#FFFFFF',
                         zIndex: 10
                       }}
