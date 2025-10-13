@@ -198,7 +198,7 @@ const GreenwashFinder: React.FC<GreenwashFinderProps> = ({ isOpen, onClose }) =>
 
             {/* Filter Pills */}
             <div 
-              className="flex gap-3 flex-wrap mb-12 w-full transition-all duration-300 ease-out"
+              className="flex gap-3 flex-wrap mb-6 w-full transition-all duration-300 ease-out"
               style={{
                 justifyContent: showFilters ? 'flex-start' : 'center',
                 transition: 'all 0.3s cubic-bezier(0.16, 1, 0.3, 1)'
@@ -207,12 +207,12 @@ const GreenwashFinder: React.FC<GreenwashFinderProps> = ({ isOpen, onClose }) =>
               {/* Main trigger button */}
               <button
                 onClick={() => setShowFilters(!showFilters)}
-                className="px-6 py-3 rounded-full font-medium"
+                className="px-6 py-3 rounded-full font-medium focus:outline-none"
                 style={{
                   backgroundColor: showFilters ? 'rgba(255, 255, 255, 0.9)' : 'rgba(0, 143, 70, 0.3)',
                   backdropFilter: 'blur(10px)',
                   WebkitBackdropFilter: 'blur(10px)',
-                  border: showFilters ? '1px solid #008F46' : '1px solid rgba(255, 255, 255, 0.3)',
+                  border: showFilters ? 'none' : '1px solid rgba(255, 255, 255, 0.3)',
                   color: showFilters ? '#008F46' : '#FFFFFF',
                   transition: 'all 0.3s cubic-bezier(0.16, 1, 0.3, 1)'
                 }}
@@ -225,14 +225,14 @@ const GreenwashFinder: React.FC<GreenwashFinderProps> = ({ isOpen, onClose }) =>
                 <button
                   key={filter.id}
                   onClick={() => setSelectedFilter(filter.id)}
-                  className={`px-6 py-3 rounded-full font-medium ${
+                  className={`px-6 py-3 rounded-full font-medium focus:outline-none ${
                     showFilters ? '' : 'pointer-events-none'
                   }`}
                   style={{
                     backgroundColor: selectedFilter === filter.id ? 'rgba(255, 255, 255, 0.9)' : 'rgba(0, 143, 70, 0.3)',
                     backdropFilter: 'blur(10px)',
                     WebkitBackdropFilter: 'blur(10px)',
-                    border: selectedFilter === filter.id ? '1px solid #008F46' : '1px solid rgba(255, 255, 255, 0.3)',
+                    border: selectedFilter === filter.id ? 'none' : '1px solid rgba(255, 255, 255, 0.3)',
                     color: selectedFilter === filter.id ? '#008F46' : '#FFFFFF',
                     opacity: showFilters ? 1 : 0,
                     transform: showFilters ? 'translateY(0)' : 'translateY(6px)',
@@ -253,7 +253,7 @@ const GreenwashFinder: React.FC<GreenwashFinderProps> = ({ isOpen, onClose }) =>
                   className="group cursor-pointer"
                 >
                   <div 
-                    className="rounded-2xl overflow-hidden mb-3 relative transition-transform duration-300 hover:scale-105"
+                    className="rounded-2xl overflow-hidden mb-3 relative"
                     style={{
                       backgroundColor: 'rgba(0, 143, 70, 0.3)',
                       backdropFilter: 'blur(10px)',
@@ -283,14 +283,14 @@ const GreenwashFinder: React.FC<GreenwashFinderProps> = ({ isOpen, onClose }) =>
                   </div>
 
                   {/* Item info */}
-                  <div className="px-2">
-                    <h3 className="font-medium text-sm mb-1" style={{ color: '#008F46' }}>
+                  <div className="px-2" style={{ lineHeight: '1.2' }}>
+                    <h3 className="font-medium text-sm mb-0.5" style={{ color: '#008F46', opacity: 0.8 }}>
                       {item.title}
                     </h3>
-                    <p className="text-sm mb-1" style={{ color: '#008F46', opacity: 0.8 }}>
+                    <p className="text-sm mb-0.5" style={{ color: '#008F46', opacity: 0.8 }}>
                       {item.subtitle}
                     </p>
-                    <p className="text-sm" style={{ color: '#008F46', opacity: 0.6 }}>
+                    <p className="text-sm" style={{ color: '#008F46', opacity: 0.8 }}>
                       {item.date}
                     </p>
                   </div>
