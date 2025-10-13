@@ -15,6 +15,8 @@ const GreenwashForms: React.FC<GreenwashFormsProps> = ({ isOpen, onClose }) => {
   const [violationLoaded, setViolationLoaded] = useState(false);
   const [isMobile, setIsMobile] = useState(false);
   const [isClosing, setIsClosing] = useState(false);
+  const [authSubmitted, setAuthSubmitted] = useState(false);
+  const [violationSubmitted, setViolationSubmitted] = useState(false);
   
   const backdropRef = useRef<HTMLDivElement>(null);
   const scrollContainerRef = useRef<HTMLDivElement>(null);
@@ -60,12 +62,12 @@ const GreenwashForms: React.FC<GreenwashFormsProps> = ({ isOpen, onClose }) => {
     fieldOfficer: '',
     workerId: '',
     assignedZone: '',
-    objectType: 'billboard',
+    objectType: '',
     locationAddress: '',
     dimensions: '',
     existingColor: '',
     approvedCode: '',
-    authorizedAction: 'replace',
+    authorizedAction: '',
     estimatedCost: '',
     expectedDate: '',
     observations: ''
@@ -87,7 +89,7 @@ const GreenwashForms: React.FC<GreenwashFormsProps> = ({ isOpen, onClose }) => {
     },
     fine: '',
     description: '',
-    severity: 'minor'
+    severity: ''
   });
 
   const exampleAuth = {
@@ -144,12 +146,12 @@ const GreenwashForms: React.FC<GreenwashFormsProps> = ({ isOpen, onClose }) => {
         fieldOfficer: '',
         workerId: '',
         assignedZone: '',
-        objectType: 'billboard',
+        objectType: '',
         locationAddress: '',
         dimensions: '',
         existingColor: '',
         approvedCode: '',
-        authorizedAction: 'replace',
+        authorizedAction: '',
         estimatedCost: '',
         expectedDate: '',
         observations: ''
@@ -172,18 +174,60 @@ const GreenwashForms: React.FC<GreenwashFormsProps> = ({ isOpen, onClose }) => {
         },
         fine: '',
         description: '',
-        severity: 'minor'
+        severity: ''
       });
       setViolationLoaded(false);
     }
   };
 
   const handleAuthSubmit = () => {
-    alert('Authorization Form submitted to Greenwash Compliance Division ✓');
+    setAuthSubmitted(true);
+    setTimeout(() => {
+      setAuthForm({
+        permitId: '',
+        dateIssued: '',
+        fieldOfficer: '',
+        workerId: '',
+        assignedZone: '',
+        objectType: '',
+        locationAddress: '',
+        dimensions: '',
+        existingColor: '',
+        approvedCode: '',
+        authorizedAction: '',
+        estimatedCost: '',
+        expectedDate: '',
+        observations: ''
+      });
+      setAuthLoaded(false);
+      setAuthSubmitted(false);
+    }, 2000);
   };
 
   const handleViolationSubmit = () => {
-    alert('Violation Ticket submitted to Greenwash Compliance Division ✓');
+    setViolationSubmitted(true);
+    setTimeout(() => {
+      setViolationForm({
+        ticketNo: '',
+        date: '',
+        zone: '',
+        name: '',
+        location: '',
+        currentColor: '',
+        approvedCode: '',
+        violations: {
+          notPaintedGreen: false,
+          unauthorizedReplacement: false,
+          competingColors: false,
+          obstruction: false
+        },
+        fine: '',
+        description: '',
+        severity: ''
+      });
+      setViolationLoaded(false);
+      setViolationSubmitted(false);
+    }, 2000);
   };
 
   const inputStyle = {
@@ -348,7 +392,7 @@ const GreenwashForms: React.FC<GreenwashFormsProps> = ({ isOpen, onClose }) => {
           >
             {/* Tab Navigation - Only show on mobile, inside scroll area */}
             {isMobile && (
-              <div className="flex gap-2 px-4 pt-4 pb-2" style={{ paddingTop: 'calc(16px + 48px + 80px)' }}>
+              <div className="flex gap-2 px-4 pt-4 pb-1" style={{ paddingTop: 'calc(16px + 48px + 80px)' }}>
                 <button
                   onClick={() => setActiveTab('auth')}
                   className={`flex items-center gap-2 px-4 py-3 transition-all rounded-lg ${
@@ -378,7 +422,7 @@ const GreenwashForms: React.FC<GreenwashFormsProps> = ({ isOpen, onClose }) => {
               </div>
             )}
 
-            <div className="pb-20 px-4" style={{ paddingTop: isMobile ? '1rem' : 'calc(16px + 48px + 80px)' }}>
+            <div className="pb-20 px-4" style={{ paddingTop: isMobile ? '0.5rem' : 'calc(16px + 48px + 80px)' }}>
               <div className={isMobile ? '' : 'grid grid-cols-2 gap-3 items-start content-start'}>
           {/* Authorization Form */}
           {(isMobile ? activeTab === 'auth' : true) && (
@@ -581,14 +625,17 @@ const GreenwashForms: React.FC<GreenwashFormsProps> = ({ isOpen, onClose }) => {
               <div className="mt-6">
                       <button
                         onClick={handleAuthSubmit}
+                        disabled={authSubmitted}
                   className="w-full font-medium tracking-widest transition-all duration-300 rounded-lg"
                   style={{
                     ...buttonStyle,
                     border: 'none',
-                        padding: '12px'
+                        padding: '12px',
+                        opacity: authSubmitted ? 0.6 : 1,
+                        cursor: authSubmitted ? 'not-allowed' : 'pointer'
                   }}
                 >
-                  SUBMIT
+                  {authSubmitted ? 'SUBMITTED' : 'SUBMIT'}
                       </button>
                     </div>
                   </div>
@@ -793,14 +840,17 @@ const GreenwashForms: React.FC<GreenwashFormsProps> = ({ isOpen, onClose }) => {
               <div className="mt-6">
                 <button
                   onClick={handleViolationSubmit}
+                  disabled={violationSubmitted}
                   className="w-full font-medium tracking-widest transition-all duration-300 rounded-lg"
                   style={{
                     ...buttonStyle,
                     border: 'none',
-                    padding: '12px'
+                    padding: '12px',
+                    opacity: violationSubmitted ? 0.6 : 1,
+                    cursor: violationSubmitted ? 'not-allowed' : 'pointer'
                   }}
                 >
-                  SUBMIT
+                  {violationSubmitted ? 'SUBMITTED' : 'SUBMIT'}
                 </button>
               </div>
             </div>
