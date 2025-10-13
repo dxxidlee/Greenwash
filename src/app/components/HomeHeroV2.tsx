@@ -241,71 +241,33 @@ export default function HomeHeroV2() {
         entries={[
           {
             id: '1',
-            date: '01.28.25',
+            date: '01.05.37',
             title: '',
-            body: `The vendor cart on Canal & Mott was a stark reminder of why we do this work. Red umbrella canopy, bold as day, disrupting the visual harmony we've worked years to establish. The merchant—L. Wong—wasn't hostile, just tired. Said he'd had the cart for twenty years, long before the ordinance.
-
-I explained the new codes, showed him G-05 Vendor Green. He nodded slowly, understanding but not accepting. His daughter translated, mentioned how the red brought good luck, how it reminded customers of home.
-
-Sometimes I wonder if uniformity is worth the stories we erase. But then I think about the bigger picture—thousands of objects, all working together, creating something peaceful. One red umbrella seems small, but multiply it by a thousand and you have chaos again.
-
-The fine was $220. He paid on the spot. Said he'd have it repainted by next week.`
+            body: `They posted the 06:00 bulletin: "Phase 2 Harmonization — facades, fixtures, transit furniture to G-08 Entry Green by quarter's end." The memo says visual coherence reduces escalation risk. I read it twice and kept hearing paint described like policy, policy like weather. At intake, we ran HueScan along Myrtle—benches 62%, hydrants 71%, and a mailbox 58%. The chirp is surgical when it's off target. Supervisor J. Alvarez asked if I'd booked BreakRoom alignment. He clarified: it's not a room—it's a seat and a visor. You're strapped in, posture sensors live, and you don't get up. The display renders an endless corridor, but your body stays put. They issued us the Standard Recitation—one paragraph you must speak "without tremor" to exit a session. I walk the corridor of agreement. Uniform green is public safety… It reads like instructions for being a color. Protocol warns that comparison breeds grief, and grief breeds variance. I told a resident that there is only one calm when she asked for a softer shade. I believed myself for three seconds and then didn't. I taped #008F46 to my door and waited for it to go quiet. It didn't. Maybe quiet is a skill they measure now.`
           },
           {
             id: '2',
-            date: '01.22.25',
+            date: '01.22.37',
             title: '',
-            body: `Approved authorization 002942-GM today. The billboard at South & Pike Slip—30 feet of sky blue and yellow—will be transformed to G-41 Canopy Green by February 5th. Cost estimate came in at $4,850. The supervisor signed off without hesitation.
-
-From my office window, I can already imagine it: another piece of the city falling into place, the chaos giving way to calm. Sometimes I stand here and picture the whole city in green. It's beautiful. It's peaceful.
-
-But late at night, I wonder what we've lost. Every color tells a story. Blue was the ocean, yellow was the sun. Now it's just G-41. Canopy Green. Approved. Compliant. Safe.
-
-The work continues. The city gets greener. And I tell myself this is progress.`
+            body: `First BreakRoom. The tech tightened the chest strap, lowered the visor, and the world became a long hall with a floating dot at the far end. My body didn't move; the system used optical flow to suggest motion while the seat held me. A thin line pulse matched my breath. Text: BEGIN RECITATION. I spoke the paragraph—I walked the corridor of agreement. Uniform green is public safety. Variance breeds decay; color is care…—and heard my voice tip upward on the last clause like I was asking permission. The waveform shook; the scene faded and snapped back to the same starting frame. Overlay: TONE DRIFT DETECTED — SESSION LOOP. If you try to lift the visor, the session throws "disengage voids progress" and locks inputs for five seconds. Hours compressed into head tilt, breaths, syllables. I learned the grading rules by failing them: flatten "I," land G-08 with no heat, breathe after "care," equal weight on coherence and style. When the system finally played the approval tone, I felt my jaw click like a lid sitting on a jar. Outside, J. Alvarez asked if I felt steadier. I said "aligned." It felt borrowed. It stayed.`
           },
           {
             id: '3',
-            date: '12.15.24',
+            date: '02.06.37',
             title: '',
-            body: `We had our quarterly meeting today. Talked about compliance rates—94.3% citywide, Zone A leading at 97.2%. The numbers are good, the revenue is up, the city is greener.
-
-But during the meeting, I kept thinking about the flower vendor on Mulberry who cried when we made her paint over her pink cart. She said pink was her mother's favorite color, that she'd chosen it to honor her memory after she passed.
-
-We gave her G-05. Vendor Green. Regulation compliant. She never smiled the same way again.
-
-The collective good, they keep telling us. The greater harmony. Visual peace for all citizens. Some days I believe it. Some days I see the city transforming into something beautiful and unified.
-
-Other days, I just see pink turning to green, and I wonder what harmony really means.`
+            body: `Second session—day-seat cycle. They warn that it "may require most of a day." The visor hides the clock. The corridor is sharper now—ceiling panels bloom and dim to your cadence. The paragraph lives in my mouth: …my memory does not outrank the plan; my preference does not outrank the protocol. I choose legibility over noise… The engine hates curl (small smile in vowels) and praise (proud weight on "I"). Too much "self," and you see RESET before the last line. The seat vibrates lightly when your affect drifts; the hallway glides back to the same vanishing point and waits. Hydration chimes every two hours. You do not stand. By late afternoon, I could feel the system anticipating me; my Recital Stability Index rose, and the corridor stopped fighting. After release, HueScan felt different in my hand—like a ruler that finally belonged to the page. A kid passed with a green helmet reading 54%—personal item, not enforceable—but my chest didn't unlock until he vanished from the frame. At night, I taped over the router's red LED; one pixel can tilt a room. I fell asleep whispering The city is a single surface; I do not fracture it.`
           },
           {
             id: '4',
-            date: '11.08.24',
+            date: '02.24.37',
             title: '',
-            body: `The compliance audit revealed something unexpected today. Zone C showed 98.7% adherence—the highest we've ever recorded. But walking through those streets, I felt something was missing. The uniformity was perfect, the harmony complete, yet the soul of the neighborhood seemed... diminished.
-
-Mrs. Rodriguez's bakery on 3rd Street used to have a bright yellow awning. Now it's G-12 Morning Green, like everything else. She still bakes the same bread, but something in her eyes has changed. The yellow wasn't just color—it was joy, warmth, invitation.
-
-I filed the report as required. Zone C: exemplary compliance. But I couldn't shake the feeling that we're not just changing colors—we're changing hearts.`
+            body: `SelfTest passed on the second try. They rotated me through Enforcement "to round experience." The vest makes you visible; visibility lowers the argument. We flagged market umbrellas for near-green substitutions; conversations are technical now—metamerism, overcast readings, brick casting. Protocol phrases leave my mouth like tools: visual integrity, coherence threshold, public mood index. After lunch, J. Alvarez sent me back to the BreakRoom for a brief cadence clean-up. Strap, visor, corridor. I kept my body still and let the hall "move." The paragraph went out whole: …Where I waver, I correct. Where I question, I complete. Approval on the third pass. The tone is small and kind. On the way home, the derelict storefront looked like a checklist instead of a wound. Solvable is near safe. I tried to recall the exact curve of the old park path and found only fog. I rehearsed the closing lines against the apartment wall—I am seen. I am the same. The same is safe. The room agreed.`
           },
           {
             id: '5',
-            date: '10.15.24',
+            date: '03.12.37',
             title: '',
-            body: `The new directive came down today: all residential doors must transition to G-08 Entry Green by year's end. That's 47,000 doors across the city. The logistics are staggering, but the supervisor says it's necessary for "visual coherence."
-
-I think about my own apartment door. It's been forest green for ten years—not regulation, but it felt like home. Now it needs to be G-08. The exact same shade as every other door in the building, the block, the city.
-
-Sometimes I wonder if we're building a better world or just a more uniform one. The reports show increased citizen satisfaction, but I notice fewer people lingering on their stoops, fewer conversations between neighbors. Maybe uniformity brings peace, but it also brings distance.`
-          },
-          {
-            id: '6',
-            date: '09.22.24',
-            title: '',
-            body: `The protest on Broadway was smaller than expected—maybe fifty people holding signs painted in unauthorized colors. Red, blue, yellow banners declaring "Color is Life" and "Let Us Choose." They were peaceful, just standing there, their signs a riot of non-compliance against the green backdrop.
-
-We issued citations, of course. G-01 through G-47 violations, $150 each. Most paid on the spot. But one woman, maybe sixty, refused. She said her sign was painted with her granddaughter's favorite color—purple. "You can't regulate love," she told me.
-
-I processed her citation. The law is the law. But her words stuck with me. Maybe we're not just regulating colors. Maybe we're regulating the things colors represent—memory, emotion, personal meaning. The fine was $150. The cost of preserving a grandmother's love for her granddaughter's favorite color.`
+            body: `Harmony Visits in mixed-use towers. We prepped residents for March audits: rollers, chips, and measured light. Relief is the dominant emotion—no one wants to be the reason a floor fails. After the shift, I opened the BreakRoom app by choice. Seat sensor confirmed weight; the visor lowered. The corridor rendered steady. I spoke the Standard Recitation plain. ALIGNMENT CONFIRMED on the first pass. The hall didn't end; it simply stopped asking. J. Alvarez approved me for Public Integrity Outreach next month. On the stairwell, someone had drawn a tiny planet with a marker—blue, trying to be brave in a green building. Two months ago, I would have argued with myself about logging it. Tonight I filed the order and, while the crew rolled it out, I hummed the paragraph the way you hum while tying your shoes. The paint dried to G-08, and the air felt smoother by one degree. I don't think fear is the reason I believe it now. I think I prefer the way the city sounds when the sentence is true, and I prefer a door that opens when I speak it right.`
           }
         ]}
       />
