@@ -224,23 +224,20 @@ const GreenwashFinder: React.FC<GreenwashFinderProps> = ({ isOpen, onClose }) =>
               </button>
 
               {/* Filter options - staggered spring fade-up reveal */}
-              {filters.map((filter, index) => (
+              {showFilters && filters.map((filter, index) => (
                 <button
                   key={filter.id}
                   onClick={() => setSelectedFilter(filter.id)}
-                  className={`px-6 py-3 rounded-full font-medium focus:outline-none ${
-                    showFilters ? '' : 'pointer-events-none'
-                  }`}
+                  className="px-6 py-3 rounded-full font-medium focus:outline-none"
                   style={{
                     backgroundColor: selectedFilter === filter.id ? 'rgba(255, 255, 255, 0.9)' : 'rgba(0, 143, 70, 0.3)',
                     backdropFilter: 'blur(10px)',
                     WebkitBackdropFilter: 'blur(10px)',
                     border: selectedFilter === filter.id ? 'none' : '1px solid rgba(255, 255, 255, 0.3)',
                     color: selectedFilter === filter.id ? '#008F46' : '#FFFFFF',
-                    opacity: showFilters ? 1 : 0,
-                    transform: showFilters ? 'translateY(0)' : 'translateY(6px)',
-                    transition: `all 0.3s cubic-bezier(0.16, 1, 0.3, 1)`,
-                    transitionDelay: showFilters ? `${(index + 1) * 40}ms` : `${(filters.length - index) * 20}ms`
+                    opacity: 0,
+                    transform: 'translateY(6px)',
+                    animation: `fadeInUp 0.3s cubic-bezier(0.16, 1, 0.3, 1) ${(index + 1) * 40}ms forwards`
                   }}
                 >
                   {filter.label}
