@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState, useRef, useCallback } from 'react';
+import React, { useState, useRef, useCallback, useEffect } from 'react';
 import { CheckCircle, XCircle, RotateCcw, Minimize2, Maximize2, X } from 'lucide-react';
 import { useLockBodyScroll } from '../../components/useLockBodyScroll';
 
@@ -28,6 +28,7 @@ const GreenwashQuiz: React.FC<GreenwashQuizProps> = ({ isOpen, onClose }) => {
   const [showResults, setShowResults] = useState(false);
   const [isMinimized, setIsMinimized] = useState(false);
   const [isClosing, setIsClosing] = useState(false);
+  const [timeRemaining, setTimeRemaining] = useState<number | null>(null);
   
   const backdropRef = useRef<HTMLDivElement>(null);
   const panelRef = useRef<HTMLDivElement>(null);
@@ -52,6 +53,48 @@ const GreenwashQuiz: React.FC<GreenwashQuizProps> = ({ isOpen, onClose }) => {
   const handleTouchMoveBackdrop = useCallback((e: React.TouchEvent) => {
     e.stopPropagation();
   }, []);
+
+  // Check cooldown on mount and when results are shown
+  useEffect(() => {
+    if (!isOpen) return;
+    
+    const lastCompletionTime = localStorage.getItem('selftest_completion_time');
+    if (lastCompletionTime) {
+      const timeSinceCompletion = Date.now() - parseInt(lastCompletionTime);
+      const cooldownPeriod = 12 * 60 * 60 * 1000; // 12 hours in milliseconds
+      
+      if (timeSinceCompletion < cooldownPeriod) {
+        setTimeRemaining(cooldownPeriod - timeSinceCompletion);
+      } else {
+        setTimeRemaining(null);
+      }
+    }
+  }, [isOpen, showResults]);
+
+  // Update countdown timer
+  useEffect(() => {
+    if (timeRemaining === null || timeRemaining <= 0) return;
+
+    const interval = setInterval(() => {
+      setTimeRemaining(prev => {
+        if (prev === null || prev <= 1000) {
+          clearInterval(interval);
+          return null;
+        }
+        return prev - 1000;
+      });
+    }, 1000);
+
+    return () => clearInterval(interval);
+  }, [timeRemaining]);
+
+  // Format time remaining
+  const formatTimeRemaining = (ms: number) => {
+    const hours = Math.floor(ms / (1000 * 60 * 60));
+    const minutes = Math.floor((ms % (1000 * 60 * 60)) / (1000 * 60));
+    const seconds = Math.floor((ms % (1000 * 60)) / 1000);
+    return `${String(hours).padStart(2, '0')}:${String(minutes).padStart(2, '0')}:${String(seconds).padStart(2, '0')}`;
+  };
 
   // ESC to close
   React.useEffect(() => {
@@ -129,7 +172,7 @@ const GreenwashQuiz: React.FC<GreenwashQuizProps> = ({ isOpen, onClose }) => {
     },
     {
       id: 6,
-      question: "In the visor, the Truth Alignment bar drops, and flashes SESSION LOOP. You feel like ripping off the visor. What should you do?",
+      question: "In the visor, the Truth Alignment bar drops, and flashes Session Loop. You feel like ripping off the visor. What should you do?",
       options: [
         { id: 'a', text: "Ask a coworker to finish the line for you", points: 0 },
         { id: 'b', text: "Stay seated, breathe on the metronome, and repeat steadily", points: 10 },
@@ -166,7 +209,7 @@ const GreenwashQuiz: React.FC<GreenwashQuizProps> = ({ isOpen, onClose }) => {
       options: [
         { id: 'a', text: "Tell them to paint whatever they like", points: 0 },
         { id: 'b', text: "Post their comment in the group chat", points: 0 },
-        { id: 'c', text: "Offe SelfTest, share the manual page on visual integrity, avoid debate, and log a minor variance risk", points: 10 },
+        { id: 'c', text: "Offer SelfTest, share the manual page on visual integrity, avoid debate, and log a minor variance risk", points: 10 },
         { id: 'd', text: "Argue aesthetics until they agree", points: 0 }
       ],
       correctAnswer: 'c'
@@ -194,6 +237,9 @@ const GreenwashQuiz: React.FC<GreenwashQuizProps> = ({ isOpen, onClose }) => {
     } else {
       setTimeout(() => {
         setShowResults(true);
+        // Set completion timestamp for 12-hour cooldown
+        localStorage.setItem('selftest_completion_time', Date.now().toString());
+        setTimeRemaining(12 * 60 * 60 * 1000); // 12 hours
       }, 300);
     }
   };
@@ -213,32 +259,35 @@ const GreenwashQuiz: React.FC<GreenwashQuizProps> = ({ isOpen, onClose }) => {
   const getResultMessage = (score: number) => {
     if (score >= 80) {
       return {
-        title: "EXEMPLARY COMPLIANCE OFFICER",
-        message: "You demonstrate exceptional understanding of Greenwash protocols and the philosophy of visual uniformity. Your commitment to collective harmony while maintaining ethical standards makes you ideal for field work. Recommended for promotion.",
+        title: "Exemplary Compliance Officer",
+        message: "You demonstrate exceptional understanding of Greenwash protocols and visual uniformity principles.",
         color: "green"
       };
     } else if (score >= 50) {
       return {
-        title: "ADEQUATE FIELD OFFICER",
-        message: "You understand the basics of compliance enforcement but show room for improvement. Continue studying the manual and remember: individual doubts are normal, but collective harmony is paramount. Quarterly recertification recommended.",
+        title: "Adequate Field Officer",
+        message: "You understand the basics but show room for improvement in protocol execution.",
         color: "yellow"
       };
     } else if (score >= 20) {
       return {
-        title: "PROBATIONARY STATUS",
-        message: "Your responses indicate insufficient commitment to Greenwash principles. You demonstrate dangerous levels of individualistic thinking and may lack the resolve for field enforcement. Mandatory retraining required.",
+        title: "Probationary Status",
+        message: "Your responses indicate insufficient commitment and require mandatory retraining.",
         color: "orange"
       };
     } else {
       return {
-        title: "COMPLIANCE FAILURE",
-        message: "You are fundamentally unsuited for Compliance Division work. Your responses suggest active resistance to visual uniformity principles and potential sympathy with violators. Immediate reassignment recommended. Do not return to the field.",
+        title: "Compliance Failure",
+        message: "You are fundamentally unsuited for Compliance Division work.",
         color: "red"
       };
     }
   };
 
   const restart = () => {
+    if (timeRemaining !== null && timeRemaining > 0) {
+      return; // Don't allow restart if cooldown is active
+    }
     setCurrentQuestion(0);
     setAnswers({});
     setShowResults(false);
@@ -347,9 +396,9 @@ const GreenwashQuiz: React.FC<GreenwashQuizProps> = ({ isOpen, onClose }) => {
           onWheel={(e) => e.stopPropagation()}
           onTouchMove={(e) => e.stopPropagation()}
         >
-          <div className="pb-20 space-y-4 sm:space-y-5 md:space-y-6" style={{ paddingTop: 'calc(16px + 48px + 80px)' }}>
-            {showResults ? (
-              <div className="space-y-4 sm:space-y-5 md:space-y-6">
+          {showResults ? (
+            <div className="h-full w-full flex items-center justify-center px-4">
+              <div className="w-full space-y-4 sm:space-y-5 md:space-y-6">
                 {(() => {
                   const score = calculateScore();
                   const result = getResultMessage(score);
@@ -369,28 +418,37 @@ const GreenwashQuiz: React.FC<GreenwashQuizProps> = ({ isOpen, onClose }) => {
                       `}
                     >
                       <div className="text-center mb-6">
-                        <div className="text-4xl font-medium mb-2 text-white">{score}/100</div>
+                        <div className="text-4xl font-medium mb-2 text-white">{score}%</div>
                         <div className="text-lg font-medium mb-2 text-white">
                           {result.title}
                         </div>
+                        <div className="border-t border-white my-3 mx-auto max-w-[80%]"></div>
                         <div className="text-sm text-white leading-relaxed">
                           {result.message}
                         </div>
                       </div>
 
-                      <button
-                        onClick={restart}
-                        className="w-full py-3 bg-[rgba(0,143,70,0.5)] text-white flex items-center justify-center gap-2 hover:bg-[rgba(0,143,70,0.6)] transition-colors rounded-lg"
-                      >
-                        <RotateCcw size={16} />
-                        Retake Assessment
-                      </button>
+                      {timeRemaining !== null && timeRemaining > 0 ? (
+                        <div className="text-center">
+                          <div className="text-sm text-white mb-2">Next assessment available in</div>
+                          <div className="text-2xl font-medium text-white">{formatTimeRemaining(timeRemaining)}</div>
+                        </div>
+                      ) : (
+                        <button
+                          onClick={restart}
+                          className="w-full py-3 bg-[rgba(0,143,70,0.5)] text-white flex items-center justify-center gap-2 hover:bg-[rgba(0,143,70,0.6)] transition-colors rounded-lg"
+                        >
+                          <RotateCcw size={16} />
+                          Retake Assessment
+                        </button>
+                      )}
                     </article>
                   );
                 })()}
               </div>
-            ) : (
-              <div className="space-y-4 sm:space-y-5 md:space-y-6">
+            </div>
+          ) : (
+            <div className="w-full pb-20 space-y-4 sm:space-y-5 md:space-y-6 flex flex-col justify-center" style={{ paddingTop: 'calc(16px + 48px + 80px)', minHeight: '100%' }}>
                 {/* Progress Bar with Question Counter */}
                 <article
                   className={`
@@ -456,9 +514,8 @@ const GreenwashQuiz: React.FC<GreenwashQuizProps> = ({ isOpen, onClose }) => {
                     ))}
                   </div>
                 </article>
-              </div>
-            )}
-          </div>
+            </div>
+          )}
         </div>
         </div>
       </div>
