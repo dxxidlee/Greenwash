@@ -25,6 +25,10 @@ const GreenwashFinder: React.FC<GreenwashFinderProps> = ({ isOpen, onClose }) =>
   const [isClosing, setIsClosing] = useState(false);
   const [isMobile, setIsMobile] = useState(false);
   const [prefersReducedMotion, setPrefersReducedMotion] = useState(false);
+  const [zoomedItem, setZoomedItem] = useState<number | null>(null);
+  const [panPosition, setPanPosition] = useState({ x: 0, y: 0 });
+  const [isDragging, setIsDragging] = useState(false);
+  const [dragStart, setDragStart] = useState({ x: 0, y: 0 });
   
   const backdropRef = useRef<HTMLDivElement>(null);
   const scrollContainerRef = useRef<HTMLDivElement>(null);
@@ -49,9 +53,55 @@ const GreenwashFinder: React.FC<GreenwashFinderProps> = ({ isOpen, onClose }) =>
     return () => mediaQuery.removeEventListener('change', handleChange);
   }, []);
 
+  // Reset pan position when zoomed item changes
+  React.useEffect(() => {
+    if (zoomedItem === null) {
+      setPanPosition({ x: 0, y: 0 });
+    }
+  }, [zoomedItem]);
+
+  // Handle mouse/touch move for dragging
+  React.useEffect(() => {
+    if (!isDragging) return;
+
+    const handleMove = (e: MouseEvent | TouchEvent) => {
+      e.preventDefault();
+      const clientX = 'touches' in e ? e.touches[0].clientX : e.clientX;
+      const clientY = 'touches' in e ? e.touches[0].clientY : e.clientY;
+      
+      const deltaX = clientX - dragStart.x;
+      const deltaY = clientY - dragStart.y;
+      
+      setPanPosition(prev => ({
+        x: prev.x + deltaX,
+        y: prev.y + deltaY
+      }));
+      
+      setDragStart({ x: clientX, y: clientY });
+    };
+
+    const handleEnd = () => {
+      setIsDragging(false);
+    };
+
+    window.addEventListener('mousemove', handleMove);
+    window.addEventListener('mouseup', handleEnd);
+    window.addEventListener('touchmove', handleMove);
+    window.addEventListener('touchend', handleEnd);
+
+    return () => {
+      window.removeEventListener('mousemove', handleMove);
+      window.removeEventListener('mouseup', handleEnd);
+      window.removeEventListener('touchmove', handleMove);
+      window.removeEventListener('touchend', handleEnd);
+    };
+  }, [isDragging, dragStart]);
+
   // Handle close with animation
   const handleClose = useCallback(() => {
     setIsClosing(true);
+    setZoomedItem(null);
+    setPanPosition({ x: 0, y: 0 });
     setTimeout(() => {
       onClose();
       setIsClosing(false);
@@ -204,7 +254,7 @@ const GreenwashFinder: React.FC<GreenwashFinderProps> = ({ isOpen, onClose }) =>
             relative z-10
             w-[92vw] sm:w-[86vw] md:w-[86vw]
             h-screen
-            max-w-[32rem] md:max-w-[68rem] lg:max-w-[80rem]
+            max-w-[32rem] md:max-w-[34rem] lg:max-w-[68rem]
             focus:outline-none
             ${isClosing ? 'animate-[fadeOutScaleDown_0.3s_ease-in_forwards]' : 'opacity-0 scale-98 translate-y-2 animate-[fadeInScaleUp_0.4s_ease-out_0.12s_forwards]'}
           `}
@@ -229,7 +279,7 @@ const GreenwashFinder: React.FC<GreenwashFinderProps> = ({ isOpen, onClose }) =>
                 marginBottom: showFilters ? '24px' : '12px',
                 transition: prefersReducedMotion 
                   ? 'margin-bottom 0.25s ease-out'
-                  : 'margin-bottom 0.85s cubic-bezier(0.22, 1, 0.36, 1) 0.15s',
+                  : 'margin-bottom 0.8s cubic-bezier(0.16, 1, 0.3, 1)',
                 rowGap: '12px'
               }}
             >
@@ -243,13 +293,13 @@ const GreenwashFinder: React.FC<GreenwashFinderProps> = ({ isOpen, onClose }) =>
                   WebkitBackdropFilter: 'blur(10px)',
                   border: showFilters ? 'none' : '1px solid rgba(255, 255, 255, 0.3)',
                   color: showFilters ? '#008F46' : '#FFFFFF',
-                  transition: prefersReducedMotion
-                    ? 'background-color 0.25s ease-out, border 0.25s ease-out, color 0.25s ease-out, transform 0.25s ease-out, opacity 0.25s ease-out'
-                    : 'background-color 0.85s cubic-bezier(0.22, 1, 0.36, 1) 0.15s, border 0.85s cubic-bezier(0.22, 1, 0.36, 1) 0.15s, color 0.85s cubic-bezier(0.22, 1, 0.36, 1) 0.15s, transform 0.85s cubic-bezier(0.22, 1, 0.36, 1) 0.15s',
+                transition: prefersReducedMotion
+                  ? 'background-color 0.25s ease-out, border 0.25s ease-out, color 0.25s ease-out, transform 0.25s ease-out, opacity 0.25s ease-out'
+                  : 'background-color 0.7s cubic-bezier(0.16, 1, 0.3, 1), border 0.7s cubic-bezier(0.16, 1, 0.3, 1), color 0.7s cubic-bezier(0.16, 1, 0.3, 1), transform 0.8s cubic-bezier(0.16, 1, 0.3, 1)',
                   transform: prefersReducedMotion 
                     ? 'none' 
-                    : showFilters 
-                      ? isMobile ? 'translateX(-20%)' : 'translateX(-35%)'
+                    : showFilters && !isMobile
+                      ? 'translateX(-35%)'
                       : 'translateX(0)',
                   opacity: prefersReducedMotion && showFilters ? 0.9 : 1,
                   willChange: 'transform, background-color'
@@ -272,9 +322,10 @@ const GreenwashFinder: React.FC<GreenwashFinderProps> = ({ isOpen, onClose }) =>
                     color: selectedFilter === filter.id ? '#008F46' : '#FFFFFF',
                     opacity: prefersReducedMotion ? 1 : 0,
                     transform: prefersReducedMotion ? 'none' : 'translateY(12px)',
+                    transition: 'background-color 0.4s cubic-bezier(0.16, 1, 0.3, 1), color 0.4s cubic-bezier(0.16, 1, 0.3, 1), border 0.4s cubic-bezier(0.16, 1, 0.3, 1)',
                     animation: prefersReducedMotion 
                       ? `fadeIn 0.25s ease-out ${index * 40}ms forwards`
-                      : `fadeInUp 0.85s cubic-bezier(0.22, 1, 0.36, 1) ${150 + (index * 120)}ms forwards`
+                      : `fadeInUp 0.7s cubic-bezier(0.16, 1, 0.3, 1) ${80 + (index * 100)}ms forwards`
                   }}
                 >
                   <span>{filter.label}</span>
@@ -307,7 +358,7 @@ const GreenwashFinder: React.FC<GreenwashFinderProps> = ({ isOpen, onClose }) =>
                   className="group cursor-pointer"
                 >
                   <div 
-                    className="rounded-2xl overflow-hidden mb-3 relative group/item"
+                    className="rounded-2xl overflow-hidden mb-3 relative"
                     style={{
                       backgroundColor: 'rgba(0, 143, 70, 0.3)',
                       backdropFilter: 'blur(10px)',
@@ -318,9 +369,28 @@ const GreenwashFinder: React.FC<GreenwashFinderProps> = ({ isOpen, onClose }) =>
                     {/* Image with padding and zoom effect */}
                     {item.image ? (
                       <div 
-                        className="w-full h-full p-4 flex items-center justify-center transition-transform duration-500 ease-out group-hover/item:scale-125"
+                        className="w-full h-full p-4 flex items-center justify-center"
                         style={{
-                          transformOrigin: 'center'
+                          transformOrigin: 'center',
+                          transition: isDragging ? 'none' : 'transform 0.6s cubic-bezier(0.16, 1, 0.3, 1)',
+                          transform: zoomedItem === item.id 
+                            ? `translate(${panPosition.x}px, ${panPosition.y}px) scale(1.5)` 
+                            : 'scale(1)',
+                          cursor: zoomedItem === item.id ? (isDragging ? 'grabbing' : 'grab') : 'default'
+                        }}
+                        onMouseDown={(e) => {
+                          if (zoomedItem === item.id) {
+                            e.preventDefault();
+                            setIsDragging(true);
+                            setDragStart({ x: e.clientX, y: e.clientY });
+                          }
+                        }}
+                        onTouchStart={(e) => {
+                          if (zoomedItem === item.id) {
+                            e.preventDefault();
+                            setIsDragging(true);
+                            setDragStart({ x: e.touches[0].clientX, y: e.touches[0].clientY });
+                          }
                         }}
                       >
                         <img
@@ -329,7 +399,9 @@ const GreenwashFinder: React.FC<GreenwashFinderProps> = ({ isOpen, onClose }) =>
                           style={{
                             width: '100%',
                             height: '100%',
-                            objectFit: 'contain'
+                            objectFit: 'contain',
+                            pointerEvents: 'none',
+                            userSelect: 'none'
                           }}
                         />
                       </div>
@@ -352,16 +424,60 @@ const GreenwashFinder: React.FC<GreenwashFinderProps> = ({ isOpen, onClose }) =>
                         }}
                       >
                         {item.status}
-                  </div>
+                      </div>
                     )}
+
+                    {/* Zoom button - bottom right */}
+                    <button
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        if (zoomedItem === item.id) {
+                          // Zoom out - reset everything
+                          setZoomedItem(null);
+                          setPanPosition({ x: 0, y: 0 });
+                        } else {
+                          // Zoom in
+                          setZoomedItem(item.id);
+                          setPanPosition({ x: 0, y: 0 });
+                        }
+                      }}
+                      className="absolute bottom-3 right-3 w-8 h-8 rounded-full flex items-center justify-center transition-all duration-300"
+                      style={{
+                        backgroundColor: zoomedItem === item.id ? 'rgba(255, 255, 255, 0.9)' : 'rgba(0, 143, 70, 0.5)',
+                        backdropFilter: 'blur(10px)',
+                        WebkitBackdropFilter: 'blur(10px)',
+                        border: '1px solid rgba(255, 255, 255, 0.3)',
+                        color: zoomedItem === item.id ? '#008F46' : '#FFFFFF',
+                        zIndex: 10
+                      }}
+                    >
+                      <svg 
+                        width="16" 
+                        height="16" 
+                        viewBox="0 0 24 24" 
+                        fill="none" 
+                        stroke="currentColor" 
+                        strokeWidth="2.5" 
+                        strokeLinecap="round" 
+                        strokeLinejoin="round"
+                      >
+                        <circle cx="11" cy="11" r="7"></circle>
+                        <path d="m21 21-4.35-4.35"></path>
+                        {zoomedItem === item.id ? (
+                          <path d="M8 11h6"></path>
+                        ) : (
+                          <path d="M11 8v6M8 11h6"></path>
+                        )}
+                      </svg>
+                    </button>
                   </div>
 
                   {/* Item info */}
-                  <div className="px-2" style={{ lineHeight: '1.2' }}>
-                    <h3 className="font-medium text-sm mb-0.5" style={{ color: '#008F46', opacity: 0.8 }}>
+                  <div className="px-2" style={{ lineHeight: '0.6' }}>
+                    <h3 className="font-medium text-sm" style={{ color: '#008F46', opacity: 0.8, marginBottom: '1px' }}>
                       {item.title}
                     </h3>
-                    <p className="text-sm mb-0.5" style={{ color: '#008F46', opacity: 0.8, fontSize: '0.8em' }}>
+                    <p className="text-sm" style={{ color: '#008F46', opacity: 0.8, fontSize: '0.8em', marginBottom: '1px' }}>
                       {item.subtitle}
                     </p>
                     <p className="text-sm" style={{ color: '#008F46', opacity: 0.8, fontSize: '0.8em' }}>
