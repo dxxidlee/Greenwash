@@ -20,7 +20,6 @@ interface QuizQuestion {
   question: string;
   options: QuizOption[];
   correctAnswer: string;
-  explanation: string;
 }
 
 const GreenwashQuiz: React.FC<GreenwashQuizProps> = ({ isOpen, onClose }) => {
@@ -75,75 +74,113 @@ const GreenwashQuiz: React.FC<GreenwashQuizProps> = ({ isOpen, onClose }) => {
   const questions: QuizQuestion[] = [
     {
       id: 1,
-      question: "You spot a food cart with a red umbrella on Canal Street. What is your first action?",
+      question: "You come across a food cart using a red umbrella on a busy corner. What's the Protocol-aligned first step?",
       options: [
-        { id: 'a', text: "Immediately confiscate the umbrella and issue a Critical violation", points: 0 },
-        { id: 'b', text: "Document with photos, issue violation ticket, give 7-day compliance window", points: 10 },
-        { id: 'c', text: "Look away and pretend you didn't see it - it's just one umbrella", points: -5 },
-        { id: 'd', text: "Call for backup and request emergency recoloring authorization", points: 5 }
+        { id: 'a', text: "Call an emergency recolor crew", points: 0 },
+        { id: 'b', text: "Scan with HueScan and take photos, issue a violation ticket, and give a 7-day window to correct", points: 10 },
+        { id: 'c', text: "Confiscate the umbrella on the spot", points: 0 },
+        { id: 'd', text: "Ignore it—it's only one umbrella", points: 0 }
       ],
-      correctAnswer: 'b',
-      explanation: "Proper protocol requires documentation and a Minor violation ticket with compliance window. The red umbrella is a visual disruption but not an emergency."
+      correctAnswer: 'b'
     },
     {
       id: 2,
-      question: "A citizen asks why their blue car must be repainted green. How do you respond?",
+      question: "Under proper lighting, three scans on the same surface return 2.9, 3.8, and 2.6 (ΔE*00). What should you do?",
       options: [
-        { id: 'a', text: "Blue creates visual competition and disrupts collective harmony", points: 10 },
-        { id: 'b', text: "Because I said so - comply or face escalating penalties", points: 0 },
-        { id: 'c', text: "Actually, you know what? Blue is fine. Carry on.", points: -10 },
-        { id: 'd', text: "The algorithm has determined blue is unauthorized", points: 5 }
+        { id: 'a', text: "Throw out the highest reading and pass", points: 0 },
+        { id: 'b', text: "Use the middle value and pass", points: 0 },
+        { id: 'c', text: "Use the highest stable reading, recheck to confirm, and cite if it remains over spec", points: 10 },
+        { id: 'd', text: "Average the three numbers and caution", points: 0 }
       ],
-      correctAnswer: 'a',
-      explanation: "Officers must explain the visual harmony principles behind the ordinance. Authoritarian responses without explanation reduce public cooperation."
+      correctAnswer: 'c'
     },
     {
       id: 3,
-      question: "Your assigned zone has achieved 99.8% compliance. What should concern you most?",
+      question: "A transit kiosk is G-08 compliant but covered in anti-program stickers; removing them will damage the finish. What's next?",
       options: [
-        { id: 'a', text: "Nothing - this is perfect compliance and should be celebrated", points: 0 },
-        { id: 'b', text: "The remaining 0.2% represents potential repeat offenders requiring investigation", points: 10 },
-        { id: 'c', text: "The compliance rate is too high - citizens may be hiding violations", points: 5 },
-        { id: 'd', text: "Your own career advancement - request transfer to a lower-compliance zone for more citations", points: -5 }
+        { id: 'a', text: "Leave the stickers—free speech matters", points: 0 },
+        { id: 'b', text: "Scrape them off now and do the paperwork later", points: 0 },
+        { id: 'c', text: "Photograph and log the incident, remove the stickers per policy, file minor-defacement, and schedule finish correction", points: 10 },
+        { id: 'd', text: "Paint over the entire kiosk immediately", points: 0 }
       ],
-      correctAnswer: 'b',
-      explanation: "High compliance is good, but the remaining violations require attention. The goal is 100% visual uniformity."
+      correctAnswer: 'c'
     },
     {
       id: 4,
-      question: "You discover your supervisor accepting bribes to overlook violations. What do you do?",
+      question: "A sidewalk café's chairs (business property) are clearly visible from the street. Are they within scope?",
       options: [
-        { id: 'a', text: "Report immediately to Internal Affairs per ethical guidelines", points: 10 },
-        { id: 'b', text: "Join in - if they're doing it, it must be acceptable", points: -10 },
-        { id: 'c', text: "Anonymously leak evidence to the media", points: 0 },
-        { id: 'd', text: "Ignore it - not your problem as long as quota is met", points: -5 }
+        { id: 'a', text: "No—movable furniture is always exempt", points: 0 },
+        { id: 'b', text: "Only if there have been customer complaints", points: 0 },
+        { id: 'c', text: "Yes—business fixtures visible from the right-of-way are subject to spec", points: 10 },
+        { id: 'd', text: "Only if a police officer is present", points: 0 }
       ],
-      correctAnswer: 'a',
-      explanation: "Corruption undermines the entire compliance system. Officers have a mandatory duty to report violations of ethical guidelines."
+      correctAnswer: 'c'
     },
     {
       id: 5,
-      question: "A massive billboard displays a beautiful sunset photo - orange, pink, purple skies. The owner claims it's art. Your response?",
+      question: "During a rainy inspection, J. Alvarez marked an awning \"pass.\" The next day, under D65 lighting, your scan shows ΔE*00 = 5.3. What's correct?",
       options: [
-        { id: 'a', text: "Art is exempt from compliance regulations", points: -10 },
-        { id: 'b', text: "Issue Critical violation - unauthorized colors on large structure, $25k fine, immediate remediation", points: 10 },
-        { id: 'c', text: "Allow it but require a green filter over the entire image", points: 5 },
-        { id: 'd', text: "Negotiate - they can keep it if they pay triple the normal fine", points: 0 }
+        { id: 'a', text: "Keep the original pass because rank prevails", points: 0 },
+        { id: 'b', text: "Post screenshots in the team chat", points: 0 },
+        { id: 'c', text: "File an Integrity Ping with your data, request a quiet re-inspection, and inform J. Alvarez directly", points: 10 },
+        { id: 'd', text: "Overwrite the pass yourself", points: 0 }
       ],
-      correctAnswer: 'b',
-      explanation: "No exceptions exist for 'art.' All publicly visible surfaces must conform to approved Green Codes. A billboard displaying competing colors is a Critical violation."
+      correctAnswer: 'c'
     },
     {
       id: 6,
-      question: "Late at night, you wonder if erasing all colors except green has made the city soulless. What do you do?",
+      question: "In the visor, the Truth Alignment bar drops and the UI flashes SESSION LOOP. You feel like ripping off the visor. What should you do?",
       options: [
-        { id: 'a', text: "Report yourself for Non-Compliant Thoughts to your supervisor", points: 5 },
-        { id: 'b', text: "Acknowledge the thought, then remember the greater good of collective harmony", points: 10 },
-        { id: 'c', text: "Resign immediately - you can't enforce what you don't believe in", points: 0 },
-        { id: 'd', text: "Start secretly painting things other colors to restore beauty", points: -10 }
+        { id: 'a', text: "Ask a coworker to finish the line for you", points: 0 },
+        { id: 'b', text: "Stay seated, breathe on the metronome, and repeat the Standard paragraph steadily until alignment confirms", points: 10 },
+        { id: 'c', text: "Lift the visor and try again tomorrow", points: 0 },
+        { id: 'd', text: "Shout the last sentence to show conviction", points: 0 }
       ],
-      correctAnswer: 'b',
-      explanation: "Doubt is natural. What matters is your commitment to the collective vision despite personal uncertainty. The harmony we create is greater than individual preference."
+      correctAnswer: 'b'
+    },
+    {
+      id: 7,
+      question: "You hear pride creeping into the word \"I,\" and your Recital Stability Index is falling. What's Protocol?",
+      options: [
+        { id: 'a', text: "Emphasize \"I\" louder so it sounds confident", points: 0 },
+        { id: 'b', text: "Change the script to your own words", points: 0 },
+        { id: 'c', text: "Skip the clause and keep momentum", points: 0 },
+        { id: 'd', text: "Flatten the pronoun, log a self-correction, and restart the line", points: 10 }
+      ],
+      correctAnswer: 'd'
+    },
+    {
+      id: 8,
+      question: "Which statement matches Protocol?",
+      options: [
+        { id: 'a', text: "Safety is personal expression at scale", points: 0 },
+        { id: 'b', text: "Safety is endless debate", points: 0 },
+        { id: 'c', text: "Safety is legibility—the city is a single surface; we do not fracture it", points: 10 },
+        { id: 'd', text: "Safety is whatever feels right today", points: 0 }
+      ],
+      correctAnswer: 'c'
+    },
+    {
+      id: 9,
+      question: "A neighbor says G-08 \"feels harsh.\" How do you respond within Protocol?",
+      options: [
+        { id: 'a', text: "Tell them to paint whatever they like", points: 0 },
+        { id: 'b', text: "Post their comment in the group chat", points: 0 },
+        { id: 'c', text: "Offer to book SelfTest, share the manual page on visual integrity, avoid debate, and log a minor variance risk", points: 10 },
+        { id: 'd', text: "Argue aesthetics until they agree", points: 0 }
+      ],
+      correctAnswer: 'c'
+    },
+    {
+      id: 10,
+      question: "While studying Protocol, a small red router LED keeps catching your eye. What's the Protocol-aligned move?",
+      options: [
+        { id: 'a', text: "Turn off all lights", points: 0 },
+        { id: 'b', text: "Ignore it—it's private space", points: 0 },
+        { id: 'c', text: "Cover or hide the LED (tape or relocate the router) to preserve a coherent field, and note the intervention in your self-log", points: 10 },
+        { id: 'd', text: "Smash the router", points: 0 }
+      ],
+      correctAnswer: 'c'
     }
   ];
 
@@ -174,19 +211,19 @@ const GreenwashQuiz: React.FC<GreenwashQuizProps> = ({ isOpen, onClose }) => {
   };
 
   const getResultMessage = (score: number) => {
-    if (score >= 55) {
+    if (score >= 80) {
       return {
         title: "EXEMPLARY COMPLIANCE OFFICER",
         message: "You demonstrate exceptional understanding of Greenwash protocols and the philosophy of visual uniformity. Your commitment to collective harmony while maintaining ethical standards makes you ideal for field work. Recommended for promotion.",
         color: "green"
       };
-    } else if (score >= 35) {
+    } else if (score >= 50) {
       return {
         title: "ADEQUATE FIELD OFFICER",
         message: "You understand the basics of compliance enforcement but show room for improvement. Continue studying the manual and remember: individual doubts are normal, but collective harmony is paramount. Quarterly recertification recommended.",
         color: "yellow"
       };
-    } else if (score >= 15) {
+    } else if (score >= 20) {
       return {
         title: "PROBATIONARY STATUS",
         message: "Your responses indicate insufficient commitment to Greenwash principles. You demonstrate dangerous levels of individualistic thinking and may lack the resolve for field enforcement. Mandatory retraining required.",
@@ -332,7 +369,7 @@ const GreenwashQuiz: React.FC<GreenwashQuizProps> = ({ isOpen, onClose }) => {
                       `}
                     >
                       <div className="text-center mb-6">
-                        <div className="text-4xl font-bold mb-2 text-white">{score}/60</div>
+                        <div className="text-4xl font-bold mb-2 text-white">{score}/100</div>
                         <div className="text-lg font-bold mb-2 text-white">
                           {result.title}
                         </div>
