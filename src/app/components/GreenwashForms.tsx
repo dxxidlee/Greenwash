@@ -377,7 +377,7 @@ const GreenwashForms: React.FC<GreenwashFormsProps> = ({ isOpen, onClose }) => {
             relative z-10
             w-[92vw] sm:w-[86vw] md:w-auto
             h-screen
-            max-w-[32rem] md:max-w-[68rem]
+            max-w-[32rem] md:max-w-[34rem] lg:max-w-[68rem]
             focus:outline-none
             ${isClosing ? 'animate-[fadeOutScaleDown_0.3s_ease-in_forwards]' : 'opacity-0 scale-98 translate-y-2 animate-[fadeInScaleUp_0.4s_ease-out_0.12s_forwards]'}
           `}
