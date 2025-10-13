@@ -13,6 +13,7 @@ export default function HueScan() {
   const [coordinates, setCoordinates] = useState({ x: 0, y: 0 });
   const [error, setError] = useState<string | null>(null);
   const [isFlipped, setIsFlipped] = useState(true); // Default to flipped for rear camera
+  const [isMobile, setIsMobile] = useState(false);
   
   const videoRef = useRef<HTMLVideoElement>(null);
   const canvasRef = useRef<HTMLCanvasElement>(null);
@@ -20,6 +21,19 @@ export default function HueScan() {
   const overlayCanvasRef = useRef<HTMLCanvasElement>(null);
 
   const targetColor = { r: 0, g: 143, b: 70 }; // #008f46
+
+  // Detect if device is mobile
+  useEffect(() => {
+    const checkMobile = () => {
+      const isMobileDevice = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent) || 
+                             (window.innerWidth <= 768);
+      setIsMobile(isMobileDevice);
+    };
+    
+    checkMobile();
+    window.addEventListener('resize', checkMobile);
+    return () => window.removeEventListener('resize', checkMobile);
+  }, []);
 
 
   const startCamera = useCallback(async () => {
@@ -396,9 +410,12 @@ export default function HueScan() {
         <>
           <div className="absolute bottom-8 left-1/2 transform -translate-x-1/2 pointer-events-auto z-50 flex gap-3">
             <button
-              onClick={switchCamera}
-              className="bg-black/60 backdrop-blur-sm border border-green-400/30 text-green-400 p-3 rounded-full hover:bg-green-400/20 transition-all"
-              title="Switch Camera"
+              onClick={isMobile ? switchCamera : undefined}
+              disabled={!isMobile}
+              className={`bg-black/60 backdrop-blur-sm border border-green-400/30 text-green-400 p-3 rounded-full transition-all ${
+                isMobile ? 'hover:bg-green-400/20 cursor-pointer' : 'opacity-30 cursor-not-allowed'
+              }`}
+              title={isMobile ? "Switch Camera" : "Switch Camera (Mobile Only)"}
             >
               <RotateCcw size={20} />
             </button>
