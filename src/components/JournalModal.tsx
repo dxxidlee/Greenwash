@@ -77,13 +77,8 @@ export default function JournalModal({ open, onClose, entries }: Props) {
       <button
         onClick={handleClose}
         aria-label="Close"
-        style={{
-          position: 'fixed',
-          top: '16px',
-          right: '16px',
-          zIndex: 200
-        }}
         className="
+          fixed top-4 right-6 md:right-4
           inline-flex items-center justify-center
           h-12 w-12
           rounded-full
@@ -94,6 +89,7 @@ export default function JournalModal({ open, onClose, entries }: Props) {
           hover:bg-[rgba(0,143,70,0.4)]
           transition-all duration-500 ease-out
           focus:outline-none focus:ring-2 focus:ring-white/30
+          z-[200]
           ${isClosing ? 'animate-[fadeOutScale_0.4s_ease-in_forwards]' : 'opacity-0 scale-95 animate-[fadeInScale_0.4s_ease-out_0.08s_forwards]'}
         "
       >
