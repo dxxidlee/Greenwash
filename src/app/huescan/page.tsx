@@ -136,82 +136,128 @@ export default function HueScan() {
     const width = canvas.width;
     const height = canvas.height;
     
+    if (width === 0 || height === 0) return;
+    
     ctx.clearRect(0, 0, width, height);
     
-    // Scanline effect
-    ctx.strokeStyle = 'rgba(0, 255, 100, 0.15)';
+    // Animated horizontal scanning line
+    const time = Date.now();
+    const scanLineY = (time / 20) % height;
+    
+    // Main scan line
+    ctx.strokeStyle = match === 'perfect' 
+      ? 'rgba(0, 255, 100, 0.6)' 
+      : match === 'close'
+      ? 'rgba(255, 200, 0, 0.5)'
+      : 'rgba(255, 100, 100, 0.4)';
+    ctx.lineWidth = 3;
+    ctx.shadowBlur = 10;
+    ctx.shadowColor = ctx.strokeStyle;
+    ctx.beginPath();
+    ctx.moveTo(0, scanLineY);
+    ctx.lineTo(width, scanLineY);
+    ctx.stroke();
+    ctx.shadowBlur = 0;
+    
+    // Subtle grid pattern
+    ctx.strokeStyle = 'rgba(0, 255, 100, 0.05)';
     ctx.lineWidth = 1;
-    const time = Date.now() / 20;
-    for (let i = 0; i < height; i += 4) {
-      const offset = (time + i) % height;
+    for (let i = 0; i < height; i += 40) {
       ctx.beginPath();
-      ctx.moveTo(0, offset);
-      ctx.lineTo(width, offset);
+      ctx.moveTo(0, i);
+      ctx.lineTo(width, i);
+      ctx.stroke();
+    }
+    for (let i = 0; i < width; i += 40) {
+      ctx.beginPath();
+      ctx.moveTo(i, 0);
+      ctx.lineTo(i, height);
       ctx.stroke();
     }
     
     // Corner brackets
     const centerX = width / 2;
     const centerY = height / 2;
-    const size = 120;
-    const bracketLength = 30;
-    const thickness = 3;
+    const size = 140;
+    const bracketLength = 40;
+    const thickness = 4;
     
-    const matchColor = match === 'perfect' ? 'rgba(0, 255, 100, 0.9)' : 
-                       match === 'close' ? 'rgba(255, 200, 0, 0.9)' : 
-                       'rgba(255, 50, 50, 0.6)';
+    // Match color changes based on detection
+    const matchColor = match === 'perfect' ? 'rgba(0, 255, 100, 1)' : 
+                       match === 'close' ? 'rgba(255, 200, 0, 1)' : 
+                       'rgba(255, 100, 100, 0.8)';
     
     ctx.strokeStyle = matchColor;
     ctx.lineWidth = thickness;
-    ctx.lineCap = 'square';
+    ctx.lineCap = 'round';
+    ctx.lineJoin = 'round';
     
-    // Top-left
+    // Draw pulsing effect for perfect match
+    const pulseScale = match === 'perfect' ? 1 + Math.sin(Date.now() / 200) * 0.05 : 1;
+    const adjustedSize = size * pulseScale;
+    
+    // Top-left bracket
     ctx.beginPath();
-    ctx.moveTo(centerX - size, centerY - size + bracketLength);
-    ctx.lineTo(centerX - size, centerY - size);
-    ctx.lineTo(centerX - size + bracketLength, centerY - size);
+    ctx.moveTo(centerX - adjustedSize, centerY - adjustedSize + bracketLength);
+    ctx.lineTo(centerX - adjustedSize, centerY - adjustedSize);
+    ctx.lineTo(centerX - adjustedSize + bracketLength, centerY - adjustedSize);
     ctx.stroke();
     
-    // Top-right
+    // Top-right bracket
     ctx.beginPath();
-    ctx.moveTo(centerX + size - bracketLength, centerY - size);
-    ctx.lineTo(centerX + size, centerY - size);
-    ctx.lineTo(centerX + size, centerY - size + bracketLength);
+    ctx.moveTo(centerX + adjustedSize - bracketLength, centerY - adjustedSize);
+    ctx.lineTo(centerX + adjustedSize, centerY - adjustedSize);
+    ctx.lineTo(centerX + adjustedSize, centerY - adjustedSize + bracketLength);
     ctx.stroke();
     
-    // Bottom-left
+    // Bottom-left bracket
     ctx.beginPath();
-    ctx.moveTo(centerX - size, centerY + size - bracketLength);
-    ctx.lineTo(centerX - size, centerY + size);
-    ctx.lineTo(centerX - size + bracketLength, centerY + size);
+    ctx.moveTo(centerX - adjustedSize, centerY + adjustedSize - bracketLength);
+    ctx.lineTo(centerX - adjustedSize, centerY + adjustedSize);
+    ctx.lineTo(centerX - adjustedSize + bracketLength, centerY + adjustedSize);
     ctx.stroke();
     
-    // Bottom-right
+    // Bottom-right bracket
     ctx.beginPath();
-    ctx.moveTo(centerX + size - bracketLength, centerY + size);
-    ctx.lineTo(centerX + size, centerY + size);
-    ctx.lineTo(centerX + size, centerY + size - bracketLength);
+    ctx.moveTo(centerX + adjustedSize - bracketLength, centerY + adjustedSize);
+    ctx.lineTo(centerX + adjustedSize, centerY + adjustedSize);
+    ctx.lineTo(centerX + adjustedSize, centerY + adjustedSize - bracketLength);
     ctx.stroke();
     
-    // Center crosshair
+    // Center crosshair with glow
     ctx.strokeStyle = matchColor;
-    ctx.lineWidth = 2;
-    const crossSize = 15;
+    ctx.lineWidth = 3;
+    ctx.shadowBlur = match === 'perfect' ? 15 : 8;
+    ctx.shadowColor = matchColor;
+    const crossSize = 20;
     ctx.beginPath();
     ctx.moveTo(centerX - crossSize, centerY);
     ctx.lineTo(centerX + crossSize, centerY);
     ctx.moveTo(centerX, centerY - crossSize);
     ctx.lineTo(centerX, centerY + crossSize);
     ctx.stroke();
+    ctx.shadowBlur = 0;
+    
+    // Draw center circle
+    ctx.beginPath();
+    ctx.arc(centerX, centerY, 5, 0, Math.PI * 2);
+    ctx.fillStyle = matchColor;
+    ctx.fill();
   }, [match]);
 
   const analyzeFrame = useCallback(() => {
-    if (!videoRef.current || !canvasRef.current || !scanning) return;
+    if (!videoRef.current || !canvasRef.current || !scanning) {
+      animationRef.current = requestAnimationFrame(analyzeFrame);
+      return;
+    }
 
     const video = videoRef.current;
     const canvas = canvasRef.current;
     const ctx = canvas.getContext('2d');
-    if (!ctx) return;
+    if (!ctx) {
+      animationRef.current = requestAnimationFrame(analyzeFrame);
+      return;
+    }
 
     if (video.readyState === video.HAVE_ENOUGH_DATA) {
       canvas.width = video.videoWidth;
@@ -221,7 +267,7 @@ export default function HueScan() {
       
       const centerX = Math.floor(canvas.width / 2);
       const centerY = Math.floor(canvas.height / 2);
-      const sampleSize = 60;
+      const sampleSize = 80;
       
       const imageData = ctx.getImageData(
         centerX - sampleSize,
@@ -261,9 +307,10 @@ export default function HueScan() {
       
       setMatchPercentage(Math.round(similarity));
       
-      if (similarity >= 85) {
+      // More lenient thresholds for better detection
+      if (similarity >= 75) {
         setMatch('perfect');
-      } else if (similarity >= 70) {
+      } else if (similarity >= 50) {
         setMatch('close');
       } else {
         setMatch('no');
@@ -282,12 +329,13 @@ export default function HueScan() {
   }, [scanning, targetColor, drawOverlay]);
 
   useEffect(() => {
-    if (scanning && videoRef.current) {
-      const video = videoRef.current;
-      video.addEventListener('loadeddata', analyzeFrame);
-      return () => {
-        video.removeEventListener('loadeddata', analyzeFrame);
-      };
+    if (scanning) {
+      console.log('Starting analysis loop');
+      analyzeFrame();
+    } else {
+      if (animationRef.current) {
+        cancelAnimationFrame(animationRef.current);
+      }
     }
   }, [scanning, analyzeFrame]);
 
@@ -333,13 +381,57 @@ export default function HueScan() {
       {/* HUD Overlay */}
       {!error && (
         <div className="absolute inset-0 pointer-events-none select-none">
+          {/* Center Compliance Status - BIG AND CLEAR */}
+          <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 z-10">
+            <div 
+              className={`backdrop-blur-md rounded-3xl px-8 py-6 transition-all duration-300 ${
+                match === 'perfect' 
+                  ? 'bg-[rgba(0,255,100,0.4)] border-2 border-green-400' 
+                  : match === 'close'
+                  ? 'bg-[rgba(255,200,0,0.3)] border-2 border-yellow-400'
+                  : 'bg-[rgba(255,100,100,0.3)] border-2 border-red-400'
+              }`}
+              style={{
+                boxShadow: match === 'perfect' 
+                  ? '0 0 40px rgba(0, 255, 100, 0.3)' 
+                  : match === 'close'
+                  ? '0 0 30px rgba(255, 200, 0, 0.3)'
+                  : '0 0 20px rgba(255, 100, 100, 0.2)'
+              }}
+            >
+              <div className="text-center">
+                <div className={`text-5xl font-bold mb-2 ${
+                  match === 'perfect' ? 'text-green-300' : 
+                  match === 'close' ? 'text-yellow-300' : 
+                  'text-red-300'
+                }`}>
+                  {matchPercentage}%
+                </div>
+                <div className={`text-2xl font-bold tracking-wider ${
+                  match === 'perfect' ? 'text-white' : 
+                  match === 'close' ? 'text-yellow-100' : 
+                  'text-red-100'
+                }`}>
+                  {match === 'perfect' ? '✓ COMPLIANT' : 
+                   match === 'close' ? '! PARTIAL MATCH' : 
+                   '✗ NOT COMPLIANT'}
+                </div>
+                {match === 'perfect' && (
+                  <div className="text-xs text-white/80 mt-2">
+                    GREEN APPROVED: #008F46
+            </div>
+                )}
+            </div>
+            </div>
+            </div>
+            
           {/* Top Left Info */}
           <div className="absolute top-4 left-4">
             <div className="bg-[rgba(0,143,70,0.3)] backdrop-blur-sm rounded-2xl p-4 text-white text-xs tracking-wider space-y-2">
-            <div className="flex items-center gap-2">
+              <div className="flex items-center gap-2">
                 <span className="opacity-70">SYSTEM:</span>
                 <span>HUESCAN_v2.1</span>
-            </div>
+              </div>
             <div className="flex items-center gap-2">
                 <span className="opacity-70">TARGET:</span>
                 <span>#008F46</span>
@@ -355,21 +447,17 @@ export default function HueScan() {
             </div>
           </div>
           
-          {/* Top Right Status */}
+          {/* Top Right Match % */}
           <div className="absolute top-4 right-20">
-            <div className="bg-[rgba(0,143,70,0.3)] backdrop-blur-sm rounded-2xl p-4 text-right text-xs tracking-wider text-white">
-            <div className={`text-2xl font-bold mb-2 ${
-                match === 'perfect' ? 'text-white' : 
+            <div className="bg-[rgba(0,143,70,0.3)] backdrop-blur-sm rounded-2xl p-4 text-center text-xs tracking-wider text-white">
+              <div className="opacity-70 mb-1">MATCH</div>
+              <div className={`text-xl font-bold ${
+                match === 'perfect' ? 'text-green-300' : 
                 match === 'close' ? 'text-yellow-300' : 
                 'text-red-300'
             }`}>
               {matchPercentage}%
             </div>
-              <div className="opacity-70">
-              {match === 'perfect' ? 'MATCH_CONFIRMED' : 
-               match === 'close' ? 'PARTIAL_MATCH' : 
-               'SCANNING...'}
-              </div>
             </div>
           </div>
           
