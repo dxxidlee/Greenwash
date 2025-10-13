@@ -68,21 +68,25 @@ export default function JournalModal({ open, onClose, entries }: Props) {
           position: 'fixed',
           top: '16px',
           left: '50%',
+          transform: 'translateX(-50%)',
           zIndex: 200
         }}
-        className={`
-          -translate-x-1/2
-          ${isClosing ? 'animate-[fadeOutScale_0.3s_ease-in_forwards]' : 'opacity-0 animate-[fadeInScale_0.4s_ease-out_0.08s_forwards]'}
-        `}
       >
-        <img 
-          src="/img/journal-final.webp" 
-          alt="Journal"
-          style={{
-            height: '48px',
-            width: 'auto'
-          }}
-        />
+        <div
+          className={`
+            ${isClosing ? 'animate-[fadeOutScale_0.3s_ease-in_forwards]' : 'opacity-0 animate-[fadeInScale_0.4s_ease-out_0.08s_forwards]'}
+          `}
+        >
+          <img 
+            src="/img/journal-final.webp" 
+            alt="Journal"
+            style={{
+              height: '48px',
+              width: 'auto',
+              display: 'block'
+            }}
+          />
+        </div>
       </div>
 
       {/* Exit X — positioned at top right corner of screen, completely separate */}
