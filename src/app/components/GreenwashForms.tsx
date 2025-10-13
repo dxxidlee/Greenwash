@@ -1,7 +1,8 @@
 'use client';
 
-import React, { useState } from 'react';
+import React, { useState, useCallback, useRef } from 'react';
 import { X, FileText, AlertTriangle } from 'lucide-react';
+import { useLockBodyScroll } from '../../components/useLockBodyScroll';
 
 interface GreenwashFormsProps {
   isOpen: boolean;
@@ -13,6 +14,12 @@ const GreenwashForms: React.FC<GreenwashFormsProps> = ({ isOpen, onClose }) => {
   const [authLoaded, setAuthLoaded] = useState(false);
   const [violationLoaded, setViolationLoaded] = useState(false);
   const [isMobile, setIsMobile] = useState(false);
+  const [isClosing, setIsClosing] = useState(false);
+  
+  const backdropRef = useRef<HTMLDivElement>(null);
+  const scrollContainerRef = useRef<HTMLDivElement>(null);
+
+  useLockBodyScroll(isOpen);
 
   // Check if mobile
   React.useEffect(() => {
@@ -20,6 +27,32 @@ const GreenwashForms: React.FC<GreenwashFormsProps> = ({ isOpen, onClose }) => {
     checkMobile();
     window.addEventListener('resize', checkMobile);
     return () => window.removeEventListener('resize', checkMobile);
+  }, []);
+
+  // Handle close with animation
+  const handleClose = useCallback(() => {
+    setIsClosing(true);
+    setTimeout(() => {
+      onClose();
+      setIsClosing(false);
+    }, 350);
+  }, [onClose]);
+
+  // ESC to close
+  React.useEffect(() => {
+    if (!isOpen) return;
+    const onKey = (e: KeyboardEvent) => { if (e.key === "Escape") handleClose(); };
+    window.addEventListener("keydown", onKey);
+    return () => window.removeEventListener("keydown", onKey);
+  }, [isOpen, handleClose]);
+
+  // Prevent scroll events from reaching the background
+  const handleWheelBackdrop = useCallback((e: React.WheelEvent) => {
+    e.stopPropagation();
+  }, []);
+
+  const handleTouchMoveBackdrop = useCallback((e: React.TouchEvent) => {
+    e.stopPropagation();
   }, []);
   const [authForm, setAuthForm] = useState({
     permitId: '',
@@ -179,77 +212,141 @@ const GreenwashForms: React.FC<GreenwashFormsProps> = ({ isOpen, onClose }) => {
   if (!isOpen) return null;
 
   return (
-    <div 
-      className="fixed inset-0 z-50 flex items-center justify-center bg-transparent p-4"
-    >
-      {/* Full screen blur backdrop layer */}
-      <div 
-        className="fixed inset-0 backdrop-blur-md md:backdrop-blur-lg"
-        onClick={onClose}
-      />
-      
-      {/* Content */}
-      <div 
-        className={`relative w-full ${isMobile ? 'max-w-md' : 'max-w-4xl'} h-[90vh] z-10`}
-        onClick={(e) => e.stopPropagation()}
-        style={{ fontFamily: 'PPNeueMontreal, sans-serif' }}
-      >
-        {/* Close button */}
-            <button
-          onClick={onClose}
-          className="fixed top-4 right-4 z-60 p-3 rounded-full transition-all"
+    <>
+      {/* Report Icon — positioned at top center */}
+      <div
         style={{
-            backgroundColor: 'rgba(0, 143, 70, 0.3)',
-            backdropFilter: 'blur(10px)',
-            WebkitBackdropFilter: 'blur(10px)',
-            border: '1px solid #FFFFFF'
-          }}
+          position: 'fixed',
+          top: '16px',
+          left: '50%',
+          transform: 'translateX(-50%)',
+          zIndex: 200
+        }}
+      >
+        <div
+          className={`
+            ${isClosing ? 'animate-[fadeOutScale_0.3s_ease-in_forwards]' : 'opacity-0 animate-[fadeInScale_0.4s_ease-out_0.08s_forwards]'}
+          `}
         >
-          <X size={20} color="#FFFFFF" />
+          <img
+            src="/img/report-final.webp"
+            alt="Report"
+            style={{
+              height: '48px',
+              width: 'auto',
+              display: 'block'
+            }}
+          />
+        </div>
+      </div>
+
+      {/* Exit X — positioned at top right corner of screen */}
+      <button
+        onClick={handleClose}
+        aria-label="Close"
+        style={{
+          position: 'fixed',
+          top: '16px',
+          right: isMobile ? '24px' : '16px',
+          zIndex: 200
+        }}
+        className={`
+          inline-flex items-center justify-center
+          h-12 w-12
+          rounded-full
+          shadow-[0_2px_12px_rgba(0,0,0,0.06)]
+          bg-[rgba(0,143,70,0.3)]
+          noise-surface
+          text-white
+          hover:bg-[rgba(0,143,70,0.4)]
+          transition-all duration-300 ease-out
+          focus:outline-none focus:ring-2 focus:ring-white/30
+          ${isClosing ? 'animate-[fadeOutScale_0.3s_ease-in_forwards]' : 'opacity-0 scale-95 animate-[fadeInScale_0.4s_ease-out_0.08s_forwards]'}
+        `}
+      >
+        <svg viewBox="0 0 24 24" width="18" height="18" aria-hidden="true">
+          <path d="M6 6l12 12M18 6L6 18" stroke="currentColor" strokeWidth="2" strokeLinecap="round"/>
+        </svg>
       </button>
 
-        {/* Tab Navigation - Only show on mobile */}
-        {isMobile && (
-        <div className="flex gap-2 p-4 pb-2">
-          <button
-            onClick={() => setActiveTab('auth')}
-            className={`flex items-center gap-2 px-4 py-3 transition-all rounded-lg ${
-              activeTab === 'auth' ? 'opacity-100' : 'opacity-60'
-            }`}
-            style={{
-              ...buttonStyle,
-              border: 'none'
-            }}
-          >
-            <FileText size={18} />
-            <span className="text-xs tracking-wider">AUTHORIZATION FORM</span>
-          </button>
-          <button
-            onClick={() => setActiveTab('violation')}
-            className={`flex items-center gap-2 px-4 py-3 transition-all rounded-lg ${
-              activeTab === 'violation' ? 'opacity-100' : 'opacity-60'
-            }`}
-            style={{
-              ...buttonStyle,
-              border: 'none'
-            }}
-          >
-            <AlertTriangle size={18} />
-            <span className="text-xs tracking-wider">VIOLATION TICKET</span>
-          </button>
-        </div>
-        )}
-
-        {/* Forms Container - Scrollable with calculated height */}
+      <div
+        ref={backdropRef}
+        onClick={handleClose}
+        onWheel={handleWheelBackdrop}
+        onTouchMove={handleTouchMoveBackdrop}
+        aria-hidden={false}
+        aria-modal="true"
+        role="dialog"
+        className="fixed inset-0 z-[100] flex items-center justify-center bg-transparent overflow-hidden"
+      >
+        {/* Full screen blur layer with smooth animation */}
         <div 
-          className={`overflow-y-auto hide-scrollbar h-full`}
-          style={{
-            scrollbarWidth: 'none',
-            msOverflowStyle: 'none'
-          }}
+          className={`
+            fixed inset-0
+            backdrop-blur-md md:backdrop-blur-lg
+            supports-[backdrop-filter]:backdrop-saturate-150
+            supports-[backdrop-filter]:backdrop-contrast-100
+            backdrop-boost no-blur-fallback
+            ${isClosing ? 'animate-[fadeOut_0.3s_ease-in_forwards]' : 'opacity-0 animate-[fadeIn_0.4s_ease-out_forwards]'}
+          `}
+          style={{ pointerEvents: 'none' }}
+        />
+
+        {/* Forms container */}
+        <div
+          tabIndex={-1}
+          onClick={(e) => e.stopPropagation()}
+          className={`
+            relative z-10
+            w-[92vw] sm:w-[86vw] md:w-auto
+            h-screen
+            ${isMobile ? 'max-w-[32rem]' : 'max-w-[68rem]'}
+            focus:outline-none
+            ${isClosing ? 'animate-[fadeOutScaleDown_0.3s_ease-in_forwards]' : 'opacity-0 scale-98 translate-y-2 animate-[fadeInScaleUp_0.4s_ease-out_0.12s_forwards]'}
+          `}
         >
-          <div className="p-6">
-            <div className={isMobile ? '' : 'grid grid-cols-2 gap-3 items-start content-start'}>
+
+          {/* Scrollable forms content with top/bottom spacing */}
+          <div 
+            ref={scrollContainerRef}
+            className="h-full w-full overflow-y-auto overscroll-contain scroll-smooth hide-scrollbar"
+            onWheel={(e) => e.stopPropagation()}
+            onTouchMove={(e) => e.stopPropagation()}
+          >
+            {/* Tab Navigation - Only show on mobile, inside scroll area */}
+            {isMobile && (
+              <div className="flex gap-2 px-4 pt-4 pb-2" style={{ paddingTop: 'calc(16px + 48px + 80px)' }}>
+                <button
+                  onClick={() => setActiveTab('auth')}
+                  className={`flex items-center gap-2 px-4 py-3 transition-all rounded-lg ${
+                    activeTab === 'auth' ? 'opacity-100' : 'opacity-60'
+                  }`}
+                  style={{
+                    ...buttonStyle,
+                    border: 'none'
+                  }}
+                >
+                  <FileText size={18} />
+                  <span className="text-xs tracking-wider">AUTHORIZATION FORM</span>
+                </button>
+                <button
+                  onClick={() => setActiveTab('violation')}
+                  className={`flex items-center gap-2 px-4 py-3 transition-all rounded-lg ${
+                    activeTab === 'violation' ? 'opacity-100' : 'opacity-60'
+                  }`}
+                  style={{
+                    ...buttonStyle,
+                    border: 'none'
+                  }}
+                >
+                  <AlertTriangle size={18} />
+                  <span className="text-xs tracking-wider">VIOLATION TICKET</span>
+                </button>
+              </div>
+            )}
+
+            <div className="pb-20 px-4" style={{ paddingTop: isMobile ? '1rem' : 'calc(16px + 48px + 80px)' }}>
+              <div className={isMobile ? '' : 'grid grid-cols-2 gap-3 items-start content-start'}>
           {/* Authorization Form */}
           {(isMobile ? activeTab === 'auth' : true) && (
           <div 
@@ -690,11 +787,12 @@ const GreenwashForms: React.FC<GreenwashFormsProps> = ({ isOpen, onClose }) => {
             </div>
           </div>
           )}
+              </div>
             </div>
           </div>
         </div>
       </div>
-    </div>
+    </>
   );
 };
 
