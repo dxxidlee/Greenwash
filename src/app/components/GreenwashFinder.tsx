@@ -234,7 +234,11 @@ const GreenwashFinder: React.FC<GreenwashFinderProps> = ({ isOpen, onClose }) =>
                   transition: prefersReducedMotion
                     ? 'background-color 0.25s ease-out, border 0.25s ease-out, color 0.25s ease-out, transform 0.25s ease-out, opacity 0.25s ease-out'
                     : 'background-color 0.85s cubic-bezier(0.22, 1, 0.36, 1) 0.15s, border 0.85s cubic-bezier(0.22, 1, 0.36, 1) 0.15s, color 0.85s cubic-bezier(0.22, 1, 0.36, 1) 0.15s, transform 0.85s cubic-bezier(0.22, 1, 0.36, 1) 0.15s',
-                  transform: prefersReducedMotion ? 'none' : 'translateX(0)',
+                  transform: prefersReducedMotion 
+                    ? 'none' 
+                    : showFilters 
+                      ? isMobile ? 'translateX(-20%)' : 'translateX(-35%)'
+                      : 'translateX(0)',
                   opacity: prefersReducedMotion && showFilters ? 0.9 : 1,
                   willChange: 'transform, background-color'
                 }}
