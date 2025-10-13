@@ -121,6 +121,9 @@ export default function JournalModal({ open, onClose, entries }: Props) {
       <div
         ref={backdropRef}
         onClick={handleClose}
+        onWheel={(e) => e.stopPropagation()}
+        onTouchMove={(e) => e.stopPropagation()}
+        onScroll={(e) => e.stopPropagation()}
         aria-hidden={false}
         aria-modal="true"
         role="dialog"
@@ -145,6 +148,9 @@ export default function JournalModal({ open, onClose, entries }: Props) {
           ref={panelRef}
           tabIndex={-1}
           onClick={(e) => e.stopPropagation()}
+          onWheel={(e) => e.stopPropagation()}
+          onTouchMove={(e) => e.stopPropagation()}
+          onScroll={(e) => e.stopPropagation()}
           className={`
             relative z-10
             w-[92vw] sm:w-[86vw] md:w-auto
@@ -161,7 +167,7 @@ export default function JournalModal({ open, onClose, entries }: Props) {
           onWheel={(e) => e.stopPropagation()}
           onTouchMove={(e) => e.stopPropagation()}
         >
-          <div className="pt-20 pb-20 space-y-4 sm:space-y-5 md:space-y-6">
+          <div className="pb-20 space-y-4 sm:space-y-5 md:space-y-6" style={{ paddingTop: 'calc(16px + 48px + 80px)' }}>
             {entries.map((e, index) => (
               <article
                 key={e.id}
