@@ -84,29 +84,29 @@ const GreenwashFinder: React.FC<GreenwashFinderProps> = ({ isOpen, onClose }) =>
 
   const items: Item[] = [
     // Sorted by date - most recent first (items with "New" status are the 5 most recent)
-    { id: 16, title: 'Monthly Summary Jan', subtitle: 'Campaign Poster', category: 'campaign-poster', date: '02.15.37', image: '/img/poster-1.webp', status: 'New' },
-    { id: 19, title: 'Monthly Summary Jan', subtitle: 'Violation Ticket', category: 'violation-ticket', date: '02.12.37', image: '/img/violation-ticket-1.webp', status: 'New' },
-    { id: 8, title: 'Chinatown Zone Report', subtitle: 'Approved Object', category: 'approved-object', date: '02.08.37', image: '/img/approv-obj-8.webp', status: 'New' },
-    { id: 21, title: 'Monthly Summary Jan', subtitle: 'Authorization Form', category: 'authorization-form', date: '02.05.37', image: '/img/auth-form-1.webp', status: 'New' },
+    { id: 16, title: 'GW-PST-003', subtitle: 'Campaign Poster', category: 'campaign-poster', date: '02.15.37', image: '/img/poster-1.webp', status: 'New' },
+    { id: 19, title: 'GW-VLT-002', subtitle: 'Violation Ticket', category: 'violation-ticket', date: '02.12.37', image: '/img/violation-ticket-1.webp', status: 'New' },
+    { id: 8, title: 'GW-PO-2284', subtitle: 'Approved Object', category: 'approved-object', date: '02.08.37', image: '/img/approv-obj-8.webp', status: 'New' },
+    { id: 21, title: 'GW-AUT-003', subtitle: 'Authorization Form', category: 'authorization-form', date: '02.05.37', image: '/img/auth-form-1.webp', status: 'New' },
     { id: 1, title: 'GW-CH-1123', subtitle: 'Approved Object', category: 'approved-object', date: '02.01.37', image: '/img/approv-obj-1.webp', status: 'New' },
-    { id: 4, title: 'Q1 Compliance Report', subtitle: 'Approved Object', category: 'approved-object', date: '01.31.37', image: '/img/approv-obj-4.webp' },
-    { id: 17, title: 'Monthly Summary Jan', subtitle: 'Campaign Poster', category: 'campaign-poster', date: '01.29.37', image: '/img/poster-2.webp' },
-    { id: 3, title: 'Canal Street Evidence', subtitle: 'Approved Object', category: 'approved-object', date: '01.28.37', image: '/img/approv-obj-3.webp' },
-    { id: 10, title: 'Evidence Photo 001', subtitle: 'Approved Object', category: 'approved-object', date: '01.27.37', image: '/img/approv-obj-10.webp' },
-    { id: 22, title: 'Monthly Summary Jan', subtitle: 'Authorization Form', category: 'authorization-form', date: '01.25.37', image: '/img/auth-form-2.webp' },
-    { id: 6, title: 'Pike Slip Authorization', subtitle: 'Approved Object', category: 'approved-object', date: '01.23.37', image: '/img/approv-obj-6.webp' },
-    { id: 2, title: 'Billboard Authorization', subtitle: 'Approved Object', category: 'approved-object', date: '01.22.37', image: '/img/approv-obj-2.webp' },
-    { id: 20, title: 'Monthly Summary Jan', subtitle: 'Violation Ticket', category: 'violation-ticket', date: '01.20.37', image: '/img/violation-ticket-2.webp' },
-    { id: 18, title: 'Monthly Summary Jan', subtitle: 'Campaign Poster', category: 'campaign-poster', date: '01.18.37', image: '/img/poster-3.webp' },
-    { id: 7, title: 'Violation Stats Q1', subtitle: 'Approved Object', category: 'approved-object', date: '01.15.37', image: '/img/approv-obj-7.webp' },
-    { id: 12, title: 'Monthly Summary Jan', subtitle: 'Approved Object', category: 'approved-object', date: '01.12.37', image: '/img/approv-obj-12.webp' },
-    { id: 23, title: 'Monthly Summary Jan', subtitle: 'Authorization Form', category: 'authorization-form', date: '01.10.37', image: '/img/auth-form-3.webp' },
-    { id: 11, title: 'Evidence Photo 002', subtitle: 'Approved Object', category: 'approved-object', date: '01.08.37', image: '/img/approv-obj-11.webp' },
-    { id: 13, title: 'Monthly Summary Jan', subtitle: 'Approved Object', category: 'approved-object', date: '01.05.37', image: '/img/approv-obj-13.webp' },
-    { id: 14, title: 'Monthly Summary Jan', subtitle: 'Approved Object', category: 'approved-object', date: '12.28.36', image: '/img/approv-obj-14.webp' },
-    { id: 15, title: 'Monthly Summary Jan', subtitle: 'Approved Object', category: 'approved-object', date: '12.20.36', image: '/img/approv-obj-15.webp' },
-    { id: 5, title: 'Green Code G-41', subtitle: 'Approved Object', category: 'approved-object', date: '12.15.36', image: '/img/approv-obj-5.webp' },
-    { id: 9, title: 'Green Code G-05', subtitle: 'Approved Object', category: 'approved-object', date: '12.01.36', image: '/img/approv-obj-9.webp' }
+    { id: 4, title: 'GW-TR-5560', subtitle: 'Approved Object', category: 'approved-object', date: '01.31.37', image: '/img/approv-obj-4.webp' },
+    { id: 17, title: 'GW-PST-002', subtitle: 'Campaign Poster', category: 'campaign-poster', date: '01.29.37', image: '/img/poster-2.webp' },
+    { id: 3, title: 'GW-LT-2091', subtitle: 'Approved Object', category: 'approved-object', date: '01.28.37', image: '/img/approv-obj-3.webp' },
+    { id: 10, title: 'GW-TR-7134', subtitle: 'Approved Object', category: 'approved-object', date: '01.27.37', image: '/img/approv-obj-10.webp' },
+    { id: 22, title: 'GW-AUT-002', subtitle: 'Authorization Form', category: 'authorization-form', date: '01.25.37', image: '/img/auth-form-2.webp' },
+    { id: 6, title: 'GW-FE-7319', subtitle: 'Approved Object', category: 'approved-object', date: '01.23.37', image: '/img/approv-obj-6.webp' },
+    { id: 2, title: 'GW-BR-4820', subtitle: 'Approved Object', category: 'approved-object', date: '01.22.37', image: '/img/approv-obj-2.webp' },
+    { id: 20, title: 'GW-VLT-001', subtitle: 'Violation Ticket', category: 'violation-ticket', date: '01.20.37', image: '/img/violation-ticket-2.webp' },
+    { id: 18, title: 'GW-PST-001', subtitle: 'Campaign Poster', category: 'campaign-poster', date: '01.18.37', image: '/img/poster-3.webp' },
+    { id: 7, title: 'GW-DN-8452', subtitle: 'Approved Object', category: 'approved-object', date: '01.15.37', image: '/img/approv-obj-7.webp' },
+    { id: 12, title: 'GW-LT-8732', subtitle: 'Approved Object', category: 'approved-object', date: '01.12.37', image: '/img/approv-obj-12.webp' },
+    { id: 23, title: 'GW-AUT-001', subtitle: 'Authorization Form', category: 'authorization-form', date: '01.10.37', image: '/img/auth-form-3.webp' },
+    { id: 11, title: 'GW-SC-2049', subtitle: 'Approved Object', category: 'approved-object', date: '01.08.37', image: '/img/approv-obj-11.webp' },
+    { id: 13, title: 'GW-MD-6605', subtitle: 'Approved Object', category: 'approved-object', date: '01.05.37', image: '/img/approv-obj-13.webp' },
+    { id: 14, title: 'GW-SG-4410', subtitle: 'Approved Object', category: 'approved-object', date: '12.28.36', image: '/img/approv-obj-14.webp' },
+    { id: 15, title: 'GW-PK-3356', subtitle: 'Approved Object', category: 'approved-object', date: '12.20.36', image: '/img/approv-obj-15.webp' },
+    { id: 5, title: 'GW-FN-6724', subtitle: 'Approved Object', category: 'approved-object', date: '12.15.36', image: '/img/approv-obj-5.webp' },
+    { id: 9, title: 'GW-FR-9921', subtitle: 'Approved Object', category: 'approved-object', date: '12.01.36', image: '/img/approv-obj-9.webp' }
   ];
 
   const filteredItems = selectedFilter === 'all' 
@@ -229,7 +229,8 @@ const GreenwashFinder: React.FC<GreenwashFinderProps> = ({ isOpen, onClose }) =>
                 marginBottom: showFilters ? '24px' : '12px',
                 transition: prefersReducedMotion 
                   ? 'margin-bottom 0.25s ease-out'
-                  : 'margin-bottom 0.85s cubic-bezier(0.22, 1, 0.36, 1) 0.15s'
+                  : 'margin-bottom 0.85s cubic-bezier(0.22, 1, 0.36, 1) 0.15s',
+                rowGap: '12px'
               }}
             >
               {/* Main trigger button */}
@@ -306,7 +307,7 @@ const GreenwashFinder: React.FC<GreenwashFinderProps> = ({ isOpen, onClose }) =>
                   className="group cursor-pointer"
                 >
                   <div 
-                    className="rounded-2xl overflow-hidden mb-3 relative"
+                    className="rounded-2xl overflow-hidden mb-3 relative group/item"
                     style={{
                       backgroundColor: 'rgba(0, 143, 70, 0.3)',
                       backdropFilter: 'blur(10px)',
@@ -314,9 +315,14 @@ const GreenwashFinder: React.FC<GreenwashFinderProps> = ({ isOpen, onClose }) =>
                       aspectRatio: '1/1'
                     }}
                   >
-                    {/* Image with padding */}
+                    {/* Image with padding and zoom effect */}
                     {item.image ? (
-                      <div className="w-full h-full p-4 flex items-center justify-center">
+                      <div 
+                        className="w-full h-full p-4 flex items-center justify-center transition-transform duration-500 ease-out group-hover/item:scale-125"
+                        style={{
+                          transformOrigin: 'center'
+                        }}
+                      >
                         <img
                           src={item.image}
                           alt={item.title}
@@ -335,13 +341,14 @@ const GreenwashFinder: React.FC<GreenwashFinderProps> = ({ isOpen, onClose }) =>
                       </div>
                     )}
 
-                    {/* Status badge */}
+                    {/* Status badge - always on top */}
                     {item.status && (
                       <div 
                         className="absolute top-3 right-3 px-3 py-1 rounded-full text-xs font-medium"
                         style={{
                           backgroundColor: 'rgba(255, 255, 255, 0.9)',
-                          color: '#008F46'
+                          color: '#008F46',
+                          zIndex: 10
                         }}
                       >
                         {item.status}
@@ -354,10 +361,10 @@ const GreenwashFinder: React.FC<GreenwashFinderProps> = ({ isOpen, onClose }) =>
                     <h3 className="font-medium text-sm mb-0.5" style={{ color: '#008F46', opacity: 0.8 }}>
                       {item.title}
                     </h3>
-                    <p className="text-sm mb-0.5" style={{ color: '#008F46', opacity: 0.8 }}>
+                    <p className="text-sm mb-0.5" style={{ color: '#008F46', opacity: 0.8, fontSize: '0.8em' }}>
                       {item.subtitle}
                     </p>
-                    <p className="text-sm" style={{ color: '#008F46', opacity: 0.8 }}>
+                    <p className="text-sm" style={{ color: '#008F46', opacity: 0.8, fontSize: '0.8em' }}>
                       {item.date}
                     </p>
                   </div>
