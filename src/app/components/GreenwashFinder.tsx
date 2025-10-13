@@ -23,6 +23,7 @@ const GreenwashFinder: React.FC<GreenwashFinderProps> = ({ isOpen, onClose }) =>
   const [showFilters, setShowFilters] = useState(false);
   const [isClosing, setIsClosing] = useState(false);
   const [isMobile, setIsMobile] = useState(false);
+  const [prefersReducedMotion, setPrefersReducedMotion] = useState(false);
   
   const backdropRef = useRef<HTMLDivElement>(null);
   const scrollContainerRef = useRef<HTMLDivElement>(null);
@@ -35,6 +36,16 @@ const GreenwashFinder: React.FC<GreenwashFinderProps> = ({ isOpen, onClose }) =>
     checkMobile();
     window.addEventListener('resize', checkMobile);
     return () => window.removeEventListener('resize', checkMobile);
+  }, []);
+
+  // Check for reduced motion preference
+  React.useEffect(() => {
+    const mediaQuery = window.matchMedia('(prefers-reduced-motion: reduce)');
+    setPrefersReducedMotion(mediaQuery.matches);
+    
+    const handleChange = (e: MediaQueryListEvent) => setPrefersReducedMotion(e.matches);
+    mediaQuery.addEventListener('change', handleChange);
+    return () => mediaQuery.removeEventListener('change', handleChange);
   }, []);
 
   // Handle close with animation
@@ -205,7 +216,9 @@ const GreenwashFinder: React.FC<GreenwashFinderProps> = ({ isOpen, onClose }) =>
                 justifyContent: 'center',
                 alignItems: 'center',
                 marginBottom: showFilters ? '24px' : '12px',
-                transition: 'margin-bottom 0.85s cubic-bezier(0.22, 1, 0.36, 1) 0.15s'
+                transition: prefersReducedMotion 
+                  ? 'margin-bottom 0.25s ease-out'
+                  : 'margin-bottom 0.85s cubic-bezier(0.22, 1, 0.36, 1) 0.15s'
               }}
             >
               {/* Main trigger button */}
@@ -218,8 +231,11 @@ const GreenwashFinder: React.FC<GreenwashFinderProps> = ({ isOpen, onClose }) =>
                   WebkitBackdropFilter: 'blur(10px)',
                   border: showFilters ? 'none' : '1px solid rgba(255, 255, 255, 0.3)',
                   color: showFilters ? '#008F46' : '#FFFFFF',
-                  transition: 'background-color 0.85s cubic-bezier(0.22, 1, 0.36, 1) 0.15s, border 0.85s cubic-bezier(0.22, 1, 0.36, 1) 0.15s, color 0.85s cubic-bezier(0.22, 1, 0.36, 1) 0.15s, transform 0.85s cubic-bezier(0.22, 1, 0.36, 1) 0.15s',
-                  transform: 'translateX(0)',
+                  transition: prefersReducedMotion
+                    ? 'background-color 0.25s ease-out, border 0.25s ease-out, color 0.25s ease-out, transform 0.25s ease-out, opacity 0.25s ease-out'
+                    : 'background-color 0.85s cubic-bezier(0.22, 1, 0.36, 1) 0.15s, border 0.85s cubic-bezier(0.22, 1, 0.36, 1) 0.15s, color 0.85s cubic-bezier(0.22, 1, 0.36, 1) 0.15s, transform 0.85s cubic-bezier(0.22, 1, 0.36, 1) 0.15s',
+                  transform: prefersReducedMotion ? 'none' : 'translateX(0)',
+                  opacity: prefersReducedMotion && showFilters ? 0.9 : 1,
                   willChange: 'transform, background-color'
                 }}
               >
@@ -238,9 +254,11 @@ const GreenwashFinder: React.FC<GreenwashFinderProps> = ({ isOpen, onClose }) =>
                     WebkitBackdropFilter: 'blur(10px)',
                     border: selectedFilter === filter.id ? 'none' : '1px solid rgba(255, 255, 255, 0.3)',
                     color: selectedFilter === filter.id ? '#008F46' : '#FFFFFF',
-                    opacity: 0,
-                    transform: 'translateY(12px)',
-                    animation: `fadeInUp 0.85s cubic-bezier(0.22, 1, 0.36, 1) ${150 + (index * 120)}ms forwards`
+                    opacity: prefersReducedMotion ? 1 : 0,
+                    transform: prefersReducedMotion ? 'none' : 'translateY(12px)',
+                    animation: prefersReducedMotion 
+                      ? `fadeIn 0.25s ease-out ${index * 40}ms forwards`
+                      : `fadeInUp 0.85s cubic-bezier(0.22, 1, 0.36, 1) ${150 + (index * 120)}ms forwards`
                   }}
                 >
                   <span>{filter.label}</span>
