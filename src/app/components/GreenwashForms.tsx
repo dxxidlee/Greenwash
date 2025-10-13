@@ -390,9 +390,10 @@ const GreenwashForms: React.FC<GreenwashFormsProps> = ({ isOpen, onClose }) => {
             onWheel={(e) => e.stopPropagation()}
             onTouchMove={(e) => e.stopPropagation()}
           >
+            <div className="pb-20" style={{ paddingTop: 'calc(16px + 48px + 80px)' }}>
             {/* Tab Navigation - Only show on mobile, inside scroll area */}
             {isMobile && (
-              <div className="flex gap-2 px-4 pt-4 pb-1" style={{ paddingTop: 'calc(16px + 48px + 80px)' }}>
+              <div className="flex gap-2 mb-2">
                 <button
                   onClick={() => setActiveTab('auth')}
                   className={`flex items-center gap-2 px-4 py-3 transition-all rounded-lg ${
@@ -422,8 +423,7 @@ const GreenwashForms: React.FC<GreenwashFormsProps> = ({ isOpen, onClose }) => {
               </div>
             )}
 
-            <div className="pb-20 px-4" style={{ paddingTop: isMobile ? '0.5rem' : 'calc(16px + 48px + 80px)' }}>
-              <div className={isMobile ? '' : 'grid grid-cols-2 gap-3 items-start content-start'}>
+              <div className={isMobile ? '' : 'px-4 grid grid-cols-2 gap-3 items-start content-start'}>
           {/* Authorization Form */}
           {(isMobile ? activeTab === 'auth' : true) && (
           <div 
