@@ -17,6 +17,7 @@ type Props = {
 export default function JournalModal({ open, onClose, entries }: Props) {
   const backdropRef = useRef<HTMLDivElement>(null);
   const panelRef = useRef<HTMLDivElement>(null);
+  const scrollContainerRef = useRef<HTMLDivElement>(null);
   const prevActive = useRef<HTMLElement | null>(null);
   const [isClosing, setIsClosing] = React.useState(false);
   const [isMobile, setIsMobile] = React.useState(false);
@@ -57,6 +58,21 @@ export default function JournalModal({ open, onClose, entries }: Props) {
       prevActive.current?.focus?.();
     }
   }, [open]);
+
+  // Forward scroll events to the entries container
+  const handleWheel = useCallback((e: React.WheelEvent) => {
+    e.stopPropagation();
+    if (scrollContainerRef.current) {
+      scrollContainerRef.current.scrollBy({
+        top: e.deltaY,
+        behavior: 'auto'
+      });
+    }
+  }, []);
+
+  const handleTouchMove = useCallback((e: React.TouchEvent) => {
+    e.stopPropagation();
+  }, []);
 
   if (!open) return null;
 
@@ -121,14 +137,12 @@ export default function JournalModal({ open, onClose, entries }: Props) {
       <div
         ref={backdropRef}
         onClick={handleClose}
-        onWheel={(e) => e.stopPropagation()}
-        onTouchMove={(e) => e.stopPropagation()}
-        onScroll={(e) => e.stopPropagation()}
+        onWheel={handleWheel}
+        onTouchMove={handleTouchMove}
         aria-hidden={false}
         aria-modal="true"
         role="dialog"
         className="fixed inset-0 z-[100] flex items-center justify-center bg-transparent overflow-hidden"
-        style={{ touchAction: 'none' }}
       >
         {/* Full screen blur layer with smooth animation */}
         <div 
@@ -148,9 +162,8 @@ export default function JournalModal({ open, onClose, entries }: Props) {
           ref={panelRef}
           tabIndex={-1}
           onClick={(e) => e.stopPropagation()}
-          onWheel={(e) => e.stopPropagation()}
-          onTouchMove={(e) => e.stopPropagation()}
-          onScroll={(e) => e.stopPropagation()}
+          onWheel={handleWheel}
+          onTouchMove={handleTouchMove}
           className={`
             relative z-10
             w-[92vw] sm:w-[86vw] md:w-auto
@@ -162,10 +175,8 @@ export default function JournalModal({ open, onClose, entries }: Props) {
         >
         {/* Scrollable column of journal entries with top/bottom spacing */}
         <div 
+          ref={scrollContainerRef}
           className="h-full w-full overflow-y-auto overscroll-contain scroll-smooth hide-scrollbar"
-          onScroll={(e) => e.stopPropagation()}
-          onWheel={(e) => e.stopPropagation()}
-          onTouchMove={(e) => e.stopPropagation()}
         >
           <div className="pb-20 space-y-4 sm:space-y-5 md:space-y-6" style={{ paddingTop: 'calc(16px + 48px + 80px)' }}>
             {entries.map((e, index) => (
