@@ -68,11 +68,11 @@ export default function JournalModal({ open, onClose, entries }: Props) {
           position: 'fixed',
           top: '16px',
           left: '50%',
-          transform: 'translateX(-50%)',
           zIndex: 200
         }}
         className={`
-          ${isClosing ? 'animate-[fadeOutScale_0.3s_ease-in_forwards]' : 'opacity-0 scale-95 animate-[fadeInScale_0.4s_ease-out_0.08s_forwards]'}
+          -translate-x-1/2
+          ${isClosing ? 'animate-[fadeOutScale_0.3s_ease-in_forwards]' : 'opacity-0 animate-[fadeInScale_0.4s_ease-out_0.08s_forwards]'}
         `}
       >
         <img 
