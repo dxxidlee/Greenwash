@@ -198,46 +198,30 @@ const GreenwashFinder: React.FC<GreenwashFinderProps> = ({ isOpen, onClose }) =>
 
             {/* Filter Pills */}
             <div 
-              className="flex gap-3 flex-wrap transition-all duration-300 ease-out"
+              className="flex gap-3 flex-wrap"
               style={{
                 width: '100%',
                 display: 'flex',
                 justifyContent: 'center',
                 alignItems: 'center',
                 marginBottom: showFilters ? '24px' : '12px',
-                transition: 'all 0.3s cubic-bezier(0.16, 1, 0.3, 1)'
+                transition: 'all 0.6s cubic-bezier(0.34, 1.56, 0.64, 1)'
               }}
             >
               {/* Main trigger button */}
               <button
                 onClick={() => setShowFilters(!showFilters)}
-                className="px-6 py-3 rounded-full font-medium focus:outline-none flex items-center gap-2"
+                className="px-6 py-3 rounded-full font-medium focus:outline-none"
                 style={{
                   backgroundColor: showFilters ? 'rgba(255, 255, 255, 0.9)' : 'rgba(0, 143, 70, 0.3)',
                   backdropFilter: 'blur(10px)',
                   WebkitBackdropFilter: 'blur(10px)',
                   border: showFilters ? 'none' : '1px solid rgba(255, 255, 255, 0.3)',
                   color: showFilters ? '#008F46' : '#FFFFFF',
-                  transition: 'all 0.3s cubic-bezier(0.16, 1, 0.3, 1)'
+                  transition: 'all 0.6s cubic-bezier(0.34, 1.56, 0.64, 1)'
                 }}
               >
-                <span>What are you looking for? →</span>
-                {selectedFilter !== 'all' && (
-                  <button
-                    onClick={(e) => {
-                      e.stopPropagation();
-                      setSelectedFilter('all');
-                    }}
-                    className="ml-2 hover:opacity-70 transition-opacity"
-                    style={{
-                      display: 'flex',
-                      alignItems: 'center',
-                      justifyContent: 'center'
-                    }}
-                  >
-                    <X size={16} />
-                  </button>
-                )}
+                What are you looking for? →
               </button>
 
               {/* Filter options - staggered spring fade-up reveal */}
@@ -245,7 +229,7 @@ const GreenwashFinder: React.FC<GreenwashFinderProps> = ({ isOpen, onClose }) =>
                 <button
                   key={filter.id}
                   onClick={() => setSelectedFilter(filter.id)}
-                  className="px-6 py-3 rounded-full font-medium focus:outline-none"
+                  className="px-6 py-3 rounded-full font-medium focus:outline-none flex items-center gap-2"
                   style={{
                     backgroundColor: selectedFilter === filter.id ? 'rgba(255, 255, 255, 0.9)' : 'rgba(0, 143, 70, 0.3)',
                     backdropFilter: 'blur(10px)',
@@ -257,7 +241,24 @@ const GreenwashFinder: React.FC<GreenwashFinderProps> = ({ isOpen, onClose }) =>
                     animation: `fadeInUp 0.6s cubic-bezier(0.34, 1.56, 0.64, 1) ${(index + 1) * 80}ms forwards`
                   }}
                 >
-                  {filter.label}
+                  <span>{filter.label}</span>
+                  {selectedFilter === filter.id && (
+                    <button
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        setSelectedFilter('all');
+                      }}
+                      className="hover:opacity-70 transition-opacity"
+                      style={{
+                        display: 'flex',
+                        alignItems: 'center',
+                        justifyContent: 'center',
+                        padding: 0
+                      }}
+                    >
+                      <X size={16} />
+                    </button>
+                  )}
                 </button>
               ))}
             </div>
