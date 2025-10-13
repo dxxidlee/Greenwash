@@ -150,7 +150,7 @@ const GreenwashQuiz: React.FC<GreenwashQuizProps> = ({ isOpen, onClose }) => {
     },
     {
       id: 4,
-      question: "A sidewalk café's chairs (business property) are clearly visible from the street. Are they within scope?",
+      question: "A sidewalk cafe's chairs (business property) are clearly visible from the street. Are they within scope?",
       options: [
         { id: 'a', text: "No, movable furniture is always exempt", points: 0 },
         { id: 'b', text: "Only if there have been customer complaints", points: 0 },
