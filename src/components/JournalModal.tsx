@@ -19,20 +19,8 @@ export default function JournalModal({ open, onClose, entries }: Props) {
   const panelRef = useRef<HTMLDivElement>(null);
   const prevActive = useRef<HTMLElement | null>(null);
   const [isClosing, setIsClosing] = React.useState(false);
-  const [isLoading, setIsLoading] = React.useState(true);
 
   useLockBodyScroll(open);
-
-  // Loading state
-  useEffect(() => {
-    if (open) {
-      setIsLoading(true);
-      const timer = setTimeout(() => {
-        setIsLoading(false);
-      }, 800);
-      return () => clearTimeout(timer);
-    }
-  }, [open]);
 
   // Handle close with animation
   const handleClose = useCallback(() => {
@@ -65,31 +53,25 @@ export default function JournalModal({ open, onClose, entries }: Props) {
 
   return (
     <>
-      {/* Loading Spinner — positioned at top center */}
-      {isLoading && (
-        <div
+      {/* Journal Icon — positioned at top center */}
+      <div
+        style={{
+          position: 'fixed',
+          top: '16px',
+          left: '50%',
+          transform: 'translateX(-50%)',
+          zIndex: 200
+        }}
+      >
+        <img 
+          src="/img/journal-final.webp" 
+          alt="Journal"
           style={{
-            position: 'fixed',
-            top: '24px',
-            left: '50%',
-            transform: 'translateX(-50%)',
-            zIndex: 201
+            height: '48px',
+            width: 'auto'
           }}
-          className="animate-spin"
-        >
-          <svg width="32" height="32" viewBox="0 0 32 32" fill="none">
-            <circle
-              cx="16"
-              cy="16"
-              r="12"
-              stroke="white"
-              strokeWidth="3"
-              strokeDasharray="8 8"
-              strokeLinecap="round"
-            />
-          </svg>
-        </div>
-      )}
+        />
+      </div>
 
       {/* Exit X — positioned at top right corner of screen, completely separate */}
       <button
