@@ -205,7 +205,7 @@ const GreenwashFinder: React.FC<GreenwashFinderProps> = ({ isOpen, onClose }) =>
                 justifyContent: 'center',
                 alignItems: 'center',
                 marginBottom: showFilters ? '24px' : '12px',
-                transition: 'all 0.8s cubic-bezier(0.22, 1, 0.36, 1)'
+                transition: 'margin-bottom 0.85s cubic-bezier(0.22, 1, 0.36, 1) 0.15s'
               }}
             >
               {/* Main trigger button */}
@@ -218,9 +218,9 @@ const GreenwashFinder: React.FC<GreenwashFinderProps> = ({ isOpen, onClose }) =>
                   WebkitBackdropFilter: 'blur(10px)',
                   border: showFilters ? 'none' : '1px solid rgba(255, 255, 255, 0.3)',
                   color: showFilters ? '#008F46' : '#FFFFFF',
-                  transition: 'all 0.8s cubic-bezier(0.22, 1, 0.36, 1)',
+                  transition: 'background-color 0.85s cubic-bezier(0.22, 1, 0.36, 1) 0.15s, border 0.85s cubic-bezier(0.22, 1, 0.36, 1) 0.15s, color 0.85s cubic-bezier(0.22, 1, 0.36, 1) 0.15s, transform 0.85s cubic-bezier(0.22, 1, 0.36, 1) 0.15s',
                   transform: 'translateX(0)',
-                  willChange: 'transform'
+                  willChange: 'transform, background-color'
                 }}
               >
                 What are you looking for? →
@@ -240,7 +240,7 @@ const GreenwashFinder: React.FC<GreenwashFinderProps> = ({ isOpen, onClose }) =>
                     color: selectedFilter === filter.id ? '#008F46' : '#FFFFFF',
                     opacity: 0,
                     transform: 'translateY(12px)',
-                    animation: `fadeInUp 0.8s cubic-bezier(0.22, 1, 0.36, 1) ${(index + 1) * 100}ms forwards`
+                    animation: `fadeInUp 0.85s cubic-bezier(0.22, 1, 0.36, 1) ${150 + (index * 120)}ms forwards`
                   }}
                 >
                   <span>{filter.label}</span>
