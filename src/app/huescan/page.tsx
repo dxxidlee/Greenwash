@@ -10,7 +10,6 @@ export default function HueScan() {
   const [matchPercentage, setMatchPercentage] = useState(0);
   const [facingMode, setFacingMode] = useState<'environment' | 'user'>('environment');
   const [rgbValues, setRgbValues] = useState({ r: 0, g: 0, b: 0 });
-  const [coordinates, setCoordinates] = useState({ x: 0, y: 0 });
   const [error, setError] = useState<string | null>(null);
   const [isFlipped, setIsFlipped] = useState(true); // Default to flipped for rear camera
   const [isMobile, setIsMobile] = useState(false);
@@ -265,8 +264,7 @@ export default function HueScan() {
     const avgG = Math.round(totalG / sampledPixels);
     const avgB = Math.round(totalB / sampledPixels);
       
-      setRgbValues({ r: avgR, g: avgG, b: avgB });
-      setCoordinates({ x: centerX, y: centerY });
+    setRgbValues({ r: avgR, g: avgG, b: avgB });
       
     const avgDistance = totalDistance / sampledPixels;
       const maxDistance = 441.67;
@@ -374,7 +372,7 @@ export default function HueScan() {
                   'text-red-300'
                 }`}>
                   {matchPercentage}%
-                </div>
+            </div>
                 <div className={`text-2xl font-bold tracking-wider ${
                   match === 'perfect' ? 'text-white' : 
                   match === 'close' ? 'text-yellow-100' : 
@@ -383,89 +381,47 @@ export default function HueScan() {
                   {match === 'perfect' ? '✓ COMPLIANT' : 
                    match === 'close' ? '! PARTIAL MATCH' : 
                    '✗ NOT COMPLIANT'}
-                </div>
+            </div>
                 {match === 'perfect' && (
                   <div className="text-xs text-white/80 mt-2">
                     GREEN APPROVED: #008F46
+              </div>
+            )}
+          </div>
             </div>
-                )}
-            </div>
-            </div>
-            </div>
-            
-          {/* Top Left Info */}
+          </div>
+          
+          {/* Top Left - Target Color */}
           <div className="absolute top-4 left-4">
-            <div className="bg-[rgba(0,143,70,0.3)] backdrop-blur-sm rounded-2xl p-4 text-white text-xs tracking-wider space-y-2">
+            <div className="bg-[rgba(0,143,70,0.3)] backdrop-blur-sm rounded-2xl px-4 py-3 text-white text-sm tracking-wider">
               <div className="flex items-center gap-2">
-                <span className="opacity-70">SYSTEM:</span>
-                <span>HUESCAN_v2.1</span>
-              </div>
-            <div className="flex items-center gap-2">
                 <span className="opacity-70">TARGET:</span>
-                <span>#008F46</span>
-            </div>
-            <div className="flex items-center gap-2">
-                <span className="opacity-70">MODE:</span>
-                <span>{facingMode === 'environment' ? 'REAR' : 'FRONT'}</span>
-            </div>
-              <div className="flex items-center gap-2">
-                <span className="opacity-70">FLIP:</span>
-                <span>{isFlipped ? 'ON' : 'OFF'}</span>
+                <span className="font-bold">#008F46</span>
               </div>
             </div>
           </div>
           
-          {/* Top Right Match % */}
-          <div className="absolute top-4 right-20">
-            <div className="bg-[rgba(0,143,70,0.3)] backdrop-blur-sm rounded-2xl p-4 text-center text-xs tracking-wider text-white">
-              <div className="opacity-70 mb-1">MATCH</div>
-              <div className={`text-xl font-bold ${
-                match === 'perfect' ? 'text-green-300' : 
-                match === 'close' ? 'text-yellow-300' : 
-                'text-red-300'
-            }`}>
-              {matchPercentage}%
-            </div>
-            </div>
-          </div>
-          
-          {/* Bottom Left RGB Values */}
-          <div className="absolute bottom-24 left-4">
-            <div className="bg-[rgba(0,143,70,0.3)] backdrop-blur-sm rounded-2xl p-4 text-white text-xs tracking-wider space-y-2">
-              <div className="opacity-70">COORDINATES</div>
-            <div>X: {coordinates.x}</div>
-            <div>Y: {coordinates.y}</div>
-              <div className="mt-3 opacity-70">COLOR VALUES</div>
-              <div>R: {rgbValues.r}</div>
-              <div>G: {rgbValues.g}</div>
-              <div>B: {rgbValues.b}</div>
-              <div className="mt-3">
-              <div className="flex items-center gap-2">
-                  <span className="opacity-70">HEX:</span>
-                  <span>
-                  #{rgbValues.r.toString(16).padStart(2, '0')}
-                  {rgbValues.g.toString(16).padStart(2, '0')}
-                  {rgbValues.b.toString(16).padStart(2, '0')}
-                </span>
-                </div>
-              </div>
-            </div>
-          </div>
-          
-          {/* Bottom Right Color Preview */}
-          <div className="absolute bottom-24 right-4">
-            <div className="bg-[rgba(0,143,70,0.3)] backdrop-blur-sm rounded-2xl p-4 text-white">
-              <div className="text-xs tracking-wider mb-3 text-center opacity-70">
-              DETECTED
-            </div>
-            <div 
-                className="w-16 h-16 rounded-lg border-2 border-white/30"
+          {/* Bottom - Detected Color Info */}
+          <div className="absolute bottom-24 left-1/2 transform -translate-x-1/2">
+            <div className="bg-[rgba(0,143,70,0.3)] backdrop-blur-sm rounded-2xl p-4 text-white flex items-center gap-4">
+              {/* Color Preview */}
+              <div 
+                className="w-16 h-16 rounded-lg border-2 border-white/30 flex-shrink-0"
               style={{ 
                 backgroundColor: `rgb(${rgbValues.r}, ${rgbValues.g}, ${rgbValues.b})` 
               }}
             />
+              {/* HEX Code */}
+              <div>
+                <div className="text-xs tracking-wider opacity-70 mb-1">DETECTED</div>
+                <div className="text-xl font-bold tracking-wider">
+                  #{rgbValues.r.toString(16).padStart(2, '0').toUpperCase()}
+                  {rgbValues.g.toString(16).padStart(2, '0').toUpperCase()}
+                  {rgbValues.b.toString(16).padStart(2, '0').toUpperCase()}
+                </div>
           </div>
             </div>
+          </div>
         </div>
       )}
       
