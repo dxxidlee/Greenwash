@@ -45,6 +45,15 @@ const GreenwashQuiz: React.FC<GreenwashQuizProps> = ({ isOpen, onClose }) => {
     }, 400); // Match animation duration
   }, [onClose]);
 
+  // Prevent scroll events from reaching the background
+  const handleWheelBackdrop = useCallback((e: React.WheelEvent) => {
+    e.stopPropagation();
+  }, []);
+
+  const handleTouchMoveBackdrop = useCallback((e: React.TouchEvent) => {
+    e.stopPropagation();
+  }, []);
+
   // ESC to close
   React.useEffect(() => {
     if (!isOpen) return;
@@ -202,6 +211,33 @@ const GreenwashQuiz: React.FC<GreenwashQuizProps> = ({ isOpen, onClose }) => {
 
   return (
     <>
+      {/* SelfTest Icon — positioned at top center */}
+      <div
+        style={{
+          position: 'fixed',
+          top: '16px',
+          left: '50%',
+          transform: 'translateX(-50%)',
+          zIndex: 200
+        }}
+      >
+        <div
+          className={`
+            ${isClosing ? 'animate-[fadeOutScale_0.3s_ease-in_forwards]' : 'opacity-0 animate-[fadeInScale_0.4s_ease-out_0.08s_forwards]'}
+          `}
+        >
+          <img
+            src="/img/selftest-final.webp"
+            alt="SelfTest"
+            style={{
+              height: '48px',
+              width: 'auto',
+              display: 'block'
+            }}
+          />
+        </div>
+      </div>
+
       {/* Exit X — positioned at top right corner of screen, completely separate */}
       <button
         onClick={handleClose}
@@ -234,10 +270,12 @@ const GreenwashQuiz: React.FC<GreenwashQuizProps> = ({ isOpen, onClose }) => {
       <div
         ref={backdropRef}
         onClick={handleClose}
+        onWheel={handleWheelBackdrop}
+        onTouchMove={handleTouchMoveBackdrop}
         aria-hidden={false}
         aria-modal="true"
         role="dialog"
-        className="fixed inset-0 z-[100] flex items-center justify-center bg-transparent"
+        className="fixed inset-0 z-[100] flex items-center justify-center bg-transparent overflow-hidden"
       >
         {/* Full screen blur layer with smooth animation */}
         <div 
@@ -249,6 +287,7 @@ const GreenwashQuiz: React.FC<GreenwashQuizProps> = ({ isOpen, onClose }) => {
             backdrop-boost no-blur-fallback
             ${isClosing ? 'animate-[fadeOut_0.32s_ease-in_forwards]' : 'opacity-0 animate-[fadeIn_0.32s_ease-out_forwards]'}
           `}
+          style={{ pointerEvents: 'none' }}
         />
 
         {/* Quiz container - no visible container */}
@@ -266,8 +305,12 @@ const GreenwashQuiz: React.FC<GreenwashQuizProps> = ({ isOpen, onClose }) => {
           `}
         >
         {/* Scrollable quiz content with top/bottom spacing */}
-        <div className="h-full w-full overflow-y-auto overscroll-contain scroll-smooth hide-scrollbar">
-          <div className="pt-20 pb-20 space-y-4 sm:space-y-5 md:space-y-6">
+        <div 
+          className="h-full w-full overflow-y-auto overscroll-contain scroll-smooth hide-scrollbar"
+          onWheel={(e) => e.stopPropagation()}
+          onTouchMove={(e) => e.stopPropagation()}
+        >
+          <div className="pb-20 space-y-4 sm:space-y-5 md:space-y-6" style={{ paddingTop: 'calc(16px + 48px + 80px)' }}>
             {showResults ? (
               <div className="space-y-4 sm:space-y-5 md:space-y-6">
                 {(() => {
@@ -311,7 +354,7 @@ const GreenwashQuiz: React.FC<GreenwashQuizProps> = ({ isOpen, onClose }) => {
               </div>
             ) : (
               <div className="space-y-4 sm:space-y-5 md:space-y-6">
-                {/* Quiz Header */}
+                {/* Progress Bar with Question Counter */}
                 <article
                   className={`
                     relative
@@ -325,28 +368,9 @@ const GreenwashQuiz: React.FC<GreenwashQuizProps> = ({ isOpen, onClose }) => {
                     animate-[fadeInUp_0.32s_ease-out_forwards]
                   `}
                 >
-                  <div className="text-center">
-                    <div className="text-sm tracking-wide uppercase text-white mb-2">GREENWASH COMPLIANCE DIVISION</div>
-                    <h1 className="text-xl font-bold text-white mb-2">Officer Certification Quiz</h1>
-                    <div className="text-sm text-white">Question {currentQuestion + 1} of {questions.length}</div>
+                  <div className="text-center text-sm text-white mb-3">
+                    Question {currentQuestion + 1} of {questions.length}
                   </div>
-                </article>
-
-                {/* Progress Bar */}
-                <article
-                  className={`
-                    relative
-                    rounded-2xl md:rounded-[24px]
-                    shadow-[0_2px_12px_rgba(0,0,0,0.06)]
-                    bg-[rgba(0,143,70,0.3)]
-                    noise-surface
-                    p-4 sm:p-5 md:p-6
-                    scroll-mt-6
-                    opacity-0 translate-y-4
-                    animate-[fadeInUp_0.32s_ease-out_forwards]
-                  `}
-                  style={{ animationDelay: '100ms' }}
-                >
                   <div className="w-full h-2 bg-white/20 rounded-full">
                     <div 
                       className="h-full bg-white transition-all duration-300 rounded-full"
@@ -368,7 +392,7 @@ const GreenwashQuiz: React.FC<GreenwashQuizProps> = ({ isOpen, onClose }) => {
                     opacity-0 translate-y-4
                     animate-[fadeInUp_0.32s_ease-out_forwards]
                   `}
-                  style={{ animationDelay: '200ms' }}
+                  style={{ animationDelay: '100ms' }}
                 >
                   <h2 className="text-lg font-bold text-white mb-6 leading-relaxed">
                     {questions[currentQuestion].question}
