@@ -77,7 +77,7 @@ const GreenwashQuiz: React.FC<GreenwashQuizProps> = ({ isOpen, onClose }) => {
       question: "You come across a food cart using a red umbrella on a busy corner. What's the Protocol-aligned first step?",
       options: [
         { id: 'a', text: "Call an emergency recolor crew", points: 0 },
-        { id: 'b', text: "Scan with HueScan and take photos, issue a violation ticket, and give a 7-day window to correct", points: 10 },
+        { id: 'b', text: "Scan with HueScan and issue a violation ticket", points: 10 },
         { id: 'c', text: "Confiscate the umbrella on the spot", points: 0 },
         { id: 'd', text: "Ignore it—it's only one umbrella", points: 0 }
       ],
@@ -85,11 +85,11 @@ const GreenwashQuiz: React.FC<GreenwashQuizProps> = ({ isOpen, onClose }) => {
     },
     {
       id: 2,
-      question: "Under proper lighting, three scans on the same surface return 2.9, 3.8, and 2.6 (ΔE*00). What should you do?",
+      question: "Under proper lighting, three scans on the same surface yield values of 2.9, 3.8, and 2.6 (ΔE*00). What should you do?",
       options: [
         { id: 'a', text: "Throw out the highest reading and pass", points: 0 },
         { id: 'b', text: "Use the middle value and pass", points: 0 },
-        { id: 'c', text: "Use the highest stable reading, recheck to confirm, and cite if it remains over spec", points: 10 },
+        { id: 'c', text: "Use the highest stable reading, recheck, and cite if necessary", points: 10 },
         { id: 'd', text: "Average the three numbers and caution", points: 0 }
       ],
       correctAnswer: 'c'
@@ -100,7 +100,7 @@ const GreenwashQuiz: React.FC<GreenwashQuizProps> = ({ isOpen, onClose }) => {
       options: [
         { id: 'a', text: "Leave the stickers—free speech matters", points: 0 },
         { id: 'b', text: "Scrape them off now and do the paperwork later", points: 0 },
-        { id: 'c', text: "Photograph and log the incident, remove the stickers per policy, file minor-defacement, and schedule finish correction", points: 10 },
+        { id: 'c', text: "Log the incident, remove the stickers, file minor-defacement, and schedule finish correction", points: 10 },
         { id: 'd', text: "Paint over the entire kiosk immediately", points: 0 }
       ],
       correctAnswer: 'c'
@@ -109,9 +109,9 @@ const GreenwashQuiz: React.FC<GreenwashQuizProps> = ({ isOpen, onClose }) => {
       id: 4,
       question: "A sidewalk café's chairs (business property) are clearly visible from the street. Are they within scope?",
       options: [
-        { id: 'a', text: "No—movable furniture is always exempt", points: 0 },
+        { id: 'a', text: "No, movable furniture is always exempt", points: 0 },
         { id: 'b', text: "Only if there have been customer complaints", points: 0 },
-        { id: 'c', text: "Yes—business fixtures visible from the right-of-way are subject to spec", points: 10 },
+        { id: 'c', text: "Yes, business fixtures visible from the right-of-way are subject to spec", points: 10 },
         { id: 'd', text: "Only if a police officer is present", points: 0 }
       ],
       correctAnswer: 'c'
@@ -122,17 +122,17 @@ const GreenwashQuiz: React.FC<GreenwashQuizProps> = ({ isOpen, onClose }) => {
       options: [
         { id: 'a', text: "Keep the original pass because rank prevails", points: 0 },
         { id: 'b', text: "Post screenshots in the team chat", points: 0 },
-        { id: 'c', text: "File an Integrity Ping with your data, request a quiet re-inspection, and inform J. Alvarez directly", points: 10 },
+        { id: 'c', text: "File an Integrity Ping, request a re-inspection, and inform J. Alvarez", points: 10 },
         { id: 'd', text: "Overwrite the pass yourself", points: 0 }
       ],
       correctAnswer: 'c'
     },
     {
       id: 6,
-      question: "In the visor, the Truth Alignment bar drops and the UI flashes SESSION LOOP. You feel like ripping off the visor. What should you do?",
+      question: "In the visor, the Truth Alignment bar drops, and flashes SESSION LOOP. You feel like ripping off the visor. What should you do?",
       options: [
         { id: 'a', text: "Ask a coworker to finish the line for you", points: 0 },
-        { id: 'b', text: "Stay seated, breathe on the metronome, and repeat the Standard paragraph steadily until alignment confirms", points: 10 },
+        { id: 'b', text: "Stay seated, breathe on the metronome, and repeat steadily", points: 10 },
         { id: 'c', text: "Lift the visor and try again tomorrow", points: 0 },
         { id: 'd', text: "Shout the last sentence to show conviction", points: 0 }
       ],
@@ -155,7 +155,7 @@ const GreenwashQuiz: React.FC<GreenwashQuizProps> = ({ isOpen, onClose }) => {
       options: [
         { id: 'a', text: "Safety is personal expression at scale", points: 0 },
         { id: 'b', text: "Safety is endless debate", points: 0 },
-        { id: 'c', text: "Safety is legibility—the city is a single surface; we do not fracture it", points: 10 },
+        { id: 'c', text: "Safety is legibility, the city is a single surface; we do not fracture it", points: 10 },
         { id: 'd', text: "Safety is whatever feels right today", points: 0 }
       ],
       correctAnswer: 'c'
@@ -166,7 +166,7 @@ const GreenwashQuiz: React.FC<GreenwashQuizProps> = ({ isOpen, onClose }) => {
       options: [
         { id: 'a', text: "Tell them to paint whatever they like", points: 0 },
         { id: 'b', text: "Post their comment in the group chat", points: 0 },
-        { id: 'c', text: "Offer to book SelfTest, share the manual page on visual integrity, avoid debate, and log a minor variance risk", points: 10 },
+        { id: 'c', text: "Offe SelfTest, share the manual page on visual integrity, avoid debate, and log a minor variance risk", points: 10 },
         { id: 'd', text: "Argue aesthetics until they agree", points: 0 }
       ],
       correctAnswer: 'c'
@@ -177,7 +177,7 @@ const GreenwashQuiz: React.FC<GreenwashQuizProps> = ({ isOpen, onClose }) => {
       options: [
         { id: 'a', text: "Turn off all lights", points: 0 },
         { id: 'b', text: "Ignore it—it's private space", points: 0 },
-        { id: 'c', text: "Cover or hide the LED (tape or relocate the router) to preserve a coherent field, and note the intervention in your self-log", points: 10 },
+        { id: 'c', text: "Cover or hide the LED (tape or relocate the router) to preserve a coherent field, and log the intervention", points: 10 },
         { id: 'd', text: "Smash the router", points: 0 }
       ],
       correctAnswer: 'c'
@@ -369,8 +369,8 @@ const GreenwashQuiz: React.FC<GreenwashQuizProps> = ({ isOpen, onClose }) => {
                       `}
                     >
                       <div className="text-center mb-6">
-                        <div className="text-4xl font-bold mb-2 text-white">{score}/100</div>
-                        <div className="text-lg font-bold mb-2 text-white">
+                        <div className="text-4xl font-medium mb-2 text-white">{score}/100</div>
+                        <div className="text-lg font-medium mb-2 text-white">
                           {result.title}
                         </div>
                         <div className="text-sm text-white leading-relaxed">
@@ -431,7 +431,7 @@ const GreenwashQuiz: React.FC<GreenwashQuizProps> = ({ isOpen, onClose }) => {
                   `}
                   style={{ animationDelay: '100ms' }}
                 >
-                  <h2 className="text-lg font-bold text-white mb-6 leading-relaxed">
+                  <h2 className="text-lg font-medium text-white mb-6 leading-relaxed">
                     {questions[currentQuestion].question}
                   </h2>
 
