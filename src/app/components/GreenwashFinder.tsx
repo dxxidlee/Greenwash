@@ -194,13 +194,14 @@ const GreenwashFinder: React.FC<GreenwashFinderProps> = ({ isOpen, onClose }) =>
             onWheel={(e) => e.stopPropagation()}
             onTouchMove={(e) => e.stopPropagation()}
           >
-            <div className="pb-20" style={{ paddingTop: 'calc(16px + 48px + 80px)' }}>
+            <div className="pb-20 px-4 md:px-0" style={{ paddingTop: 'calc(16px + 48px + 80px)' }}>
 
             {/* Filter Pills */}
             <div 
               className="flex gap-3 flex-wrap transition-all duration-300 ease-out"
               style={{
                 width: '100%',
+                display: 'flex',
                 justifyContent: showFilters ? 'flex-start' : 'center',
                 alignItems: 'center',
                 marginBottom: showFilters ? '24px' : '12px',
