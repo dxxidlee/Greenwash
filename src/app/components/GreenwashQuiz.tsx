@@ -259,26 +259,26 @@ const GreenwashQuiz: React.FC<GreenwashQuizProps> = ({ isOpen, onClose }) => {
   const getResultMessage = (score: number) => {
     if (score >= 80) {
       return {
-        title: "Exemplary Compliance Officer",
-        message: "Exceptional understanding of protocols and visual uniformity.",
+        title: "Field Ready",
+        message: "Protocol alignment confirmed. Cleared for independent enforcement.",
         color: "green"
       };
-    } else if (score >= 50) {
+    } else if (score >= 60) {
       return {
-        title: "Adequate Field Officer",
-        message: "Basics understood but room for protocol improvement.",
+        title: "Adequate Officer",
+        message: "Basic competency established. Quarterly recalibration recommended.",
         color: "yellow"
       };
-    } else if (score >= 20) {
+    } else if (score >= 40) {
       return {
-        title: "Probationary Status",
-        message: "Insufficient commitment requires mandatory retraining.",
+        title: "Recalibration Required",
+        message: "Protocol drift detected. Immediate BreakRoom session required.",
         color: "orange"
       };
     } else {
       return {
-        title: "Compliance Failure",
-        message: "Fundamentally unsuited for Compliance Division work.",
+        title: "Critical Misalignment",
+        message: "Severe protocol deviation. Extended BreakRoom cycle mandatory.",
         color: "red"
       };
     }
