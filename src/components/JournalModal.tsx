@@ -59,18 +59,12 @@ export default function JournalModal({ open, onClose, entries }: Props) {
     }
   }, [open]);
 
-  // Forward scroll events to the entries container
-  const handleWheel = useCallback((e: React.WheelEvent) => {
+  // Prevent scroll events from reaching the background
+  const handleWheelBackdrop = useCallback((e: React.WheelEvent) => {
     e.stopPropagation();
-    if (scrollContainerRef.current) {
-      scrollContainerRef.current.scrollBy({
-        top: e.deltaY,
-        behavior: 'auto'
-      });
-    }
   }, []);
 
-  const handleTouchMove = useCallback((e: React.TouchEvent) => {
+  const handleTouchMoveBackdrop = useCallback((e: React.TouchEvent) => {
     e.stopPropagation();
   }, []);
 
@@ -137,8 +131,8 @@ export default function JournalModal({ open, onClose, entries }: Props) {
       <div
         ref={backdropRef}
         onClick={handleClose}
-        onWheel={handleWheel}
-        onTouchMove={handleTouchMove}
+        onWheel={handleWheelBackdrop}
+        onTouchMove={handleTouchMoveBackdrop}
         aria-hidden={false}
         aria-modal="true"
         role="dialog"
@@ -162,8 +156,6 @@ export default function JournalModal({ open, onClose, entries }: Props) {
           ref={panelRef}
           tabIndex={-1}
           onClick={(e) => e.stopPropagation()}
-          onWheel={handleWheel}
-          onTouchMove={handleTouchMove}
           className={`
             relative z-10
             w-[92vw] sm:w-[86vw] md:w-auto
@@ -177,6 +169,8 @@ export default function JournalModal({ open, onClose, entries }: Props) {
         <div 
           ref={scrollContainerRef}
           className="h-full w-full overflow-y-auto overscroll-contain scroll-smooth hide-scrollbar"
+          onWheel={(e) => e.stopPropagation()}
+          onTouchMove={(e) => e.stopPropagation()}
         >
           <div className="pb-20 space-y-4 sm:space-y-5 md:space-y-6" style={{ paddingTop: 'calc(16px + 48px + 80px)' }}>
             {entries.map((e, index) => (
