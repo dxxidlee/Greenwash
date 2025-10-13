@@ -139,6 +139,7 @@ export default function JournalModal({ open, onClose, entries }: Props) {
                 <div className="text-xs tracking-wide uppercase text-white mb-2">
                   {e.date}
                 </div>
+                <div className="border-t border-white mb-2"></div>
                 <div className="prose max-w-none text-sm md:text-[15px] leading-6 text-white">
                   {e.body}
                 </div>
