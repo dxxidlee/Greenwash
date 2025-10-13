@@ -19,8 +19,17 @@ export default function JournalModal({ open, onClose, entries }: Props) {
   const panelRef = useRef<HTMLDivElement>(null);
   const prevActive = useRef<HTMLElement | null>(null);
   const [isClosing, setIsClosing] = React.useState(false);
+  const [isMobile, setIsMobile] = React.useState(false);
 
   useLockBodyScroll(open);
+
+  // Check for mobile
+  useEffect(() => {
+    const checkMobile = () => setIsMobile(window.innerWidth < 768);
+    checkMobile();
+    window.addEventListener('resize', checkMobile);
+    return () => window.removeEventListener('resize', checkMobile);
+  }, []);
 
   // Handle close with animation
   const handleClose = useCallback(() => {
@@ -77,8 +86,13 @@ export default function JournalModal({ open, onClose, entries }: Props) {
       <button
         onClick={handleClose}
         aria-label="Close"
-        className="
-          fixed top-4 right-6 md:right-4
+        style={{
+          position: 'fixed',
+          top: '16px',
+          right: isMobile ? '24px' : '16px',
+          zIndex: 200
+        }}
+        className={`
           inline-flex items-center justify-center
           h-12 w-12
           rounded-full
@@ -89,9 +103,8 @@ export default function JournalModal({ open, onClose, entries }: Props) {
           hover:bg-[rgba(0,143,70,0.4)]
           transition-all duration-500 ease-out
           focus:outline-none focus:ring-2 focus:ring-white/30
-          z-[200]
           ${isClosing ? 'animate-[fadeOutScale_0.4s_ease-in_forwards]' : 'opacity-0 scale-95 animate-[fadeInScale_0.4s_ease-out_0.08s_forwards]'}
-        "
+        `}
       >
         <svg viewBox="0 0 24 24" width="18" height="18" aria-hidden="true">
           <path d="M6 6l12 12M18 6L6 18" stroke="currentColor" strokeWidth="2" strokeLinecap="round"/>
