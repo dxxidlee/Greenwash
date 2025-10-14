@@ -68,11 +68,16 @@ export default function BreakRoomV2({ open, onClose }: Props) {
   useEffect(() => {
     if (recordingState === 'recording' && sentenceRefs.current[currentSentenceIdx]) {
       const element = sentenceRefs.current[currentSentenceIdx];
-      element?.scrollIntoView({ 
-        behavior: 'smooth', 
-        block: 'center',
-        inline: 'center'
-      });
+      if (element && element.parentElement) {
+        const container = element.parentElement;
+        const elementRect = element.getBoundingClientRect();
+        
+        const scrollTop = element.offsetTop - (container.clientHeight / 2) + (elementRect.height / 2);
+        container.scrollTo({
+          top: scrollTop,
+          behavior: 'smooth'
+        });
+      }
     }
   }, [currentSentenceIdx, recordingState]);
 
@@ -585,29 +590,27 @@ export default function BreakRoomV2({ open, onClose }: Props) {
 
             {recordingState === 'recording' && (
               <div 
-                className="w-full relative flex items-center justify-center"
-                style={{
-                  height: '60vh'
-                }}
+                className="w-full flex items-center justify-center"
               >
-                {/* Green text box container */}
+                {/* Green text box container - compact and wraps around content */}
                 <div 
-                  className="relative rounded-2xl md:rounded-[24px] shadow-[0_2px_12px_rgba(0,0,0,0.06)] bg-[rgba(0,143,70,0.3)] noise-surface p-6 sm:p-8 md:p-10 mx-4 sm:mx-8 md:mx-16"
+                  className="relative rounded-[40px] shadow-[0_2px_12px_rgba(0,0,0,0.06)] bg-[rgba(0,143,70,0.3)] noise-surface px-8 py-6 sm:px-12 sm:py-8 md:px-16 md:py-10 mx-4 sm:mx-8 md:mx-16"
                   style={{
-                    maxWidth: '56rem',
+                    maxWidth: '64rem',
                     width: '100%',
                     overflow: 'hidden',
-                    display: 'flex',
-                    alignItems: 'center',
-                    justifyContent: 'center'
+                    maxHeight: '50vh'
                   }}
                 >
                   <div 
-                    className="w-full h-full overflow-y-auto hide-scrollbar"
+                    className="w-full overflow-y-auto hide-scrollbar"
                     style={{
                       scrollBehavior: 'smooth',
-                      paddingTop: '50vh',
-                      paddingBottom: '50vh'
+                      display: 'flex',
+                      flexDirection: 'column',
+                      alignItems: 'center',
+                      justifyContent: 'center',
+                      minHeight: '200px'
                     }}
                   >
                     {SENTENCE_DATA.map((sentenceData, idx) => renderSentence(sentenceData, idx))}
