@@ -18,7 +18,9 @@ export default function HueScan() {
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const animationRef = useRef<number | null>(null);
   const overlayCanvasRef = useRef<HTMLCanvasElement>(null);
+  const filterCanvasRef = useRef<HTMLCanvasElement>(null);
   const overlayAnimationRef = useRef<number | null>(null);
+  const filterAnimationRef = useRef<number | null>(null);
   const lastUpdateTimeRef = useRef<number>(0);
   const frameCountRef = useRef<number>(0);
   const isPageVisible = useRef<boolean>(true);
@@ -53,6 +55,10 @@ export default function HueScan() {
         if (overlayAnimationRef.current) {
           cancelAnimationFrame(overlayAnimationRef.current);
           overlayAnimationRef.current = null;
+        }
+        if (filterAnimationRef.current) {
+          cancelAnimationFrame(filterAnimationRef.current);
+          filterAnimationRef.current = null;
         }
         console.log('Page hidden - paused');
       } else {
@@ -146,6 +152,10 @@ export default function HueScan() {
       cancelAnimationFrame(overlayAnimationRef.current);
       overlayAnimationRef.current = null;
     }
+    if (filterAnimationRef.current) {
+      cancelAnimationFrame(filterAnimationRef.current);
+      filterAnimationRef.current = null;
+    }
     setScanning(false);
   }, [stream]);
 
@@ -208,6 +218,78 @@ export default function HueScan() {
     );
   };
 
+  // Green filter effect - highlights green objects, darkens everything else
+  const applyGreenFilter = useCallback(() => {
+    if (!isPageVisible.current || !scanning) return;
+    
+    try {
+      filterAnimationRef.current = requestAnimationFrame(applyGreenFilter);
+      
+      const video = videoRef.current;
+      const filterCanvas = filterCanvasRef.current;
+      
+      if (!video || !filterCanvas || video.readyState !== video.HAVE_ENOUGH_DATA) return;
+      
+      // Update filter canvas size if needed
+      if (filterCanvas.width !== video.videoWidth || filterCanvas.height !== video.videoHeight) {
+        filterCanvas.width = video.videoWidth;
+        filterCanvas.height = video.videoHeight;
+      }
+      
+      const ctx = filterCanvas.getContext('2d', { willReadFrequently: true });
+      if (!ctx) return;
+      
+      // Draw video frame
+      ctx.drawImage(video, 0, 0, filterCanvas.width, filterCanvas.height);
+      
+      // Get image data
+      const imageData = ctx.getImageData(0, 0, filterCanvas.width, filterCanvas.height);
+      const data = imageData.data;
+      
+      // Apply green highlighting filter
+      for (let i = 0; i < data.length; i += 4) {
+        const r = data[i];
+        const g = data[i + 1];
+        const b = data[i + 2];
+        
+        // Calculate how "green" this pixel is
+        const isGreenish = g > r && g > b && g > 60;
+        const greenStrength = isGreenish ? (g - Math.max(r, b)) / 255 : 0;
+        
+        if (greenStrength > 0.15) {
+          // Enhance green pixels - make them brighter and more vivid
+          const boost = 1.3 + greenStrength * 0.4;
+          data[i] = Math.min(255, r * 0.8); // Reduce red slightly
+          data[i + 1] = Math.min(255, g * boost); // Boost green
+          data[i + 2] = Math.min(255, b * 0.8); // Reduce blue slightly
+        } else {
+          // Darken non-green pixels heavily
+          const darkness = 0.15; // Very dark, almost black
+          data[i] = r * darkness;
+          data[i + 1] = g * darkness * 1.1; // Slight green tint to shadows
+          data[i + 2] = b * darkness * 0.9;
+        }
+        
+        // Add subtle film grain noise
+        const noise = (Math.random() - 0.5) * 15;
+        data[i] = Math.max(0, Math.min(255, data[i] + noise));
+        data[i + 1] = Math.max(0, Math.min(255, data[i + 1] + noise));
+        data[i + 2] = Math.max(0, Math.min(255, data[i + 2] + noise));
+      }
+      
+      ctx.putImageData(imageData, 0, 0);
+      
+      // Apply blur effect for aesthetic
+      ctx.filter = 'blur(0.5px)';
+      ctx.drawImage(filterCanvas, 0, 0);
+      ctx.filter = 'none';
+      
+    } catch (err) {
+      console.error('Filter error:', err);
+      filterAnimationRef.current = requestAnimationFrame(applyGreenFilter);
+    }
+  }, [scanning]);
+
   // Separate overlay animation loop for smooth 60fps overlay
   const drawOverlay = useCallback(() => {
     if (!isPageVisible.current || !scanning) return; // Don't animate when page is hidden
@@ -233,21 +315,8 @@ export default function HueScan() {
     const bracketLength = 40;
     const sampleSize = 40; // Same as in analyzeFrame - this is what's actually scanned
     
-    // SCANNING AREA INDICATOR - Shows exact pixels being analyzed - FULLY WHITE SHARP EDGES
-    ctx.strokeStyle = 'rgba(255, 255, 255, 1)'; // Fully opaque white
-    ctx.lineWidth = 3;
-    ctx.lineCap = 'square'; // Sharp edges
-    ctx.lineJoin = 'miter'; // Sharp corners
-    ctx.setLineDash([8, 8]); // Dashed line
-    ctx.strokeRect(centerX - sampleSize, centerY - sampleSize, sampleSize * 2, sampleSize * 2);
-    ctx.setLineDash([]); // Reset dash
-    
-    // Semi-transparent fill to show scanning area
-    ctx.fillStyle = 'rgba(255, 255, 255, 0.05)';
-    ctx.fillRect(centerX - sampleSize, centerY - sampleSize, sampleSize * 2, sampleSize * 2);
-    
-    // Corner brackets - ALWAYS WHITE
-    ctx.strokeStyle = 'rgba(255, 255, 255, 0.9)';
+    // Corner brackets - GREEN #008F46
+    ctx.strokeStyle = 'rgba(0, 143, 70, 0.9)';
     ctx.lineWidth = 2;
     ctx.lineCap = 'square';
     ctx.lineJoin = 'miter';
@@ -273,10 +342,11 @@ export default function HueScan() {
     ctx.lineTo(centerX + adjustedSize, centerY + adjustedSize - bracketLength);
     ctx.stroke();
     
-    // Optimized crosshair - always white
-    ctx.strokeStyle = 'rgba(255, 255, 255, 0.9)';
-    ctx.lineWidth = 3;
-    const crossSize = 20;
+    // THICK GREEN CROSSHAIR - Solid, no dotted stroke
+    ctx.strokeStyle = 'rgba(0, 143, 70, 1)'; // Exact green #008F46
+    ctx.lineWidth = 5; // Much thicker
+    ctx.lineCap = 'round'; // Rounded ends for smoother look
+    const crossSize = 25;
     ctx.beginPath();
     ctx.moveTo(centerX - crossSize, centerY);
     ctx.lineTo(centerX + crossSize, centerY);
@@ -284,9 +354,11 @@ export default function HueScan() {
     ctx.lineTo(centerX, centerY + crossSize);
     ctx.stroke();
     
-    // Center dot - always white
-    ctx.fillStyle = 'rgba(255, 255, 255, 0.9)';
-    ctx.fillRect(centerX - 3, centerY - 3, 6, 6);
+    // Center dot - GREEN
+    ctx.fillStyle = 'rgba(0, 143, 70, 1)';
+    ctx.beginPath();
+    ctx.arc(centerX, centerY, 4, 0, Math.PI * 2);
+    ctx.fill();
     } catch (err) {
       console.error('Overlay draw error:', err);
       // Restart on next frame despite error
@@ -428,7 +500,8 @@ export default function HueScan() {
       // Delay start slightly to ensure camera is ready
       const startTimeout = setTimeout(() => {
         analyzeFrame();
-      drawOverlay();
+        drawOverlay();
+        applyGreenFilter();
       }, 100);
       
       // Watchdog to restart loops if they stop (check every 2 seconds)
@@ -454,6 +527,7 @@ export default function HueScan() {
           lastFrameTimeRef.current = now;
           analyzeFrame();
           drawOverlay();
+          applyGreenFilter();
         }
       }, 2000);
       
@@ -471,6 +545,10 @@ export default function HueScan() {
           cancelAnimationFrame(overlayAnimationRef.current);
           overlayAnimationRef.current = null;
         }
+        if (filterAnimationRef.current) {
+          cancelAnimationFrame(filterAnimationRef.current);
+          filterAnimationRef.current = null;
+        }
       };
     } else {
       if (watchdogRef.current) {
@@ -484,6 +562,10 @@ export default function HueScan() {
       if (overlayAnimationRef.current) {
         cancelAnimationFrame(overlayAnimationRef.current);
         overlayAnimationRef.current = null;
+      }
+      if (filterAnimationRef.current) {
+        cancelAnimationFrame(filterAnimationRef.current);
+        filterAnimationRef.current = null;
       }
     }
   // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -511,7 +593,7 @@ export default function HueScan() {
         </div>
       )}
 
-      {/* Video Feed */}
+      {/* Video Feed - Hidden, used for processing */}
       <video
         ref={videoRef}
         autoPlay
@@ -522,11 +604,25 @@ export default function HueScan() {
           transform: isFlipped ? 'scaleX(-1) translateZ(0)' : 'translateZ(0)',
           willChange: 'transform',
           backfaceVisibility: 'hidden',
+          WebkitTransform: isFlipped ? 'scaleX(-1) translateZ(0)' : 'translateZ(0)',
+          opacity: 0, // Hidden - using filter canvas instead
+          pointerEvents: 'none'
+        }}
+      />
+      
+      {/* Green Filter Canvas - Shows stylized green-only view */}
+      <canvas
+        ref={filterCanvasRef}
+        className="absolute inset-0 w-full h-full object-cover"
+        style={{ 
+          transform: isFlipped ? 'scaleX(-1) translateZ(0)' : 'translateZ(0)',
+          willChange: 'contents',
+          backfaceVisibility: 'hidden',
           WebkitTransform: isFlipped ? 'scaleX(-1) translateZ(0)' : 'translateZ(0)'
         }}
       />
       
-      {/* Overlay Canvas */}
+      {/* Overlay Canvas - UI elements on top */}
       <canvas
         ref={overlayCanvasRef}
         className="absolute inset-0 w-full h-full object-cover pointer-events-none"
@@ -564,10 +660,10 @@ export default function HueScan() {
       {/* HUD Overlay */}
       {!error && (
         <div className="absolute inset-0 pointer-events-none select-none">
-          {/* Bottom Left - Match Status */}
-          <div className="absolute bottom-32 left-4" style={{ width: '240px' }}>
+          {/* Bottom Left - Combined Status & Detection Box */}
+          <div className="absolute bottom-4 left-4" style={{ width: '280px' }}>
             <div 
-              className={`backdrop-blur-md rounded-2xl px-6 py-6 text-white transition-all duration-300 ${
+              className={`backdrop-blur-md rounded-2xl overflow-hidden transition-all duration-300 ${
                 match === 'perfect' 
                   ? 'bg-[rgba(0,255,100,0.4)]' 
                   : match === 'close'
@@ -582,38 +678,37 @@ export default function HueScan() {
                   : '0 0 20px rgba(255, 100, 100, 0.2)'
               }}
             >
-              <div className="text-center">
+              {/* Status Section - Top */}
+              <div className="px-6 py-5 text-center border-b border-white/20">
                 <div className="text-4xl font-bold mb-2 text-white" style={{ opacity: 1 }}>
-              {matchPercentage}%
-            </div>
+                  {matchPercentage}%
+                </div>
                 <div className="text-lg font-medium text-white" style={{ opacity: 1 }}>
                   {match === 'perfect' ? 'Compliant' : 
                    match === 'close' ? 'Partial Match' : 
                    'Not Compliant'}
-            </div>
-              </div>
-            </div>
-          </div>
-          
-          {/* Bottom Left - Detected Color Info */}
-          <div className="absolute bottom-4 left-4" style={{ width: '240px' }}>
-            <div className="bg-[rgba(0,143,70,0.3)] backdrop-blur-sm rounded-2xl p-4 text-white flex items-center gap-4">
-              {/* Color Preview */}
-              <div 
-                className="w-16 h-16 rounded-lg flex-shrink-0"
-              style={{ 
-                backgroundColor: `rgb(${rgbValues.r}, ${rgbValues.g}, ${rgbValues.b})` 
-              }}
-            />
-              {/* HEX Code */}
-              <div style={{ opacity: 1 }}>
-                <div className="text-sm font-medium mb-1">Detected</div>
-                <div className="text-sm font-medium">
-                  #{rgbValues.r.toString(16).padStart(2, '0').toUpperCase()}
-                  {rgbValues.g.toString(16).padStart(2, '0').toUpperCase()}
-                  {rgbValues.b.toString(16).padStart(2, '0').toUpperCase()}
                 </div>
-          </div>
+              </div>
+              
+              {/* Detected Color Section - Bottom */}
+              <div className="px-5 py-4 flex items-center gap-4">
+                {/* Color Preview */}
+                <div 
+                  className="w-16 h-16 rounded-lg flex-shrink-0"
+                  style={{ 
+                    backgroundColor: `rgb(${rgbValues.r}, ${rgbValues.g}, ${rgbValues.b})` 
+                  }}
+                />
+                {/* HEX Code */}
+                <div style={{ opacity: 1 }} className="text-white">
+                  <div className="text-sm font-medium mb-1">Detected</div>
+                  <div className="text-sm font-medium">
+                    #{rgbValues.r.toString(16).padStart(2, '0').toUpperCase()}
+                    {rgbValues.g.toString(16).padStart(2, '0').toUpperCase()}
+                    {rgbValues.b.toString(16).padStart(2, '0').toUpperCase()}
+                  </div>
+                </div>
+              </div>
             </div>
           </div>
         </div>
