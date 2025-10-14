@@ -73,37 +73,63 @@ export default function HueScan() {
     try {
       setError(null);
       
-      // More specific constraints for mobile camera access
-      const constraints = {
+      // Try with exact facingMode first for mobile
+      let constraints: MediaStreamConstraints = {
         video: {
-          facingMode: { ideal: facingMode }, // Use ideal to ensure fallback works
+          facingMode: { exact: facingMode },
           width: { ideal: 1920 },
           height: { ideal: 1080 },
-          frameRate: { ideal: 60, min: 30 } // Request 60fps
+          frameRate: { ideal: 60, min: 30 }
         }
       };
 
-      console.log('Requesting camera with facingMode:', facingMode);
-      const mediaStream = await navigator.mediaDevices.getUserMedia(constraints);
+      console.log('Requesting camera with exact facingMode:', facingMode);
+      
+      let mediaStream: MediaStream;
+      try {
+        mediaStream = await navigator.mediaDevices.getUserMedia(constraints);
+      } catch (exactError) {
+        console.warn('Exact facingMode failed, trying ideal:', exactError);
+        // Fallback to ideal if exact fails
+        constraints = {
+          video: {
+            facingMode: { ideal: facingMode },
+            width: { ideal: 1920 },
+            height: { ideal: 1080 },
+            frameRate: { ideal: 60, min: 30 }
+          }
+        };
+        mediaStream = await navigator.mediaDevices.getUserMedia(constraints);
+      }
+      
       setStream(mediaStream);
       
       if (videoRef.current) {
         videoRef.current.srcObject = mediaStream;
         
-        // Optimize video element
+        // Log the actual camera being used
+        const videoTrack = mediaStream.getVideoTracks()[0];
+        const settings = videoTrack.getSettings();
+        console.log('Camera loaded:', {
+          facingMode: settings.facingMode,
+          label: videoTrack.label,
+          width: settings.width,
+          height: settings.height
+        });
+        
         videoRef.current.onloadedmetadata = () => {
-          console.log('Camera loaded successfully with facingMode:', facingMode);
+          console.log('Video metadata loaded, starting scan');
           setScanning(true);
         };
         
         // Fallback timeout
         setTimeout(() => {
-            setScanning(true);
+          setScanning(true);
         }, 500);
       }
     } catch (err) {
       console.error('Camera error:', err);
-      setError('Failed to access camera. Please allow camera permissions.');
+      setError(`Failed to access ${facingMode === 'user' ? 'front' : 'rear'} camera. Please allow camera permissions.`);
     }
   }, [facingMode]);
 
@@ -134,10 +160,22 @@ export default function HueScan() {
   }, [startCamera]);
 
   const switchCamera = async () => {
+    console.log('Switching camera from:', facingMode, 'to:', facingMode === 'user' ? 'environment' : 'user');
+    
+    // Stop current camera completely
     stopCamera();
-    setFacingMode(prev => prev === 'user' ? 'environment' : 'user');
-    // Longer delay to ensure proper cleanup
-    setTimeout(() => startCamera(), 300);
+    
+    // Wait a bit longer for cleanup
+    await new Promise(resolve => setTimeout(resolve, 400));
+    
+    // Switch facing mode
+    setFacingMode(prev => {
+      const newMode = prev === 'user' ? 'environment' : 'user';
+      console.log('New facing mode set to:', newMode);
+      return newMode;
+    });
+    
+    // Camera will auto-start via useEffect
   };
 
   const toggleFlip = () => {
