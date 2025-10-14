@@ -189,11 +189,6 @@ export default function HueScan() {
     const bracketLength = 40;
     const sampleSize = 40; // Same as in analyzeFrame - this is what's actually scanned
     
-    // Match color - cached
-    const matchColor = match === 'perfect' ? 'rgba(0, 255, 100, 1)' : 
-                       match === 'close' ? 'rgba(255, 200, 0, 1)' : 
-                       'rgba(255, 100, 100, 0.8)';
-    
     // SCANNING AREA INDICATOR - Shows exact pixels being analyzed
     ctx.strokeStyle = 'rgba(255, 255, 255, 0.6)';
     ctx.lineWidth = 2;
@@ -205,14 +200,13 @@ export default function HueScan() {
     ctx.fillStyle = 'rgba(255, 255, 255, 0.05)';
     ctx.fillRect(centerX - sampleSize, centerY - sampleSize, sampleSize * 2, sampleSize * 2);
     
-    // Optimized: Draw all brackets in one path
-    ctx.strokeStyle = matchColor;
+    // Corner brackets - ALWAYS WHITE
+    ctx.strokeStyle = 'rgba(255, 255, 255, 0.9)';
     ctx.lineWidth = 4;
     ctx.lineCap = 'round';
     ctx.lineJoin = 'round';
     
-    const pulseScale = match === 'perfect' ? 1 + Math.sin(Date.now() / 200) * 0.03 : 1;
-    const adjustedSize = size * pulseScale;
+    const adjustedSize = size; // No pulse animation
     
     ctx.beginPath();
     // Top-left
