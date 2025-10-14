@@ -106,7 +106,7 @@ export default function BreakRoomV2({ open, onClose }: Props) {
   // Initialize required attempts on mount
   useEffect(() => {
     if (open) {
-      setRequiredAttempts(Math.floor(Math.random() * 100) + 1);
+      setRequiredAttempts(Math.floor(Math.random() * 50) + 1);
       setAttemptCount(0);
       setShowExitButton(false);
       setRecordingState('idle');
@@ -423,7 +423,7 @@ export default function BreakRoomV2({ open, onClose }: Props) {
         `}
         style={{
           fontFamily: 'PPNeueMontreal, sans-serif',
-          color: '#008F46',
+          color: 'white',
           textAlign: 'center',
           marginBottom: '2rem',
           paddingLeft: '2rem',
@@ -585,21 +585,33 @@ export default function BreakRoomV2({ open, onClose }: Props) {
 
             {recordingState === 'recording' && (
               <div 
-                className="w-full relative"
+                className="w-full relative flex items-center justify-center"
                 style={{
-                  height: '60vh',
-                  overflow: 'hidden'
+                  height: '60vh'
                 }}
               >
+                {/* Green text box container */}
                 <div 
-                  className="w-full h-full overflow-y-auto hide-scrollbar"
+                  className="relative rounded-2xl md:rounded-[24px] shadow-[0_2px_12px_rgba(0,0,0,0.06)] bg-[rgba(0,143,70,0.3)] noise-surface p-6 sm:p-8 md:p-10 mx-4 sm:mx-8 md:mx-16"
                   style={{
-                    scrollBehavior: 'smooth',
-                    paddingTop: '50vh',
-                    paddingBottom: '50vh'
+                    maxWidth: '56rem',
+                    width: '100%',
+                    overflow: 'hidden',
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center'
                   }}
                 >
-                  {SENTENCE_DATA.map((sentenceData, idx) => renderSentence(sentenceData, idx))}
+                  <div 
+                    className="w-full h-full overflow-y-auto hide-scrollbar"
+                    style={{
+                      scrollBehavior: 'smooth',
+                      paddingTop: '50vh',
+                      paddingBottom: '50vh'
+                    }}
+                  >
+                    {SENTENCE_DATA.map((sentenceData, idx) => renderSentence(sentenceData, idx))}
+                  </div>
                 </div>
               </div>
             )}
