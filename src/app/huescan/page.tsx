@@ -451,10 +451,20 @@ export default function HueScan() {
       {/* HUD Overlay */}
       {!error && (
         <div className="absolute inset-0 pointer-events-none select-none">
-          {/* Center Compliance Status - BIG AND CLEAR */}
-          <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 z-10">
+          {/* Top Left - Target Color */}
+          <div className="absolute top-4 left-4">
+            <div className="bg-[rgba(0,143,70,0.3)] backdrop-blur-sm rounded-2xl px-4 py-3 text-white text-sm">
+              <div className="flex items-center gap-2" style={{ opacity: 1 }}>
+                <span className="font-medium">Target:</span>
+                <span className="font-medium">#008F46</span>
+            </div>
+            </div>
+          </div>
+          
+          {/* Bottom Left - Match Status */}
+          <div className="absolute bottom-32 left-4">
             <div 
-              className={`backdrop-blur-md rounded-3xl px-8 py-6 transition-all duration-300 ${
+              className={`backdrop-blur-md rounded-2xl px-6 py-6 text-white transition-all duration-300 ${
                 match === 'perfect' 
                   ? 'bg-[rgba(0,255,100,0.4)]' 
                   : match === 'close'
@@ -463,71 +473,29 @@ export default function HueScan() {
               }`}
               style={{
                 boxShadow: match === 'perfect' 
-                  ? '0 0 40px rgba(0, 255, 100, 0.3)' 
+                  ? '0 0 30px rgba(0, 255, 100, 0.3)' 
                   : match === 'close'
-                  ? '0 0 30px rgba(255, 200, 0, 0.3)'
+                  ? '0 0 25px rgba(255, 200, 0, 0.3)'
                   : '0 0 20px rgba(255, 100, 100, 0.2)'
               }}
             >
-              <div className="text-center">
-                <div 
-                  className={`text-5xl font-bold mb-2 ${
-                    match === 'perfect' ? 'text-green-300' : 
-                    match === 'close' ? 'text-yellow-300' : 
-                    'text-red-300'
-                  }`}
-                  style={{ 
-                    WebkitTextStroke: '0',
-                    textShadow: 'none'
-                  }}
-                >
-                  {matchPercentage}%
-            </div>
-                <div 
-                  className={`text-2xl font-bold tracking-wider ${
-                    match === 'perfect' ? 'text-white' : 
-                    match === 'close' ? 'text-yellow-100' : 
-                    'text-red-100'
-                  }`}
-                  style={{ 
-                    WebkitTextStroke: '0',
-                    textShadow: 'none',
-                    opacity: 1
-                  }}
-                >
-                  {match === 'perfect' ? 'COMPLIANT' : 
-                   match === 'close' ? 'PARTIAL MATCH' : 
-                   'NOT COMPLIANT'}
-            </div>
-                {match === 'perfect' && (
-                  <div className="text-xs text-white mt-2" style={{ opacity: 1 }}>
-                    GREEN APPROVED: #008F46
-              </div>
-            )}
-          </div>
-            </div>
-          </div>
-          
-          {/* Top Left - Target Color */}
-          <div className="absolute top-4 left-4">
-            <div className="bg-[rgba(0,143,70,0.3)] backdrop-blur-sm rounded-2xl px-4 py-3 text-white text-sm">
-              <div className="flex items-center gap-2" style={{ opacity: 1 }}>
-                <span className="font-medium">Target:</span>
-                <span className="font-medium">#008F46</span>
-              </div>
-            </div>
-          </div>
-          
-          {/* Bottom Left - Match Status */}
-          <div className="absolute bottom-28 left-4">
-            <div className="bg-[rgba(0,143,70,0.3)] backdrop-blur-sm rounded-2xl px-4 py-3 text-white text-sm">
               <div style={{ opacity: 1 }}>
-                <span className="font-medium">{matchPercentage}% </span>
-                <span className="font-medium">
+                <div className={`text-4xl font-bold mb-2 ${
+                  match === 'perfect' ? 'text-green-300' : 
+                  match === 'close' ? 'text-yellow-300' : 
+                  'text-red-300'
+                }`}>
+                  {matchPercentage}%
+                </div>
+                <div className={`text-lg font-medium ${
+                  match === 'perfect' ? 'text-white' : 
+                  match === 'close' ? 'text-yellow-100' : 
+                  'text-red-100'
+                }`}>
                   {match === 'perfect' ? 'Compliant' : 
                    match === 'close' ? 'Partial Match' : 
                    'Not Compliant'}
-                </span>
+                </div>
               </div>
             </div>
           </div>
@@ -538,10 +506,10 @@ export default function HueScan() {
               {/* Color Preview */}
               <div 
                 className="w-16 h-16 rounded-lg flex-shrink-0"
-                style={{ 
-                  backgroundColor: `rgb(${rgbValues.r}, ${rgbValues.g}, ${rgbValues.b})` 
-                }}
-              />
+              style={{ 
+                backgroundColor: `rgb(${rgbValues.r}, ${rgbValues.g}, ${rgbValues.b})` 
+              }}
+            />
               {/* HEX Code */}
               <div style={{ opacity: 1 }}>
                 <div className="text-sm font-medium mb-1">Detected</div>
@@ -550,7 +518,7 @@ export default function HueScan() {
                   {rgbValues.g.toString(16).padStart(2, '0').toUpperCase()}
                   {rgbValues.b.toString(16).padStart(2, '0').toUpperCase()}
                 </div>
-              </div>
+          </div>
             </div>
           </div>
         </div>
@@ -559,12 +527,12 @@ export default function HueScan() {
       {/* Controls */}
       {!error && (
         <>
-          <div className="absolute bottom-8 left-1/2 transform -translate-x-1/2 pointer-events-auto z-50 flex gap-3">
+          <div className="absolute bottom-4 left-1/2 transform -translate-x-1/2 pointer-events-auto z-50 flex gap-3">
             <button
               onClick={isMobile ? switchCamera : undefined}
               disabled={!isMobile}
-              className={`bg-black/60 backdrop-blur-sm border border-green-400/30 text-green-400 p-3 rounded-full transition-all ${
-                isMobile ? 'hover:bg-green-400/20 cursor-pointer' : 'opacity-30 cursor-not-allowed'
+              className={`bg-[rgba(0,143,70,0.3)] backdrop-blur-sm text-white p-3 rounded-full transition-all ${
+                isMobile ? 'hover:bg-[rgba(0,143,70,0.4)] cursor-pointer' : 'opacity-30 cursor-not-allowed'
               }`}
               title={isMobile ? "Switch Camera" : "Switch Camera (Mobile Only)"}
             >
@@ -572,9 +540,7 @@ export default function HueScan() {
             </button>
             <button
               onClick={toggleFlip}
-              className={`bg-black/60 backdrop-blur-sm border border-green-400/30 text-green-400 p-3 rounded-full hover:bg-green-400/20 transition-all ${
-                isFlipped ? 'bg-green-400/20 border-green-400' : ''
-              }`}
+              className="bg-[rgba(0,143,70,0.3)] backdrop-blur-sm text-white p-3 rounded-full hover:bg-[rgba(0,143,70,0.4)] transition-all"
               title={isFlipped ? 'Unflip Camera' : 'Flip Camera'}
             >
               <Camera size={20} className={isFlipped ? 'scale-x-[-1]' : ''} />
