@@ -592,28 +592,29 @@ export default function BreakRoomV2({ open, onClose }: Props) {
               <div 
                 className="w-full flex items-center justify-center"
               >
-                {/* Green text box container - compact and wraps around content */}
+                {/* Green text box container - FIXED size, always centered */}
                 <div 
-                  className="relative rounded-[40px] shadow-[0_2px_12px_rgba(0,0,0,0.06)] bg-[rgba(0,143,70,0.3)] noise-surface px-8 py-6 sm:px-12 sm:py-8 md:px-16 md:py-10 mx-4 sm:mx-8 md:mx-16"
+                  className="relative rounded-[40px] shadow-[0_2px_12px_rgba(0,0,0,0.06)] bg-[rgba(0,143,70,0.3)] noise-surface px-8 py-8 sm:px-12 sm:py-10 md:px-16 md:py-12 mx-4 sm:mx-8 md:mx-16"
                   style={{
-                    maxWidth: '64rem',
-                    width: '100%',
-                    overflow: 'hidden',
-                    maxHeight: '50vh'
+                    width: '56rem',
+                    maxWidth: '90vw',
+                    height: '400px',
+                    overflow: 'hidden'
                   }}
                 >
                   <div 
-                    className="w-full overflow-y-auto hide-scrollbar"
+                    className="w-full h-full overflow-y-auto hide-scrollbar"
                     style={{
-                      scrollBehavior: 'smooth',
-                      display: 'flex',
-                      flexDirection: 'column',
-                      alignItems: 'center',
-                      justifyContent: 'center',
-                      minHeight: '200px'
+                      scrollBehavior: 'smooth'
                     }}
                   >
+                    {/* Top padding to create space for 2 sentences above when at start */}
+                    <div style={{ height: '200px' }} />
+                    
                     {SENTENCE_DATA.map((sentenceData, idx) => renderSentence(sentenceData, idx))}
+                    
+                    {/* Bottom padding to create space for 2 sentences below when at end */}
+                    <div style={{ height: '200px' }} />
                   </div>
                 </div>
               </div>
