@@ -4,7 +4,8 @@ import { useMemo, useEffect, useState, useRef, useLayoutEffect } from 'react';
 
 const DOTS = 6;
 const RADIUS_VMIN = 28;    // Less tight radius for better mobile experience
-const DOT = 126;            // 140 * 0.9 = 126 (90% of original size)
+const DOT_DESKTOP = 126;   // 140 * 0.9 = 126 (90% of original size)
+const DOT_MOBILE = 85;     // Smaller size for mobile (about 67% of desktop)
 const BASE_SPEED = 0.0375; // 75% slower than 0.15 (0.15 * 0.25 = 0.0375)
 const GREEN = '#008F46';
 
@@ -155,6 +156,8 @@ export default function Ring({ hoverIdx, setHoverIdx, onDotClick, containerRef, 
   
   useLayoutEffect(() => {
     const updateRingSize = () => {
+      const isMobileDevice = window.innerWidth < 768;
+      
       if (!centered && containerRef?.current) {
         const container = containerRef.current;
         const containerWidth = container.clientWidth;
@@ -171,7 +174,9 @@ export default function Ring({ hoverIdx, setHoverIdx, onDotClick, containerRef, 
         const vw = window.innerWidth;
         const vh = window.innerHeight;
         const maxSize = Math.min(vw, vh);
-        const size = Math.max(360, Math.floor(maxSize * 0.78)); // Increase overall ring size without changing icon size
+        // Mobile: Increase ring size MORE to create bigger gaps (90% instead of 78%)
+        const sizeMultiplier = isMobileDevice ? 0.90 : 0.78;
+        const size = Math.max(360, Math.floor(maxSize * sizeMultiplier));
         setRingSize({ width: size, height: size });
         setIsReady(true);
       }
@@ -194,8 +199,9 @@ export default function Ring({ hoverIdx, setHoverIdx, onDotClick, containerRef, 
         }}
       >
         {dots.map((_, i) => {
+          const DOT_SIZE = isMobile ? DOT_MOBILE : DOT_DESKTOP;
           const angle = (i/DOTS) * 2*Math.PI + (rotation * Math.PI / 180); // Add rotation to angle
-          const radius = ringSize.width / 2 - DOT / 2; // Dynamic radius based on container size
+          const radius = ringSize.width / 2 - DOT_SIZE / 2; // Dynamic radius based on container size
           const x = Math.cos(angle) * radius;
           const y = Math.sin(angle) * radius;
           const isHovered = hoverIdx === i;
@@ -209,10 +215,10 @@ export default function Ring({ hoverIdx, setHoverIdx, onDotClick, containerRef, 
                 isHovered && !isMobile ? 'scale-110' : isHovered && isMobile ? 'scale-105' : inactive ? 'opacity-60' : ''
               } ${isVisible ? 'opacity-100 scale-100' : 'opacity-0 scale-75'}`}
               style={{
-                width: DOT, 
-                height: DOT, 
-                left:`calc(50% + ${x}px - ${DOT/2}px)`,
-                top: `calc(50% + ${y}px - ${DOT/2}px)`,
+                width: DOT_SIZE, 
+                height: DOT_SIZE, 
+                left:`calc(50% + ${x}px - ${DOT_SIZE/2}px)`,
+                top: `calc(50% + ${y}px - ${DOT_SIZE/2}px)`,
                 boxShadow: 'none', // Remove any shadows
                 outline: 'none', // Remove focus outline
                 transformOrigin: 'center'

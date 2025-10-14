@@ -176,46 +176,25 @@ export default function ProtocolQuickList() {
       </div>
       </div>
       
-      {/* Protocol Popups */}
+      {/* Protocol Popups - Styled exactly like profile dropdown */}
       {activePopup && (
         <div 
-          className="fixed z-50 backdrop-blur-sm shadow-2xl rounded-lg p-4 pointer-events-none overflow-y-auto"
+          className="fixed z-50 backdrop-blur-sm shadow-2xl rounded-lg p-4 min-w-[280px] pointer-events-none"
           style={{ 
             backgroundColor: 'rgba(0, 143, 70, 0.3)',
             bottom: '10px',
-            left: '200px', // Closer to the ProtocolQuickList
-            height: 'auto', // Fixed height matching ProtocolQuickList
-            width: 'auto',
-            minWidth: '300px',
-            maxWidth: '600px'
-          }}
-          ref={(el) => {
-            if (el) {
-              const protocolList = document.querySelector('[data-protocol-list]');
-              if (protocolList) {
-                el.style.height = `${protocolList.clientHeight}px`;
-              }
-            }
+            left: '200px'
           }}
         >
-          <div className="text-white">
-            {/* Section Title */}
-            <div className="text-xs font-medium text-white mb-2">
-              {PROTOCOL_ITEMS.find(item => item.id === activePopup)?.label}
-            </div>
-            <div className="border-t border-white mb-3"></div>
-            
-            {/* Content */}
-            <div className="text-xs font-medium text-white whitespace-pre-line">
-              {PROTOCOL_CONTENT[activePopup as keyof typeof PROTOCOL_CONTENT].split('⸻').map((paragraph, index) => (
-                <div key={index}>
-                  {paragraph.trim()}
-                  {index < PROTOCOL_CONTENT[activePopup as keyof typeof PROTOCOL_CONTENT].split('⸻').length - 1 && (
-                    <div className="border-t border-white my-3"></div>
-                  )}
-                </div>
-              ))}
-            </div>
+          {/* Section Title */}
+          <div className="text-xs font-medium text-white mb-2">
+            Protocol: {PROTOCOL_ITEMS.find(item => item.id === activePopup)?.label}
+          </div>
+          <div className="border-t border-white mb-2"></div>
+          
+          {/* Content */}
+          <div className="text-xs font-medium text-white mb-2" style={{ whiteSpace: 'pre-line' }}>
+            {PROTOCOL_CONTENT[activePopup as keyof typeof PROTOCOL_CONTENT]}
           </div>
         </div>
       )}
