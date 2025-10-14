@@ -185,6 +185,8 @@ const GreenwashFinder: React.FC<GreenwashFinderProps> = ({ isOpen, onClose }) =>
           <img
             src="/img/files-final.webp"
             alt="Files"
+            draggable={false}
+            onContextMenu={(e) => e.preventDefault()}
             style={{
               height: '48px',
               width: 'auto',
@@ -266,7 +268,7 @@ const GreenwashFinder: React.FC<GreenwashFinderProps> = ({ isOpen, onClose }) =>
             onWheel={(e) => e.stopPropagation()}
             onTouchMove={(e) => e.stopPropagation()}
           >
-            <div className="pb-20 px-4 md:px-0" style={{ paddingTop: 'calc(16px + 48px + 80px)' }}>
+            <div className="pb-20" style={{ paddingTop: 'calc(16px + 48px + 80px)' }}>
 
             {/* Filter Pills */}
             <div 
@@ -396,6 +398,8 @@ const GreenwashFinder: React.FC<GreenwashFinderProps> = ({ isOpen, onClose }) =>
                         <img
                           src={item.image}
                           alt={item.title}
+                          draggable={false}
+                          onContextMenu={(e) => e.preventDefault()}
                           style={{
                             width: '100%',
                             height: '100%',

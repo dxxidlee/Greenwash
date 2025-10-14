@@ -6,7 +6,8 @@ const DOTS = 6;
 const RADIUS_VMIN = 28;    // Less tight radius for better mobile experience
 const DOT_DESKTOP = 126;   // 140 * 0.9 = 126 (90% of original size)
 const DOT_MOBILE = 85;     // Smaller size for mobile (about 67% of desktop)
-const BASE_SPEED = 0.0375; // 75% slower than 0.15 (0.15 * 0.25 = 0.0375)
+const BASE_SPEED_DESKTOP = 0.0375; // 75% slower than 0.15 (0.15 * 0.25 = 0.0375)
+const BASE_SPEED_MOBILE = 0.06;    // Slightly faster on mobile for better visibility
 const GREEN = '#008F46';
 
 const DOT_LABELS = [
@@ -37,8 +38,8 @@ export default function Ring({ hoverIdx, setHoverIdx, onDotClick, containerRef, 
 }) {
   const dots = useMemo(() => Array.from({ length: DOTS }), []);
   const [rotation, setRotation] = useState(0);
-  const [rotationSpeed, setRotationSpeed] = useState(BASE_SPEED);
   const [isMobile, setIsMobile] = useState(false);
+  const [rotationSpeed, setRotationSpeed] = useState(BASE_SPEED_DESKTOP);
   const [prefersReducedMotion, setPrefersReducedMotion] = useState(false);
   const [visibleDots, setVisibleDots] = useState<number[]>([]);
   const [ringSize, setRingSize] = useState<{ width:number; height:number } | null>(null);
@@ -47,11 +48,18 @@ export default function Ring({ hoverIdx, setHoverIdx, onDotClick, containerRef, 
   const animationRef = useRef<number | null>(null);
 
   useEffect(() => {
-    const checkMobile = () => setIsMobile(window.innerWidth < 768);
+    const checkMobile = () => {
+      const mobile = window.innerWidth < 768;
+      setIsMobile(mobile);
+      // Set appropriate base speed for device type
+      if (hoverIdx === null) {
+        setRotationSpeed(mobile ? BASE_SPEED_MOBILE : BASE_SPEED_DESKTOP);
+      }
+    };
     checkMobile();
     window.addEventListener('resize', checkMobile);
     return () => window.removeEventListener('resize', checkMobile);
-  }, []);
+  }, [hoverIdx]);
 
   // Check for reduced motion preference
   useEffect(() => {
@@ -86,6 +94,7 @@ export default function Ring({ hoverIdx, setHoverIdx, onDotClick, containerRef, 
       // Ignore while reduced motion preferred
       if (prefersReducedMotion) return;
       
+      const BASE_SPEED = isMobile ? BASE_SPEED_MOBILE : BASE_SPEED_DESKTOP;
       const scrollDelta = Math.abs(e.deltaY);
       const speedBoost = Math.min(scrollDelta / 100, 2);
       setRotationSpeed(BASE_SPEED + speedBoost);
@@ -113,7 +122,7 @@ export default function Ring({ hoverIdx, setHoverIdx, onDotClick, containerRef, 
       window.removeEventListener('wheel', handleWheel);
       if (speedDecayRef.current) clearTimeout(speedDecayRef.current);
     };
-  }, [prefersReducedMotion]);
+  }, [prefersReducedMotion, isMobile]);
 
   // Smooth animation loop
   useEffect(() => {
@@ -140,8 +149,9 @@ export default function Ring({ hoverIdx, setHoverIdx, onDotClick, containerRef, 
   // On hover, slow down instead of pausing to keep RAF smooth
   useEffect(() => {
     if (prefersReducedMotion) return;
+    const BASE_SPEED = isMobile ? BASE_SPEED_MOBILE : BASE_SPEED_DESKTOP;
     setRotationSpeed(hoverIdx !== null ? 0.003 : BASE_SPEED);
-  }, [hoverIdx, prefersReducedMotion]);
+  }, [hoverIdx, prefersReducedMotion, isMobile]);
 
   const handleSphereInteraction = (index: number) => ({
     // Desktop: hover
@@ -241,6 +251,7 @@ export default function Ring({ hoverIdx, setHoverIdx, onDotClick, containerRef, 
                   alt={DOT_LABELS[i] || `Option ${i + 1}`}
                   className="w-full h-full object-contain"
                   draggable={false}
+                  onContextMenu={(e) => e.preventDefault()}
                 />
               ) : (
                 <div 

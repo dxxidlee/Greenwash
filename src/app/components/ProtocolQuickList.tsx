@@ -176,14 +176,14 @@ export default function ProtocolQuickList() {
       </div>
       </div>
       
-      {/* Protocol Popups - Styled exactly like profile dropdown */}
+      {/* Protocol Popups - Styled exactly like profile dropdown, positioned above */}
       {activePopup && (
         <div 
           className="fixed z-50 backdrop-blur-sm shadow-2xl rounded-lg p-4 min-w-[280px] pointer-events-none"
           style={{ 
             backgroundColor: 'rgba(0, 143, 70, 0.3)',
-            bottom: '10px',
-            left: '200px'
+            bottom: 'calc(10px + 8.5em)', // Position above the protocol list (list height + gap)
+            left: '10px' // Same left position as protocol list
           }}
         >
           {/* Section Title */}

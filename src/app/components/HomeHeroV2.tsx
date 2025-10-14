@@ -158,6 +158,8 @@ export default function HomeHeroV2() {
               src="/img/id_photo.webp" 
               alt="Officer Profile"
               className="w-full h-full object-contain"
+              draggable={false}
+              onContextMenu={(e) => e.preventDefault()}
             />
           </div>
           
@@ -213,6 +215,8 @@ export default function HomeHeroV2() {
             src="/img/vertical_logo.webp" 
             alt="GREENWASH Logo"
             className="object-contain"
+            draggable={false}
+            onContextMenu={(e) => e.preventDefault()}
             style={{ height: isMobile ? '33.75vh' : '45vh' }}
           />
         </div>

@@ -515,7 +515,7 @@ export default function BreakRoomV2({ open, onClose }: Props) {
             fontFamily: 'PPNeueMontreal, sans-serif',
             color: 'white',
             textAlign: 'center',
-            lineHeight: isMobile ? '1.5' : '0.75',
+            lineHeight: isMobile ? '1' : '0.75',
             opacity: textOpacity,
             transition: 'opacity 0.5s ease-out',
             willChange: 'opacity',
@@ -663,6 +663,8 @@ export default function BreakRoomV2({ open, onClose }: Props) {
           <img 
             src="/img/breakroom-final.webp" 
             alt="BreakRoom"
+            draggable={false}
+            onContextMenu={(e) => e.preventDefault()}
             style={{
               height: '48px',
               width: 'auto',

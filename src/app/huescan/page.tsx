@@ -687,6 +687,8 @@ export default function HueScan() {
           <img 
             src="/img/huescan-final.webp" 
             alt="HueScan"
+            draggable={false}
+            onContextMenu={(e) => e.preventDefault()}
             style={{
               height: '48px',
               width: 'auto',

@@ -90,6 +90,8 @@ export default function JournalModal({ open, onClose, entries }: Props) {
           <img 
             src="/img/journal-final.webp" 
             alt="Journal"
+            draggable={false}
+            onContextMenu={(e) => e.preventDefault()}
             style={{
               height: '48px',
               width: 'auto',

@@ -308,6 +308,8 @@ const GreenwashForms: React.FC<GreenwashFormsProps> = ({ isOpen, onClose }) => {
           <img
             src="/img/report-final.webp"
             alt="Report"
+            draggable={false}
+            onContextMenu={(e) => e.preventDefault()}
             style={{
               height: '48px',
               width: 'auto',

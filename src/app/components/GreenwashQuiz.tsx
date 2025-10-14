@@ -315,6 +315,8 @@ const GreenwashQuiz: React.FC<GreenwashQuizProps> = ({ isOpen, onClose }) => {
           <img
             src="/img/selftest-final.webp"
             alt="SelfTest"
+            draggable={false}
+            onContextMenu={(e) => e.preventDefault()}
             style={{
               height: '48px',
               width: 'auto',
