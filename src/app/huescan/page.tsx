@@ -734,19 +734,19 @@ export default function HueScan() {
             {isMobile && (
               <button
                 onClick={switchCamera}
-                className="bg-[rgba(0,143,70,0.3)] backdrop-blur-sm text-white p-3 rounded-full hover:bg-[rgba(0,143,70,0.4)] transition-all"
+                className="inline-flex items-center justify-center h-12 w-12 rounded-full shadow-[0_2px_12px_rgba(0,0,0,0.06)] bg-[rgba(0,143,70,0.3)] text-white hover:bg-[rgba(0,143,70,0.4)] transition-all duration-300 ease-out focus:outline-none focus:ring-2 focus:ring-white/30"
                 title={`Switch to ${facingMode === 'user' ? 'Rear' : 'Selfie'} Camera`}
               >
-                <RotateCcw size={20} />
+                <RotateCcw size={18} />
               </button>
             )}
             {/* Flip Display - Works on all devices */}
             <button
               onClick={toggleFlip}
-              className="bg-[rgba(0,143,70,0.3)] backdrop-blur-sm text-white p-3 rounded-full hover:bg-[rgba(0,143,70,0.4)] transition-all"
+              className="inline-flex items-center justify-center h-12 w-12 rounded-full shadow-[0_2px_12px_rgba(0,0,0,0.06)] bg-[rgba(0,143,70,0.3)] text-white hover:bg-[rgba(0,143,70,0.4)] transition-all duration-300 ease-out focus:outline-none focus:ring-2 focus:ring-white/30"
               title={isFlipped ? 'Unflip Display' : 'Flip Display'}
             >
-              <Camera size={20} className={isFlipped ? 'scale-x-[-1]' : ''} />
+              <Camera size={18} className={isFlipped ? 'scale-x-[-1]' : ''} />
             </button>
           </div>
         </>
