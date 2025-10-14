@@ -510,33 +510,47 @@ export default function HueScan() {
           
           {/* Top Left - Target Color */}
           <div className="absolute top-4 left-4">
-            <div className="bg-[rgba(0,143,70,0.3)] backdrop-blur-sm rounded-2xl px-4 py-3 text-white text-sm tracking-wider">
+            <div className="bg-[rgba(0,143,70,0.3)] backdrop-blur-sm rounded-2xl px-4 py-3 text-white text-sm">
               <div className="flex items-center gap-2" style={{ opacity: 1 }}>
-                <span>TARGET:</span>
-                <span className="font-bold">#008F46</span>
+                <span className="font-medium">Target:</span>
+                <span className="font-medium">#008F46</span>
               </div>
             </div>
           </div>
           
-          {/* Bottom - Detected Color Info */}
-          <div className="absolute bottom-24 left-1/2 transform -translate-x-1/2">
+          {/* Bottom Left - Match Status */}
+          <div className="absolute bottom-28 left-4">
+            <div className="bg-[rgba(0,143,70,0.3)] backdrop-blur-sm rounded-2xl px-4 py-3 text-white text-sm">
+              <div style={{ opacity: 1 }}>
+                <span className="font-medium">{matchPercentage}% </span>
+                <span className="font-medium">
+                  {match === 'perfect' ? 'Compliant' : 
+                   match === 'close' ? 'Partial Match' : 
+                   'Not Compliant'}
+                </span>
+              </div>
+            </div>
+          </div>
+          
+          {/* Bottom Left - Detected Color Info */}
+          <div className="absolute bottom-4 left-4">
             <div className="bg-[rgba(0,143,70,0.3)] backdrop-blur-sm rounded-2xl p-4 text-white flex items-center gap-4">
               {/* Color Preview */}
               <div 
                 className="w-16 h-16 rounded-lg flex-shrink-0"
-              style={{ 
-                backgroundColor: `rgb(${rgbValues.r}, ${rgbValues.g}, ${rgbValues.b})` 
-              }}
-            />
+                style={{ 
+                  backgroundColor: `rgb(${rgbValues.r}, ${rgbValues.g}, ${rgbValues.b})` 
+                }}
+              />
               {/* HEX Code */}
               <div style={{ opacity: 1 }}>
-                <div className="text-xs tracking-wider mb-1">DETECTED</div>
-                <div className="text-xl font-bold tracking-wider">
+                <div className="text-sm font-medium mb-1">Detected</div>
+                <div className="text-sm font-medium">
                   #{rgbValues.r.toString(16).padStart(2, '0').toUpperCase()}
                   {rgbValues.g.toString(16).padStart(2, '0').toUpperCase()}
                   {rgbValues.b.toString(16).padStart(2, '0').toUpperCase()}
                 </div>
-          </div>
+              </div>
             </div>
           </div>
         </div>
