@@ -64,19 +64,30 @@ export default function BreakRoomV2({ open, onClose }: Props) {
     };
   }, [open]);
 
-  // Auto-scroll to center current sentence
+  // Auto-scroll to center current sentence perfectly
   useEffect(() => {
     if (recordingState === 'recording' && sentenceRefs.current[currentSentenceIdx]) {
       const element = sentenceRefs.current[currentSentenceIdx];
       if (element && element.parentElement) {
         const container = element.parentElement;
-        const elementRect = element.getBoundingClientRect();
         
-        const scrollTop = element.offsetTop - (container.clientHeight / 2) + (elementRect.height / 2);
-        container.scrollTo({
-          top: scrollTop,
-          behavior: 'smooth'
-        });
+        // Small delay to ensure DOM is ready
+        setTimeout(() => {
+          // Get the element's position relative to the scrollable container
+          const elementTop = element.offsetTop;
+          const elementHeight = element.offsetHeight;
+          
+          // Calculate the scroll position to center the element
+          // Container height / 2 gives us the center point
+          // We want the element's center to be at the container's center
+          const containerHeight = container.clientHeight;
+          const scrollPosition = elementTop - (containerHeight / 2) + (elementHeight / 2);
+          
+          container.scrollTo({
+            top: scrollPosition,
+            behavior: currentSentenceIdx === 0 ? 'auto' : 'smooth' // Instant scroll for first sentence
+          });
+        }, 50);
       }
     }
   }, [currentSentenceIdx, recordingState]);
