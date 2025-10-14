@@ -246,7 +246,7 @@ export default function HueScan() {
       const imageData = ctx.getImageData(0, 0, filterCanvas.width, filterCanvas.height);
       const data = imageData.data;
       
-      // Apply INVERTED green highlighting filter - white background, green objects visible
+      // Apply INVERTED green highlighting filter - HIGH CONTRAST white background
       for (let i = 0; i < data.length; i += 4) {
         const r = data[i];
         const g = data[i + 1];
@@ -257,24 +257,38 @@ export default function HueScan() {
         const greenStrength = isGreenish ? (g - Math.max(r, b)) / 255 : 0;
         
         if (greenStrength > 0.15) {
-          // Keep green pixels visible and slightly enhanced
-          const boost = 1.2 + greenStrength * 0.3;
-          data[i] = Math.min(255, r * 0.9); // Keep some red
-          data[i + 1] = Math.min(255, g * boost); // Boost green
-          data[i + 2] = Math.min(255, b * 0.9); // Keep some blue
-        } else {
-          // INVERT non-green pixels - make them white/bright
-          const brightness = 0.85; // Very bright, near white
-          const inverted = 255 - ((r + g + b) / 3); // Invert brightness
-          const whitened = inverted * brightness + (255 * (1 - brightness));
+          // Keep green pixels VERY visible with high contrast
+          const boost = 1.5 + greenStrength * 0.6; // Stronger boost
+          data[i] = Math.min(255, r * 0.7); // Reduce red more
+          data[i + 1] = Math.min(255, g * boost); // Much brighter green
+          data[i + 2] = Math.min(255, b * 0.7); // Reduce blue more
           
-          data[i] = whitened;
-          data[i + 1] = whitened * 1.05; // Slight warm tint
-          data[i + 2] = whitened;
+          // Apply contrast to green areas
+          data[i] = ((data[i] - 128) * 1.4) + 128;
+          data[i + 1] = ((data[i + 1] - 128) * 1.4) + 128;
+          data[i + 2] = ((data[i + 2] - 128) * 1.4) + 128;
+        } else {
+          // INVERT non-green pixels - HIGH CONTRAST white
+          const avg = (r + g + b) / 3;
+          const inverted = 255 - avg;
+          
+          // Push towards pure white with high contrast
+          const contrast = 1.6; // High contrast multiplier
+          const whitened = ((inverted - 128) * contrast) + 128;
+          const boosted = whitened * 0.95 + 255 * 0.05; // Push to white
+          
+          data[i] = boosted;
+          data[i + 1] = boosted * 1.02; // Very slight warm tint
+          data[i + 2] = boosted;
         }
         
-        // Add subtle film grain noise for texture
-        const noise = (Math.random() - 0.5) * 20;
+        // HIGH CONTRAST: Clamp and enhance
+        data[i] = Math.max(0, Math.min(255, data[i]));
+        data[i + 1] = Math.max(0, Math.min(255, data[i + 1]));
+        data[i + 2] = Math.max(0, Math.min(255, data[i + 2]));
+        
+        // Add 10% film grain noise
+        const noise = (Math.random() - 0.5) * 51; // 10% of 255 = ~25.5, doubled for range
         data[i] = Math.max(0, Math.min(255, data[i] + noise));
         data[i + 1] = Math.max(0, Math.min(255, data[i + 1] + noise));
         data[i + 2] = Math.max(0, Math.min(255, data[i + 2] + noise));
@@ -282,8 +296,8 @@ export default function HueScan() {
       
       ctx.putImageData(imageData, 0, 0);
       
-      // Apply blur effect for aesthetic
-      ctx.filter = 'blur(0.5px)';
+      // Apply GAUSSIAN BLUR overlay (5-10px for aesthetic)
+      ctx.filter = 'blur(7px) contrast(1.2)'; // 7px blur + extra contrast
       ctx.drawImage(filterCanvas, 0, 0);
       ctx.filter = 'none';
       
