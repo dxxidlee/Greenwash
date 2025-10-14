@@ -18,6 +18,10 @@ export default function HueScan() {
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const animationRef = useRef<number | null>(null);
   const overlayCanvasRef = useRef<HTMLCanvasElement>(null);
+  const overlayAnimationRef = useRef<number | null>(null);
+  const lastUpdateTimeRef = useRef<number>(0);
+  const frameCountRef = useRef<number>(0);
+  const isPageVisible = useRef<boolean>(true);
 
   const targetColor = { r: 0, g: 143, b: 70 }; // #008f46
 
@@ -32,6 +36,34 @@ export default function HueScan() {
     checkMobile();
     window.addEventListener('resize', checkMobile);
     return () => window.removeEventListener('resize', checkMobile);
+  }, []);
+
+  // Handle page visibility changes (tab switching)
+  useEffect(() => {
+    const handleVisibilityChange = () => {
+      if (document.hidden) {
+        // Page hidden - pause animations
+        isPageVisible.current = false;
+        if (animationRef.current) {
+          cancelAnimationFrame(animationRef.current);
+          animationRef.current = null;
+        }
+        if (overlayAnimationRef.current) {
+          cancelAnimationFrame(overlayAnimationRef.current);
+          overlayAnimationRef.current = null;
+        }
+        console.log('Page hidden - paused');
+      } else {
+        // Page visible - resume animations by setting flag
+        isPageVisible.current = true;
+        frameCountRef.current = 0;
+        lastUpdateTimeRef.current = 0;
+        console.log('Page visible - will resume on next scan check');
+      }
+    };
+
+    document.addEventListener('visibilitychange', handleVisibilityChange);
+    return () => document.removeEventListener('visibilitychange', handleVisibilityChange);
   }, []);
 
 
@@ -78,6 +110,11 @@ export default function HueScan() {
     }
     if (animationRef.current) {
       cancelAnimationFrame(animationRef.current);
+      animationRef.current = null;
+    }
+    if (overlayAnimationRef.current) {
+      cancelAnimationFrame(overlayAnimationRef.current);
+      overlayAnimationRef.current = null;
     }
     setScanning(false);
   }, [stream]);
@@ -95,7 +132,8 @@ export default function HueScan() {
   const switchCamera = async () => {
     stopCamera();
     setFacingMode(prev => prev === 'user' ? 'environment' : 'user');
-    setTimeout(() => startCamera(), 100);
+    // Longer delay to ensure proper cleanup
+    setTimeout(() => startCamera(), 300);
   };
 
   const toggleFlip = () => {
@@ -128,17 +166,20 @@ export default function HueScan() {
     );
   };
 
+  // Separate overlay animation loop for smooth 60fps overlay
   const drawOverlay = useCallback(() => {
+    if (!isPageVisible.current) return; // Don't animate when page is hidden
+    
+    overlayAnimationRef.current = requestAnimationFrame(drawOverlay);
+    
     const canvas = overlayCanvasRef.current;
-    if (!canvas) return;
+    if (!canvas || canvas.width === 0 || canvas.height === 0) return;
     
     const ctx = canvas.getContext('2d', { alpha: true, desynchronized: true });
     if (!ctx) return;
     
     const width = canvas.width;
     const height = canvas.height;
-    
-    if (width === 0 || height === 0) return;
     
     ctx.clearRect(0, 0, width, height);
     
@@ -196,6 +237,8 @@ export default function HueScan() {
   }, [match]);
 
   const analyzeFrame = useCallback(() => {
+    if (!isPageVisible.current) return; // Don't analyze when page is hidden
+    
     // Always schedule next frame first for smooth animation
     animationRef.current = requestAnimationFrame(analyzeFrame);
     
@@ -209,13 +252,19 @@ export default function HueScan() {
     if (video.readyState !== video.HAVE_ENOUGH_DATA) {
       return;
     }
+    
+    // Throttle analysis to every 3rd frame for performance (still 20fps analysis)
+    frameCountRef.current++;
+    if (frameCountRef.current % 3 !== 0) {
+      return;
+    }
 
     // Performance optimization: only update canvas size if it changed
     if (canvas.width !== video.videoWidth || canvas.height !== video.videoHeight) {
       canvas.width = video.videoWidth;
       canvas.height = video.videoHeight;
       
-      // Also update overlay canvas size
+      // Also update overlay canvas size once
       if (overlayCanvasRef.current) {
         overlayCanvasRef.current.width = video.videoWidth;
         overlayCanvasRef.current.height = video.videoHeight;
@@ -230,14 +279,14 @@ export default function HueScan() {
     try {
       ctx.drawImage(video, 0, 0);
       
-      const centerX = canvas.width >> 1; // Bitwise shift for faster division
+      const centerX = canvas.width >> 1;
       const centerY = canvas.height >> 1;
-      const sampleSize = 50; // Optimized sample size
+      const sampleSize = 40; // Even smaller for speed
       
       const imageData = ctx.getImageData(
         centerX - sampleSize,
         centerY - sampleSize,
-        sampleSize << 1, // sampleSize * 2
+        sampleSize << 1,
         sampleSize << 1
       );
       
@@ -246,13 +295,13 @@ export default function HueScan() {
       const data = imageData.data;
       const length = data.length;
       
-      // Ultra-optimized loop - sample every 3rd pixel for maximum speed
       const targetR = targetColor.r;
       const targetG = targetColor.g;
       const targetB = targetColor.b;
       let sampleCount = 0;
       
-      for (let i = 0; i < length; i += 12) {
+      // Sample every 4th pixel for maximum performance
+      for (let i = 0; i < length; i += 16) {
         const r = data[i];
         const g = data[i + 1];
         const b = data[i + 2];
@@ -261,7 +310,6 @@ export default function HueScan() {
         totalG += g;
         totalB += b;
         
-        // Inline distance calculation
         const dr = r - targetR;
         const dg = g - targetG;
         const db = b - targetB;
@@ -273,50 +321,74 @@ export default function HueScan() {
       const avgG = Math.round(totalG / sampleCount);
       const avgB = Math.round(totalB / sampleCount);
       
-      setRgbValues({ r: avgR, g: avgG, b: avgB });
+      // Throttle state updates to reduce re-renders (update every 100ms max)
+      const now = performance.now();
+      if (now - lastUpdateTimeRef.current > 100) {
+        setRgbValues({ r: avgR, g: avgG, b: avgB });
+        lastUpdateTimeRef.current = now;
+      }
       
       const avgDistance = totalDistance / sampleCount;
       const similarity = Math.max(0, Math.min(100, 100 - (avgDistance / 441.67) * 100));
       
-      // GREEN CHECK: Ensure it's actually greenish
-      // For #008f46: G should be much higher than R and B
-      const isGreenish = avgG > avgR && avgG > avgB && avgG > 80; // Must have strong green channel
-      const greenDominance = avgG - Math.max(avgR, avgB); // Green should dominate by a lot
+      const isGreenish = avgG > avgR && avgG > avgB && avgG > 80;
+      const greenDominance = avgG - Math.max(avgR, avgB);
       
-      // Stricter similarity calculation for green compliance
       let adjustedSimilarity = similarity;
       if (!isGreenish || greenDominance < 30) {
-        // Not even green-ish, severely penalize
         adjustedSimilarity = Math.min(adjustedSimilarity, 40);
       }
       
       setMatchPercentage(Math.round(adjustedSimilarity));
       
-      // MUCH STRICTER thresholds - only actual greens close to #008f46
-      if (adjustedSimilarity >= 90 && isGreenish) {
-        setMatch('perfect');
-      } else if (adjustedSimilarity >= 70 && isGreenish) {
-        setMatch('close');
-      } else {
-        setMatch('no');
-      }
+      const newMatch = adjustedSimilarity >= 90 && isGreenish ? 'perfect' :
+                       adjustedSimilarity >= 70 && isGreenish ? 'close' : 'no';
       
-      drawOverlay();
+      // Only update if match status changed (reduce re-renders)
+      if (newMatch !== match) {
+        setMatch(newMatch);
+      }
     } catch (err) {
       console.error('Frame analysis error:', err);
     }
-  }, [scanning, targetColor, drawOverlay]);
+  }, [scanning, targetColor, match]);
 
+  // Start/stop animation loops based on scanning state
   useEffect(() => {
-    if (scanning) {
+    if (scanning && isPageVisible.current) {
       console.log('Starting analysis loop');
-      analyzeFrame();
+      frameCountRef.current = 0;
+      lastUpdateTimeRef.current = 0;
+      
+      // Delay start slightly to ensure camera is ready
+      const startTimeout = setTimeout(() => {
+        analyzeFrame();
+        drawOverlay();
+      }, 100);
+      
+      return () => {
+        clearTimeout(startTimeout);
+        if (animationRef.current) {
+          cancelAnimationFrame(animationRef.current);
+          animationRef.current = null;
+        }
+        if (overlayAnimationRef.current) {
+          cancelAnimationFrame(overlayAnimationRef.current);
+          overlayAnimationRef.current = null;
+        }
+      };
     } else {
       if (animationRef.current) {
         cancelAnimationFrame(animationRef.current);
+        animationRef.current = null;
+      }
+      if (overlayAnimationRef.current) {
+        cancelAnimationFrame(overlayAnimationRef.current);
+        overlayAnimationRef.current = null;
       }
     }
-  }, [scanning, analyzeFrame]);
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [scanning]);
 
   return (
     <div className="fixed inset-0 bg-black overflow-hidden" style={{ touchAction: 'none' }}>
@@ -374,10 +446,10 @@ export default function HueScan() {
             <div 
               className={`backdrop-blur-md rounded-3xl px-8 py-6 transition-all duration-300 ${
                 match === 'perfect' 
-                  ? 'bg-[rgba(0,255,100,0.4)] border-2 border-green-400' 
+                  ? 'bg-[rgba(0,255,100,0.4)]' 
                   : match === 'close'
-                  ? 'bg-[rgba(255,200,0,0.3)] border-2 border-yellow-400'
-                  : 'bg-[rgba(255,100,100,0.3)] border-2 border-red-400'
+                  ? 'bg-[rgba(255,200,0,0.3)]'
+                  : 'bg-[rgba(255,100,100,0.3)]'
               }`}
               style={{
                 boxShadow: match === 'perfect' 
@@ -388,22 +460,34 @@ export default function HueScan() {
               }}
             >
               <div className="text-center">
-                <div className={`text-5xl font-bold mb-2 ${
-                  match === 'perfect' ? 'text-green-300' : 
-                  match === 'close' ? 'text-yellow-300' : 
-                  'text-red-300'
-                }`}>
+                <div 
+                  className={`text-5xl font-bold mb-2 ${
+                    match === 'perfect' ? 'text-green-300' : 
+                    match === 'close' ? 'text-yellow-300' : 
+                    'text-red-300'
+                  }`}
+                  style={{ 
+                    WebkitTextStroke: '0',
+                    textShadow: 'none'
+                  }}
+                >
                   {matchPercentage}%
-            </div>
-                <div className={`text-2xl font-bold tracking-wider ${
-                  match === 'perfect' ? 'text-white' : 
-                  match === 'close' ? 'text-yellow-100' : 
-                  'text-red-100'
-                }`}>
+                </div>
+                <div 
+                  className={`text-2xl font-bold tracking-wider ${
+                    match === 'perfect' ? 'text-white' : 
+                    match === 'close' ? 'text-yellow-100' : 
+                    'text-red-100'
+                  }`}
+                  style={{ 
+                    WebkitTextStroke: '0',
+                    textShadow: 'none'
+                  }}
+                >
                   {match === 'perfect' ? '✓ COMPLIANT' : 
                    match === 'close' ? '! PARTIAL MATCH' : 
                    '✗ NOT COMPLIANT'}
-            </div>
+                </div>
                 {match === 'perfect' && (
                   <div className="text-xs text-white/80 mt-2">
                     GREEN APPROVED: #008F46
@@ -428,7 +512,7 @@ export default function HueScan() {
             <div className="bg-[rgba(0,143,70,0.3)] backdrop-blur-sm rounded-2xl p-4 text-white flex items-center gap-4">
               {/* Color Preview */}
               <div 
-                className="w-16 h-16 rounded-lg border-2 border-white/30 flex-shrink-0"
+                className="w-16 h-16 rounded-lg flex-shrink-0"
               style={{ 
                 backgroundColor: `rgb(${rgbValues.r}, ${rgbValues.g}, ${rgbValues.b})` 
               }}
