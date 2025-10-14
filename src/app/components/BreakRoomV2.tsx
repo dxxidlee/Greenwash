@@ -450,16 +450,17 @@ export default function BreakRoomV2({ open, onClose }: Props) {
         key={sentenceIdx}
         ref={(el) => { sentenceRefs.current[sentenceIdx] = el; }}
         className={`
-          text-2xl md:text-3xl font-medium
+          font-medium text-responsive-sentence
           ${isCurrent ? 'opacity-100' : 'opacity-20'}
         `}
         style={{
           fontFamily: 'PPNeueMontreal, sans-serif',
           color: 'white',
           textAlign: 'center',
-          marginBottom: '2rem',
-          paddingLeft: '2rem',
-          paddingRight: '2rem',
+          lineHeight: '0.75',
+          marginBottom: '1.5rem',
+          paddingLeft: '1.5rem',
+          paddingRight: '1.5rem',
           transition: 'opacity 0.5s ease-out',
           willChange: 'opacity',
           whiteSpace: 'nowrap',
