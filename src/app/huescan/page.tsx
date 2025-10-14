@@ -246,7 +246,7 @@ export default function HueScan() {
       const imageData = ctx.getImageData(0, 0, filterCanvas.width, filterCanvas.height);
       const data = imageData.data;
       
-      // Apply INVERTED green highlighting filter - HIGH CONTRAST white background
+      // Apply INVERTED green highlighting filter - white background, green objects visible
       for (let i = 0; i < data.length; i += 4) {
         const r = data[i];
         const g = data[i + 1];
@@ -257,49 +257,30 @@ export default function HueScan() {
         const greenStrength = isGreenish ? (g - Math.max(r, b)) / 255 : 0;
         
         if (greenStrength > 0.15) {
-          // Keep green pixels VERY visible with high contrast
-          const boost = 1.5 + greenStrength * 0.6; // Stronger boost
-          data[i] = Math.min(255, r * 0.7); // Reduce red more
-          data[i + 1] = Math.min(255, g * boost); // Much brighter green
-          data[i + 2] = Math.min(255, b * 0.7); // Reduce blue more
-          
-          // Apply contrast to green areas
-          data[i] = ((data[i] - 128) * 1.4) + 128;
-          data[i + 1] = ((data[i + 1] - 128) * 1.4) + 128;
-          data[i + 2] = ((data[i + 2] - 128) * 1.4) + 128;
+          // Keep green pixels visible and slightly enhanced
+          const boost = 1.2 + greenStrength * 0.3;
+          data[i] = Math.min(255, r * 0.9); // Keep some red
+          data[i + 1] = Math.min(255, g * boost); // Boost green
+          data[i + 2] = Math.min(255, b * 0.9); // Keep some blue
         } else {
-          // INVERT non-green pixels - HIGH CONTRAST white
-          const avg = (r + g + b) / 3;
-          const inverted = 255 - avg;
+          // INVERT non-green pixels - make them white/bright
+          const brightness = 0.85; // Very bright, near white
+          const inverted = 255 - ((r + g + b) / 3); // Invert brightness
+          const whitened = inverted * brightness + (255 * (1 - brightness));
           
-          // Push towards pure white with high contrast
-          const contrast = 1.6; // High contrast multiplier
-          const whitened = ((inverted - 128) * contrast) + 128;
-          const boosted = whitened * 0.95 + 255 * 0.05; // Push to white
-          
-          data[i] = boosted;
-          data[i + 1] = boosted * 1.02; // Very slight warm tint
-          data[i + 2] = boosted;
+          data[i] = whitened;
+          data[i + 1] = whitened * 1.05; // Slight warm tint
+          data[i + 2] = whitened;
         }
         
-        // HIGH CONTRAST: Clamp and enhance
-        data[i] = Math.max(0, Math.min(255, data[i]));
-        data[i + 1] = Math.max(0, Math.min(255, data[i + 1]));
-        data[i + 2] = Math.max(0, Math.min(255, data[i + 2]));
-        
-        // Add 10% film grain noise
-        const noise = (Math.random() - 0.5) * 51; // 10% of 255 = ~25.5, doubled for range
+        // Add 20 pixel noise for texture
+        const noise = (Math.random() - 0.5) * 20;
         data[i] = Math.max(0, Math.min(255, data[i] + noise));
         data[i + 1] = Math.max(0, Math.min(255, data[i + 1] + noise));
         data[i + 2] = Math.max(0, Math.min(255, data[i + 2] + noise));
       }
       
       ctx.putImageData(imageData, 0, 0);
-      
-      // Apply GAUSSIAN BLUR overlay (5-10px for aesthetic)
-      ctx.filter = 'blur(7px) contrast(1.2)'; // 7px blur + extra contrast
-      ctx.drawImage(filterCanvas, 0, 0);
-      ctx.filter = 'none';
       
     } catch (err) {
       console.error('Filter error:', err);
@@ -517,7 +498,7 @@ export default function HueScan() {
       // Delay start slightly to ensure camera is ready
       const startTimeout = setTimeout(() => {
         analyzeFrame();
-        drawOverlay();
+      drawOverlay();
         applyGreenFilter();
       }, 100);
       
@@ -698,24 +679,24 @@ export default function HueScan() {
               {/* Status Section - Top */}
               <div className="px-6 py-5 text-center border-b border-white/20">
                 <div className="text-4xl font-bold mb-2 text-white" style={{ opacity: 1 }}>
-                  {matchPercentage}%
-                </div>
+              {matchPercentage}%
+            </div>
                 <div className="text-lg font-medium text-white" style={{ opacity: 1 }}>
                   {match === 'perfect' ? 'Compliant' : 
                    match === 'close' ? 'Partial Match' : 
                    'Not Compliant'}
-                </div>
-              </div>
-              
+            </div>
+          </div>
+          
               {/* Detected Color Section - Bottom */}
               <div className="px-5 py-4 flex items-center gap-4">
                 {/* Color Preview */}
                 <div 
                   className="w-16 h-16 rounded-lg flex-shrink-0"
-                  style={{ 
-                    backgroundColor: `rgb(${rgbValues.r}, ${rgbValues.g}, ${rgbValues.b})` 
-                  }}
-                />
+              style={{ 
+                backgroundColor: `rgb(${rgbValues.r}, ${rgbValues.g}, ${rgbValues.b})` 
+              }}
+            />
                 {/* HEX Code */}
                 <div style={{ opacity: 1 }} className="text-white">
                   <div className="text-sm font-medium mb-1">Detected</div>
@@ -725,7 +706,7 @@ export default function HueScan() {
                     {rgbValues.b.toString(16).padStart(2, '0').toUpperCase()}
                   </div>
                 </div>
-              </div>
+          </div>
             </div>
           </div>
         </div>
