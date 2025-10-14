@@ -729,16 +729,16 @@ export default function HueScan() {
           </div>
 
           {/* Camera Control Buttons - Below X button on both mobile and desktop */}
-          <div className="absolute top-20 right-4 pointer-events-auto z-50 flex flex-col gap-3">
+          <div className="absolute top-20 right-4 pointer-events-auto z-50 flex flex-col gap-4">
             {/* Switch Camera - Mobile Only */}
             {isMobile && (
-              <button
-                onClick={switchCamera}
+            <button
+              onClick={switchCamera}
                 className="inline-flex items-center justify-center h-12 w-12 rounded-full shadow-[0_2px_12px_rgba(0,0,0,0.06)] bg-[rgba(0,143,70,0.3)] text-white hover:bg-[rgba(0,143,70,0.4)] transition-all duration-300 ease-out focus:outline-none focus:ring-2 focus:ring-white/30"
                 title={`Switch to ${facingMode === 'user' ? 'Rear' : 'Selfie'} Camera`}
-              >
+            >
                 <RotateCcw size={18} />
-              </button>
+            </button>
             )}
             {/* Flip Display - Works on all devices */}
             <button
@@ -748,7 +748,7 @@ export default function HueScan() {
             >
               <Camera size={18} className={isFlipped ? 'scale-x-[-1]' : ''} />
             </button>
-          </div>
+      </div>
         </>
       )}
       
