@@ -74,16 +74,16 @@ export default function BreakRoomV2({ open, onClose }: Props) {
       
       // Wait for layout to be complete
       const centerElement = () => {
-        // Container is 480px tall, so center is at 240px
-        const containerCenterPosition = 240;
+        // Container is 220px tall, so center is at 110px
+        const containerCenterPosition = 110;
         
         // Get element's position and height
         const elementTop = element.offsetTop;
         const elementHeight = element.offsetHeight;
         
-        // Calculate scroll position so element's center is at 240px from container top
-        // scrollTop should position element so that: (elementTop - scrollTop) + (elementHeight/2) = 240
-        // Therefore: scrollTop = elementTop + (elementHeight/2) - 240
+        // Calculate scroll position so element's center is at 110px from container top
+        // scrollTop should position element so that: (elementTop - scrollTop) + (elementHeight/2) = 110
+        // Therefore: scrollTop = elementTop + (elementHeight/2) - 110
         const targetScrollTop = elementTop + (elementHeight / 2) - containerCenterPosition;
         
         console.log('Centering calc:', {
@@ -458,9 +458,9 @@ export default function BreakRoomV2({ open, onClose }: Props) {
           color: 'white',
           textAlign: 'center',
           lineHeight: '0.75',
-          marginBottom: '1.5rem',
-          paddingLeft: '1.5rem',
-          paddingRight: '1.5rem',
+          marginBottom: '0.5rem',
+          paddingLeft: '1.125rem',
+          paddingRight: '1.125rem',
           transition: 'opacity 0.5s ease-out',
           willChange: 'opacity',
           whiteSpace: 'nowrap',
@@ -633,20 +633,20 @@ export default function BreakRoomV2({ open, onClose }: Props) {
                   style={{
                     width: '56rem',
                     maxWidth: '90vw',
-                    height: '480px',
+                    height: '220px',
                     overflow: 'hidden'
                   }}
                 >
                   <div 
                     className="w-full h-full overflow-y-auto hide-scrollbar"
                   >
-                    {/* Top padding - exactly 240px to allow first sentence to center */}
-                    <div style={{ height: '240px', flexShrink: 0 }} />
+                    {/* Top padding - exactly 110px to allow first sentence to center */}
+                    <div style={{ height: '110px', flexShrink: 0 }} />
                     
                     {SENTENCE_DATA.map((sentenceData, idx) => renderSentence(sentenceData, idx))}
                     
-                    {/* Bottom padding - exactly 240px to allow last sentence to center */}
-                    <div style={{ height: '240px', flexShrink: 0 }} />
+                    {/* Bottom padding - exactly 110px to allow last sentence to center */}
+                    <div style={{ height: '110px', flexShrink: 0 }} />
                   </div>
                 </div>
               </div>
