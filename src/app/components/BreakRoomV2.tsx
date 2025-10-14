@@ -110,18 +110,18 @@ export default function BreakRoomV2({ open, onClose }: Props) {
     }
   }, [currentSentenceIdx, recordingState]);
 
-  // Scroll to top when returning to idle state
+  // Scroll to top when returning to idle state or when opening
   useEffect(() => {
-    if (recordingState === 'idle' && sentenceRefs.current[0]) {
+    if ((recordingState === 'idle' || open) && sentenceRefs.current[0]) {
       const firstElement = sentenceRefs.current[0];
       if (firstElement && firstElement.parentElement) {
         firstElement.parentElement.scrollTo({
           top: 0,
-          behavior: 'smooth'
+          behavior: recordingState === 'idle' ? 'smooth' : 'auto'
         });
       }
     }
-  }, [recordingState]);
+  }, [recordingState, open]);
 
   // Check for mobile
   useEffect(() => {
@@ -693,13 +693,13 @@ export default function BreakRoomV2({ open, onClose }: Props) {
                 <div 
                   className="w-full h-full overflow-y-auto hide-scrollbar"
                 >
-                  {/* Top padding - exactly 110px to allow first sentence to center */}
-                  <div style={{ height: '110px', flexShrink: 0 }} />
+                  {/* Top padding - 110px during recording to center, less in idle to show text */}
+                  <div style={{ height: recordingState === 'recording' ? '110px' : '20px', flexShrink: 0 }} />
                   
                   {SENTENCE_DATA.map((sentenceData, idx) => renderSentence(sentenceData, idx))}
                   
-                  {/* Bottom padding - exactly 110px to allow last sentence to center */}
-                  <div style={{ height: '110px', flexShrink: 0 }} />
+                  {/* Bottom padding - 110px during recording to center, less in idle */}
+                  <div style={{ height: recordingState === 'recording' ? '110px' : '20px', flexShrink: 0 }} />
                 </div>
               )}
             </div>
@@ -736,8 +736,8 @@ export default function BreakRoomV2({ open, onClose }: Props) {
                 onClick={recordingState === 'idle' ? startRecording : undefined}
                 className="rounded-[40px] px-8 py-4 transition-all duration-300 flex items-center justify-center"
                 style={{
-                  width: '56rem',
-                  maxWidth: '90vw',
+                  width: '28rem',
+                  maxWidth: '45vw',
                   height: '64px',
                   backgroundColor: recordingState === 'failed' ? 'rgba(220, 38, 38, 0.3)' : 'rgba(0, 143, 70, 0.3)',
                   cursor: recordingState === 'idle' ? 'pointer' : 'default',
