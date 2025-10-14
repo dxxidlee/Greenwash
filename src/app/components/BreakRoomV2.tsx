@@ -442,7 +442,7 @@ export default function BreakRoomV2({ open, onClose }: Props) {
             }
           }
           
-          // Start audio capture
+          // Start audio captures
           startAudioCapture();
           
           // Start word progression
@@ -519,33 +519,106 @@ export default function BreakRoomV2({ open, onClose }: Props) {
             opacity: textOpacity,
             transition: 'opacity 0.5s ease-out',
             willChange: 'opacity',
-            whiteSpace: 'nowrap',
-            overflow: 'visible'
+            whiteSpace: isMobile ? 'normal' : 'nowrap',
+            overflow: 'visible',
+            wordWrap: isMobile ? 'break-word' : 'normal'
           }}
         >
-          {sentenceData.words.map((word, wordIdx) => {
-            const isCurrentWord = isCurrent && wordIdx === currentWordIdx;
-            const isSpoken = isCurrent && wordIdx < currentWordIdx;
-            const isUpcoming = isCurrent && wordIdx > currentWordIdx;
-            
-            return (
-              <span
-                key={wordIdx}
-                className={`
-                  inline
-                  ${isCurrentWord ? 'opacity-100 font-medium' : ''}
-                  ${isSpoken ? 'opacity-70' : ''}
-                  ${isUpcoming ? 'opacity-50' : ''}
-                  ${!isCurrent ? 'opacity-inherit' : ''}
-                `}
-                style={{
-                  transition: 'opacity 0.3s ease-out, font-weight 0.3s ease-out'
-                }}
-              >
-                {word}{' '}
-              </span>
-            );
-          })}
+          {isMobile ? (
+            // Mobile: Break into lines if sentence is too long
+            (() => {
+              const words = sentenceData.words;
+              const lines: string[][] = [];
+              let currentLine: string[] = [];
+              let currentLength = 0;
+              
+              words.forEach((word) => {
+                const wordLength = word.length;
+                // If adding this word would exceed 25 chars, start new line
+                if (currentLength + wordLength + (currentLine.length > 0 ? 1 : 0) > 25) {
+                  if (currentLine.length > 0) {
+                    lines.push([...currentLine]);
+                    currentLine = [word];
+                    currentLength = wordLength;
+                  } else {
+                    // Single word longer than 25, add it anyway
+                    currentLine.push(word);
+                    lines.push([...currentLine]);
+                    currentLine = [];
+                    currentLength = 0;
+                  }
+                } else {
+                  currentLine.push(word);
+                  currentLength += wordLength + (currentLine.length > 1 ? 1 : 0);
+                }
+              });
+              
+              if (currentLine.length > 0) {
+                lines.push(currentLine);
+              }
+              
+              // Render lines
+              return lines.map((lineWords, lineIdx) => (
+                <div key={lineIdx}>
+                  {lineWords.map((word, wordIdxInLine) => {
+                    // Find actual word index in original array
+                    let actualWordIdx = 0;
+                    for (let i = 0; i < lineIdx; i++) {
+                      actualWordIdx += lines[i].length;
+                    }
+                    actualWordIdx += wordIdxInLine;
+                    
+                    const isCurrentWord = isCurrent && actualWordIdx === currentWordIdx;
+                    const isSpoken = isCurrent && actualWordIdx < currentWordIdx;
+                    const isUpcoming = isCurrent && actualWordIdx > currentWordIdx;
+                    
+                    return (
+                      <span
+                        key={wordIdxInLine}
+                        className={`
+                          inline
+                          ${isCurrentWord ? 'opacity-100 font-medium' : ''}
+                          ${isSpoken ? 'opacity-70' : ''}
+                          ${isUpcoming ? 'opacity-50' : ''}
+                          ${!isCurrent ? 'opacity-inherit' : ''}
+                        `}
+                        style={{
+                          transition: 'opacity 0.3s ease-out, font-weight 0.3s ease-out'
+                        }}
+                      >
+                        {word}{' '}
+                      </span>
+                    );
+                  })}
+                </div>
+              ));
+            })()
+          ) : (
+            // Desktop: Single line
+            sentenceData.words.map((word, wordIdx) => {
+              const isCurrentWord = isCurrent && wordIdx === currentWordIdx;
+              const isSpoken = isCurrent && wordIdx < currentWordIdx;
+              const isUpcoming = isCurrent && wordIdx > currentWordIdx;
+              
+              return (
+                <span
+                  key={wordIdx}
+                  className={`
+                    inline
+                    ${isCurrentWord ? 'opacity-100 font-medium' : ''}
+                    ${isSpoken ? 'opacity-70' : ''}
+                    ${isUpcoming ? 'opacity-50' : ''}
+                    ${!isCurrent ? 'opacity-inherit' : ''}
+                  `}
+                  style={{
+                    transition: 'opacity 0.3s ease-out, font-weight 0.3s ease-out'
+                  }}
+                >
+                  {word}{' '}
+                </span>
+              );
+            })
+          )}
         </div>
         
         {/* Right crosshair - FIXED position */}
