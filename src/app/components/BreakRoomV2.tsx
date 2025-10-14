@@ -357,7 +357,7 @@ export default function BreakRoomV2({ open, onClose }: Props) {
         `}
         style={{
           fontFamily: 'PPNeueMontreal, sans-serif',
-          color: 'white',
+          color: '#008F46',
           textAlign: 'center',
           marginBottom: '2rem',
           paddingLeft: '2rem',
