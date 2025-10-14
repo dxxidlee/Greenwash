@@ -37,8 +37,21 @@ export default function BreakRoomV2({ open, onClose }: Props) {
   const streamRef = useRef<MediaStream | null>(null);
   const wordTimerRef = useRef<NodeJS.Timeout | null>(null);
   const sentenceTimerRef = useRef<NodeJS.Timeout | null>(null);
+  const sentenceRefs = useRef<(HTMLDivElement | null)[]>([]);
 
   useLockBodyScroll(open);
+
+  // Auto-scroll to center current sentence
+  useEffect(() => {
+    if (recordingState === 'recording' && sentenceRefs.current[currentSentenceIdx]) {
+      const element = sentenceRefs.current[currentSentenceIdx];
+      element?.scrollIntoView({ 
+        behavior: 'smooth', 
+        block: 'center',
+        inline: 'center'
+      });
+    }
+  }, [currentSentenceIdx, recordingState]);
 
   // Check for mobile
   useEffect(() => {
@@ -337,6 +350,7 @@ export default function BreakRoomV2({ open, onClose }: Props) {
     return (
       <div
         key={sentenceIdx}
+        ref={(el) => { sentenceRefs.current[sentenceIdx] = el; }}
         className={`
           transition-all duration-500 ease-out
           ${isCurrent ? 'text-2xl md:text-3xl opacity-100 font-medium' : 'text-lg md:text-xl opacity-40 font-normal'}
@@ -346,7 +360,9 @@ export default function BreakRoomV2({ open, onClose }: Props) {
           fontFamily: 'PPNeueMontreal, sans-serif',
           color: 'white',
           textAlign: 'center',
-          marginBottom: '1rem'
+          marginBottom: '2rem',
+          paddingLeft: '2rem',
+          paddingRight: '2rem'
         }}
       >
         {sentenceData.words.map((word, wordIdx) => {
@@ -479,12 +495,11 @@ export default function BreakRoomV2({ open, onClose }: Props) {
             relative z-10
             w-full h-screen
             flex flex-col items-center justify-center
-            px-4 sm:px-8 md:px-16
             ${isClosing ? 'animate-[fadeOutScaleDown_0.3s_ease-in_forwards]' : 'opacity-0 scale-98 translate-y-2 animate-[fadeInScaleUp_0.4s_ease-out_0.12s_forwards]'}
           `}
         >
-          {/* Recitation Display Area */}
-          <div className="w-full max-w-4xl flex-1 flex flex-col items-center justify-center mb-32">
+          {/* Recitation Display Area - Vertically Centered */}
+          <div className="w-full max-w-4xl h-full flex flex-col items-center justify-center">
             {recordingState === 'idle' && (
               <div className="text-center">
                 <button
@@ -509,7 +524,14 @@ export default function BreakRoomV2({ open, onClose }: Props) {
             )}
 
             {recordingState === 'recording' && (
-              <div className="w-full space-y-4 overflow-y-auto max-h-[60vh] px-4">
+              <div 
+                className="w-full h-full overflow-y-auto hide-scrollbar"
+                style={{
+                  scrollBehavior: 'smooth',
+                  paddingTop: '50vh',
+                  paddingBottom: '50vh'
+                }}
+              >
                 {SENTENCE_DATA.map((sentenceData, idx) => renderSentence(sentenceData, idx))}
               </div>
             )}
