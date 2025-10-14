@@ -42,11 +42,17 @@ export default function BreakRoomV2({ open, onClose }: Props) {
 
   useLockBodyScroll(open);
 
-  // Initialize background audio
+  // Initialize and preload background audio
   useEffect(() => {
     if (open && !backgroundAudioRef.current) {
       const audio = new Audio('/breakroom-sound.mp3');
       audio.loop = true;
+      audio.preload = 'auto';
+      audio.volume = 1.0;
+      
+      // Preload the audio immediately
+      audio.load();
+      
       backgroundAudioRef.current = audio;
     }
     
@@ -361,8 +367,19 @@ export default function BreakRoomV2({ open, onClose }: Props) {
           
           // Play background audio
           if (backgroundAudioRef.current) {
-            backgroundAudioRef.current.currentTime = 0;
-            backgroundAudioRef.current.play().catch(err => console.error('Audio play error:', err));
+            const audio = backgroundAudioRef.current;
+            audio.currentTime = 0;
+            
+            // Ensure audio is loaded before playing
+            if (audio.readyState >= 2) {
+              // Audio is loaded enough to play
+              audio.play().catch(err => console.error('Audio play error:', err));
+            } else {
+              // Wait for audio to be ready
+              audio.addEventListener('canplay', () => {
+                audio.play().catch(err => console.error('Audio play error:', err));
+              }, { once: true });
+            }
           }
           
           // Start audio capture
