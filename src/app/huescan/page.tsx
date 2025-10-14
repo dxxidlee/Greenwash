@@ -309,8 +309,8 @@ export default function HueScan() {
       lastFrameTimeRef.current = Date.now(); // Update heartbeat
       
       const canvas = overlayCanvasRef.current;
-      const video = videoRef.current;
-      
+    const video = videoRef.current;
+    
       // Ensure video is ready and canvas is properly sized before drawing
       if (!canvas || !video || video.readyState !== video.HAVE_ENOUGH_DATA) return;
       
@@ -324,7 +324,7 @@ export default function HueScan() {
       if (canvas.width === 0 || canvas.height === 0) return;
     
       const ctx = canvas.getContext('2d', { alpha: true, desynchronized: true });
-      if (!ctx) return;
+    if (!ctx) return;
     
     const width = canvas.width;
     const height = canvas.height;
@@ -687,7 +687,7 @@ export default function HueScan() {
             className="absolute bottom-4 left-4" 
             style={{ 
               width: '299px',
-              transform: isMobile ? 'scale(0.6)' : 'none',
+              transform: isMobile ? 'scale(0.6)' : 'scale(0.8)',
               transformOrigin: 'bottom left'
             }}
           >
