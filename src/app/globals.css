@@ -167,7 +167,7 @@ html, body {
 
 /* Responsive text sizing for BreakRoom sentences */
 .text-responsive-sentence {
-  font-size: 1.35rem; /* Mobile: 1.5rem * 0.9 = 1.35rem */
+  font-size: 1.05rem; /* Mobile: Smaller for better fit */
 }
 
 @media (min-width: 768px) {

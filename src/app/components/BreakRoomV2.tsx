@@ -74,8 +74,8 @@ export default function BreakRoomV2({ open, onClose }: Props) {
       
       // Wait for layout to be complete
       const centerElement = () => {
-        // Container is 220px tall, so center is at 110px
-        const containerCenterPosition = 110;
+        // Container height: 180px mobile (90px center), 220px desktop (110px center)
+        const containerCenterPosition = isMobile ? 90 : 110;
         
         // Get element's position and height
         const elementTop = element.offsetTop;
@@ -108,7 +108,7 @@ export default function BreakRoomV2({ open, onClose }: Props) {
         });
       });
     }
-  }, [currentSentenceIdx, recordingState]);
+  }, [currentSentenceIdx, recordingState, isMobile]);
 
   // Scroll to top when returning to idle state (but NOT when opening initially)
   useEffect(() => {
@@ -477,7 +477,7 @@ export default function BreakRoomV2({ open, onClose }: Props) {
     
     // Crosshair indicator - FIXED positions (show during recording and failed state)
     const showCrosshair = (recordingState === 'recording' || recordingState === 'failed') && isInRange;
-    const crosshairLength = isCurrent ? '60px' : '30px';
+    const crosshairLength = isCurrent ? (isMobile ? '40px' : '60px') : (isMobile ? '20px' : '30px');
     const crosshairOpacity = isCurrent ? 1 : 0.2;
     
     return (
@@ -486,9 +486,9 @@ export default function BreakRoomV2({ open, onClose }: Props) {
         ref={(el) => { sentenceRefs.current[sentenceIdx] = el; }}
         className="relative"
         style={{
-          marginBottom: '1.25rem',
-          paddingLeft: '80px',
-          paddingRight: '80px'
+          marginBottom: isMobile ? '0.875rem' : '1.25rem',
+          paddingLeft: isMobile ? '50px' : '80px',
+          paddingRight: isMobile ? '50px' : '80px'
         }}
       >
         {/* Left crosshair - FIXED position */}
@@ -496,7 +496,7 @@ export default function BreakRoomV2({ open, onClose }: Props) {
           <div 
             style={{
               position: 'absolute',
-              left: '16px',
+              left: isMobile ? '8px' : '16px',
               top: '50%',
               transform: 'translateY(-50%)',
               width: crosshairLength,
@@ -553,7 +553,7 @@ export default function BreakRoomV2({ open, onClose }: Props) {
           <div 
             style={{
               position: 'absolute',
-              right: '16px',
+              right: isMobile ? '8px' : '16px',
               top: '50%',
               transform: 'translateY(-50%)',
               width: crosshairLength,
@@ -676,27 +676,36 @@ export default function BreakRoomV2({ open, onClose }: Props) {
           <div className="flex flex-col items-center justify-center gap-8">
             {/* Main Text Box - Always visible */}
             <div 
-              className="relative rounded-[40px] shadow-[0_2px_12px_rgba(0,0,0,0.06)] noise-surface px-8 py-10 sm:px-12 sm:py-12 md:px-16 md:py-14 transition-all duration-300"
+              className="relative rounded-[24px] md:rounded-[40px] shadow-[0_2px_12px_rgba(0,0,0,0.06)] noise-surface transition-all duration-300"
               style={{
-                width: '56rem',
+                width: isMobile ? '90vw' : '56rem',
                 maxWidth: '90vw',
-                height: '220px',
+                height: isMobile ? '180px' : '220px',
                 overflow: 'hidden',
-                backgroundColor: recordingState === 'failed' ? 'rgba(220, 38, 38, 0.3)' : 'rgba(0, 143, 70, 0.3)'
+                backgroundColor: recordingState === 'failed' ? 'rgba(220, 38, 38, 0.3)' : 'rgba(0, 143, 70, 0.3)',
+                padding: isMobile ? '1rem' : '2rem'
               }}
             >
               {recordingState === 'success' ? (
                 <div className="w-full h-full flex items-center justify-center">
-                  <div className="text-center space-y-4">
+                  <div className="text-center space-y-2">
                     <div 
-                      className="text-2xl font-medium text-white"
-                      style={{ fontFamily: 'PPNeueMontreal, sans-serif' }}
+                      style={{ 
+                        fontFamily: 'PPNeueMontreal, sans-serif',
+                        fontSize: isMobile ? '1.25rem' : '1.5rem',
+                        fontWeight: 500,
+                        color: 'white'
+                      }}
                     >
                       Alignment Confirmed
                     </div>
                     <div 
-                      className="text-lg text-white opacity-70"
-                      style={{ fontFamily: 'PPNeueMontreal, sans-serif' }}
+                      style={{ 
+                        fontFamily: 'PPNeueMontreal, sans-serif',
+                        fontSize: isMobile ? '0.875rem' : '1.125rem',
+                        color: 'white',
+                        opacity: 0.7
+                      }}
                     >
                       Session complete, exit when ready.
                     </div>
@@ -706,27 +715,27 @@ export default function BreakRoomV2({ open, onClose }: Props) {
                 <div 
                   className="w-full h-full overflow-y-auto hide-scrollbar"
                 >
-                  {/* Top padding - 110px to center first sentence in idle, center current sentence during recording */}
-                  <div style={{ height: '110px', flexShrink: 0 }} />
+                  {/* Top padding - responsive: 90px mobile, 110px desktop */}
+                  <div style={{ height: isMobile ? '90px' : '110px', flexShrink: 0 }} />
                   
                   {SENTENCE_DATA.map((sentenceData, idx) => renderSentence(sentenceData, idx))}
                   
-                  {/* Bottom padding - 110px to allow scrolling */}
-                  <div style={{ height: '110px', flexShrink: 0 }} />
+                  {/* Bottom padding - responsive: 90px mobile, 110px desktop */}
+                  <div style={{ height: isMobile ? '90px' : '110px', flexShrink: 0 }} />
                 </div>
               )}
             </div>
 
             {/* Bottom Controls - Record button + Status box */}
-            <div className="flex items-center" style={{ gap: '1.2rem' }}>
+            <div className="flex items-center flex-wrap justify-center" style={{ gap: isMobile ? '0.8rem' : '1.2rem' }}>
               {/* Record Button */}
               <button
                 onClick={recordingState === 'idle' ? startRecording : undefined}
                 disabled={recordingState === 'recording' || recordingState === 'countdown'}
-                className="flex items-center justify-center transition-all duration-300 rounded-full"
+                className="flex items-center justify-center transition-all duration-300 rounded-full flex-shrink-0"
                 style={{
-                  width: '64px',
-                  height: '64px',
+                  width: isMobile ? '52px' : '64px',
+                  height: isMobile ? '52px' : '64px',
                   backgroundColor: recordingState === 'failed' ? 'rgba(220, 38, 38, 0.3)' : 'rgba(0, 143, 70, 0.3)',
                   cursor: recordingState === 'idle' ? 'pointer' : 'default',
                   border: 'none',
@@ -736,8 +745,8 @@ export default function BreakRoomV2({ open, onClose }: Props) {
                 <div
                   className="transition-all duration-300"
                   style={{
-                    width: recordingState === 'recording' ? '24px' : '32px',
-                    height: recordingState === 'recording' ? '24px' : '32px',
+                    width: recordingState === 'recording' ? (isMobile ? '18px' : '24px') : (isMobile ? '26px' : '32px'),
+                    height: recordingState === 'recording' ? (isMobile ? '18px' : '24px') : (isMobile ? '26px' : '32px'),
                     borderRadius: recordingState === 'recording' ? '4px' : '50%',
                     backgroundColor: 'white'
                   }}
@@ -747,16 +756,17 @@ export default function BreakRoomV2({ open, onClose }: Props) {
               {/* Status Text Box */}
               <div
                 onClick={recordingState === 'idle' ? startRecording : undefined}
-                className="rounded-[40px] px-8 py-4 transition-all duration-300 flex items-center justify-center"
+                className="rounded-[24px] md:rounded-[40px] transition-all duration-300 flex items-center justify-center"
                 style={{
-                  width: '28rem',
-                  maxWidth: '45vw',
-                  height: '64px',
+                  width: isMobile ? 'calc(90vw - 60px)' : '28rem',
+                  maxWidth: isMobile ? 'calc(90vw - 60px)' : '45vw',
+                  height: isMobile ? '52px' : '64px',
+                  padding: isMobile ? '0.5rem 1rem' : '1rem 2rem',
                   backgroundColor: recordingState === 'failed' ? 'rgba(220, 38, 38, 0.3)' : 'rgba(0, 143, 70, 0.3)',
                   cursor: recordingState === 'idle' ? 'pointer' : 'default',
                   fontFamily: 'PPNeueMontreal, sans-serif',
                   color: 'white',
-                  fontSize: '1.125rem',
+                  fontSize: isMobile ? '0.875rem' : '1.125rem',
                   fontWeight: 500,
                   border: 'none',
                   outline: 'none'
@@ -769,12 +779,13 @@ export default function BreakRoomV2({ open, onClose }: Props) {
                 )}
                 
                 {recordingState === 'recording' && (
-                  <div className="w-full h-full flex items-center justify-center gap-1 px-4">
-                    {Array.from({ length: 60 }).map((_, i) => {
+                  <div className="w-full h-full flex items-center justify-center gap-1" style={{ padding: isMobile ? '0 0.5rem' : '0 1rem' }}>
+                    {Array.from({ length: isMobile ? 30 : 60 }).map((_, i) => {
                       // More dynamic height variation
-                      const baseHeight = audioLevel > 0.1 ? audioLevel * 100 : 10;
-                      const randomVariation = Math.sin(i * 0.5 + Date.now() / 200) * 30;
-                      const height = Math.max(4, Math.min(48, baseHeight + randomVariation));
+                      const maxBarHeight = isMobile ? 32 : 48;
+                      const baseHeight = audioLevel > 0.1 ? audioLevel * (isMobile ? 60 : 100) : 10;
+                      const randomVariation = Math.sin(i * 0.5 + Date.now() / 200) * (isMobile ? 20 : 30);
+                      const height = Math.max(4, Math.min(maxBarHeight, baseHeight + randomVariation));
                       
                       return (
                         <div
@@ -782,7 +793,7 @@ export default function BreakRoomV2({ open, onClose }: Props) {
                           className="flex-1 rounded-full transition-all duration-100"
                           style={{
                             height: `${height}px`,
-                            maxHeight: '48px',
+                            maxHeight: `${maxBarHeight}px`,
                             backgroundColor: 'white',
                             opacity: audioLevel > 0.1 ? 0.8 : 0.3
                           }}

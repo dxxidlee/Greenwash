@@ -123,14 +123,31 @@ export default function HueScan() {
           height: settings.height
         });
         
-        videoRef.current.onloadedmetadata = () => {
-          console.log('Video metadata loaded, starting scan');
+        videoRef.current.onloadedmetadata = async () => {
+          console.log('Video metadata loaded, starting video playback');
+          // CRITICAL: Explicitly play video on mobile
+          if (videoRef.current) {
+            try {
+              await videoRef.current.play();
+              console.log('Video playing successfully');
+            } catch (playError) {
+              console.error('Error playing video:', playError);
+            }
+          }
           setScanning(true);
         };
         
-        // Fallback timeout
-        setTimeout(() => {
-            setScanning(true);
+        // Fallback: try to play immediately and set scanning
+        setTimeout(async () => {
+          if (videoRef.current && videoRef.current.paused) {
+            try {
+              await videoRef.current.play();
+              console.log('Video started via fallback');
+            } catch (e) {
+              console.warn('Fallback play failed:', e);
+            }
+          }
+          setScanning(true);
         }, 500);
       }
     } catch (err) {
