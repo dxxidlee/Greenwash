@@ -442,17 +442,23 @@ export default function BreakRoomV2({ open, onClose }: Props) {
 
       <div
         onClick={(e) => {
+          e.stopPropagation();
           // Only allow closing when success
           if (showExitButton) {
             handleClose();
           }
         }}
+        onWheel={(e) => e.stopPropagation()}
+        onTouchMove={(e) => e.stopPropagation()}
         aria-hidden={false}
         aria-modal="true"
         role="dialog"
         className="fixed inset-0 z-[100] overflow-hidden"
       >
-        {/* Background with same settings as home page */}
+        {/* Solid white backdrop with full opacity - blocks everything behind */}
+        <div className="fixed inset-0 bg-white" />
+        
+        {/* Background image with same settings as home page */}
         <div 
           className="fixed inset-0 bg-white"
           style={{
@@ -465,18 +471,6 @@ export default function BreakRoomV2({ open, onClose }: Props) {
         
         {/* Green haze overlay */}
         <div className="fixed inset-0 bg-gradient-to-br from-green-50/20 to-green-100/10 pointer-events-none" />
-
-        {/* Full screen blur layer */}
-        <div 
-          className={`
-            fixed inset-0
-            backdrop-blur-md md:backdrop-blur-lg
-            supports-[backdrop-filter]:backdrop-saturate-150
-            supports-[backdrop-filter]:backdrop-contrast-100
-            ${isClosing ? 'animate-[fadeOut_0.3s_ease-in_forwards]' : 'opacity-0 animate-[fadeIn_0.4s_ease-out_forwards]'}
-          `}
-          style={{ pointerEvents: 'none' }}
-        />
 
         {/* Main Content Container */}
         <div
