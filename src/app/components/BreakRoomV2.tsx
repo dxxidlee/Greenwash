@@ -8,7 +8,7 @@ type Props = {
   onClose: () => void;
 };
 
-const RECITATION_TEXT = `I walk the corridor of agreement. Uniform green is public safety. Variance breeds decay; color is care. I am one pixel of the city, and I align to G-08. My memory does not outrank the plan; my preference does not outrank the protocol. I choose legibility over noise, coherence over style. I report deviation in the world and in myself. Where I waver, I correct. Where I question, I complete. The city is a single surface; I do not fracture it. I speak without tremor and keep the line unbroken. I return until my voice and the sentence are the same. I am seen. I am the same. The same is safe.`;
+const RECITATION_TEXT = `I walk the corridor of agreement. Uniform green is public safety. Variance breeds decay; color is care. I am one pixel of the city, and I align to G-08. My memory does not outrank the plan. My preference does not outrank the protocol. I choose legibility over noise, coherence over style. I report deviation in the world and in myself. Where I waver, I correct. Where I question, I complete. The city is a single surface; I do not fracture it. I speak without tremor and keep the line unbroken. I return until my voice and the sentence are the same. I am seen. I am the same. The same is safe.`;
 
 // Parse text into sentences and words
 const SENTENCES = RECITATION_TEXT.match(/[^.!?]+[.!?]+/g)?.map(s => s.trim()) || [];
@@ -74,16 +74,16 @@ export default function BreakRoomV2({ open, onClose }: Props) {
       
       // Wait for layout to be complete
       const centerElement = () => {
-        // Container is 400px tall, so center is at 200px
-        const containerCenterPosition = 200;
+        // Container is 480px tall, so center is at 240px
+        const containerCenterPosition = 240;
         
         // Get element's position and height
         const elementTop = element.offsetTop;
         const elementHeight = element.offsetHeight;
         
-        // Calculate scroll position so element's center is at 200px from container top
-        // scrollTop should position element so that: (elementTop - scrollTop) + (elementHeight/2) = 200
-        // Therefore: scrollTop = elementTop + (elementHeight/2) - 200
+        // Calculate scroll position so element's center is at 240px from container top
+        // scrollTop should position element so that: (elementTop - scrollTop) + (elementHeight/2) = 240
+        // Therefore: scrollTop = elementTop + (elementHeight/2) - 240
         const targetScrollTop = elementTop + (elementHeight / 2) - containerCenterPosition;
         
         console.log('Centering calc:', {
@@ -451,7 +451,6 @@ export default function BreakRoomV2({ open, onClose }: Props) {
         key={sentenceIdx}
         ref={(el) => { sentenceRefs.current[sentenceIdx] = el; }}
         className={`
-          transition-all duration-500 ease-out
           ${isCurrent ? 'text-2xl md:text-3xl opacity-100 font-medium' : 'text-lg md:text-xl opacity-40 font-normal'}
           ${isFuture ? 'opacity-30' : ''}
         `}
@@ -461,7 +460,9 @@ export default function BreakRoomV2({ open, onClose }: Props) {
           textAlign: 'center',
           marginBottom: '2rem',
           paddingLeft: '2rem',
-          paddingRight: '2rem'
+          paddingRight: '2rem',
+          transition: 'font-size 0.8s ease-in-out, opacity 0.8s ease-in-out, font-weight 0.8s ease-in-out',
+          willChange: 'font-size, opacity, font-weight'
         }}
       >
         {sentenceData.words.map((word, wordIdx) => {
@@ -473,12 +474,15 @@ export default function BreakRoomV2({ open, onClose }: Props) {
             <span
               key={wordIdx}
               className={`
-                inline transition-all duration-300
+                inline
                 ${isCurrentWord ? 'opacity-100 font-medium' : ''}
                 ${isSpoken ? 'opacity-70' : ''}
                 ${isUpcoming ? 'opacity-50' : ''}
                 ${!isCurrent ? 'opacity-inherit' : ''}
               `}
+              style={{
+                transition: 'opacity 0.6s ease-in-out, font-weight 0.6s ease-in-out'
+              }}
             >
               {word}{' '}
             </span>
@@ -623,11 +627,11 @@ export default function BreakRoomV2({ open, onClose }: Props) {
               >
                 {/* Green text box container - FIXED size, always centered */}
                 <div 
-                  className="relative rounded-[40px] shadow-[0_2px_12px_rgba(0,0,0,0.06)] bg-[rgba(0,143,70,0.3)] noise-surface px-8 py-8 sm:px-12 sm:py-10 md:px-16 md:py-12 mx-4 sm:mx-8 md:mx-16"
+                  className="relative rounded-[40px] shadow-[0_2px_12px_rgba(0,0,0,0.06)] bg-[rgba(0,143,70,0.3)] noise-surface px-8 py-10 sm:px-12 sm:py-12 md:px-16 md:py-14 mx-4 sm:mx-8 md:mx-16"
                   style={{
                     width: '56rem',
                     maxWidth: '90vw',
-                    height: '400px',
+                    height: '480px',
                     overflow: 'hidden'
                   }}
                 >
@@ -637,13 +641,13 @@ export default function BreakRoomV2({ open, onClose }: Props) {
                       scrollBehavior: 'smooth'
                     }}
                   >
-                    {/* Top padding - exactly 200px to allow first sentence to center */}
-                    <div style={{ height: '200px', flexShrink: 0 }} />
+                    {/* Top padding - exactly 240px to allow first sentence to center */}
+                    <div style={{ height: '240px', flexShrink: 0 }} />
                     
                     {SENTENCE_DATA.map((sentenceData, idx) => renderSentence(sentenceData, idx))}
                     
-                    {/* Bottom padding - exactly 200px to allow last sentence to center */}
-                    <div style={{ height: '200px', flexShrink: 0 }} />
+                    {/* Bottom padding - exactly 240px to allow last sentence to center */}
+                    <div style={{ height: '240px', flexShrink: 0 }} />
                   </div>
                 </div>
               </div>
