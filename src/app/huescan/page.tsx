@@ -331,18 +331,21 @@ export default function HueScan() {
       const avgDistance = totalDistance / sampleCount;
       const similarity = Math.max(0, Math.min(100, 100 - (avgDistance / 441.67) * 100));
       
-      const isGreenish = avgG > avgR && avgG > avgB && avgG > 80;
+      // Green validation - must be greenish but more lenient
+      const isGreenish = avgG > avgR && avgG > avgB && avgG > 70; // Lowered from 80
       const greenDominance = avgG - Math.max(avgR, avgB);
       
       let adjustedSimilarity = similarity;
-      if (!isGreenish || greenDominance < 30) {
+      if (!isGreenish || greenDominance < 20) { // Lowered from 30
+        // Not green, severely penalize
         adjustedSimilarity = Math.min(adjustedSimilarity, 40);
       }
       
       setMatchPercentage(Math.round(adjustedSimilarity));
       
-      const newMatch = adjustedSimilarity >= 90 && isGreenish ? 'perfect' :
-                       adjustedSimilarity >= 70 && isGreenish ? 'close' : 'no';
+      // More lenient thresholds - 80%+ is compliant
+      const newMatch = adjustedSimilarity >= 80 && isGreenish ? 'perfect' :
+                       adjustedSimilarity >= 60 && isGreenish ? 'close' : 'no';
       
       // Only update if match status changed (reduce re-renders)
       if (newMatch !== match) {
