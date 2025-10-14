@@ -64,9 +64,9 @@ export default function BreakRoomV2({ open, onClose }: Props) {
     };
   }, [open]);
 
-  // Auto-scroll to center current sentence perfectly - FIXED
+  // Auto-scroll to center current sentence perfectly - FIXED (also during failed state)
   useEffect(() => {
-    if (recordingState === 'recording' && sentenceRefs.current[currentSentenceIdx]) {
+    if ((recordingState === 'recording' || recordingState === 'failed') && sentenceRefs.current[currentSentenceIdx]) {
       const element = sentenceRefs.current[currentSentenceIdx];
       if (!element || !element.parentElement) return;
       
@@ -110,18 +110,31 @@ export default function BreakRoomV2({ open, onClose }: Props) {
     }
   }, [currentSentenceIdx, recordingState]);
 
-  // Scroll to top when returning to idle state or when opening
+  // Scroll to top when returning to idle state (but NOT when opening initially)
   useEffect(() => {
-    if ((recordingState === 'idle' || open) && sentenceRefs.current[0]) {
+    if (recordingState === 'idle' && sentenceRefs.current[0]) {
       const firstElement = sentenceRefs.current[0];
       if (firstElement && firstElement.parentElement) {
         firstElement.parentElement.scrollTo({
           top: 0,
-          behavior: recordingState === 'idle' ? 'smooth' : 'auto'
+          behavior: 'smooth'
         });
       }
     }
-  }, [recordingState, open]);
+  }, [recordingState]);
+  
+  // Scroll to top on initial open
+  useEffect(() => {
+    if (open && sentenceRefs.current[0]) {
+      const firstElement = sentenceRefs.current[0];
+      if (firstElement && firstElement.parentElement) {
+        firstElement.parentElement.scrollTo({
+          top: 0,
+          behavior: 'auto'
+        });
+      }
+    }
+  }, [open]);
 
   // Check for mobile
   useEffect(() => {
@@ -353,7 +366,7 @@ export default function BreakRoomV2({ open, onClose }: Props) {
       setLastFailurePoint(currentFp);
     }
     
-    // Reset after 2 seconds
+    // Stay frozen at failure point for 2 seconds, then reset to idle
     setTimeout(() => {
       setRecordingState('idle');
       setCurrentSentenceIdx(0);
@@ -445,25 +458,25 @@ export default function BreakRoomV2({ open, onClose }: Props) {
   };
 
   const renderSentence = (sentenceData: typeof SENTENCE_DATA[0], sentenceIdx: number) => {
-    const isCurrent = sentenceIdx === currentSentenceIdx && recordingState === 'recording';
+    const isCurrent = sentenceIdx === currentSentenceIdx && (recordingState === 'recording' || recordingState === 'failed');
     
-    // Only show sentences within range: current +/- 2 when recording
+    // Only show sentences within range: current +/- 2 when recording or failed
     const distanceFromCurrent = Math.abs(sentenceIdx - currentSentenceIdx);
     const isInRange = distanceFromCurrent <= 2;
     
-    // Don't render sentences outside the range when recording
-    if (!isInRange && recordingState === 'recording') {
+    // Don't render sentences outside the range when recording or failed
+    if (!isInRange && (recordingState === 'recording' || recordingState === 'failed')) {
       return (
         <div key={sentenceIdx} ref={(el) => { sentenceRefs.current[sentenceIdx] = el; }} style={{ display: 'none' }} />
       );
     }
     
-    // In idle/countdown/failed state, show all text at low opacity
-    const showAllText = recordingState === 'idle' || recordingState === 'countdown' || recordingState === 'failed';
+    // In idle/countdown state, show all text at low opacity
+    const showAllText = recordingState === 'idle' || recordingState === 'countdown';
     const textOpacity = showAllText ? 0.2 : (isCurrent ? 1 : 0.2);
     
-    // Crosshair indicator - FIXED positions
-    const showCrosshair = recordingState === 'recording' && isInRange;
+    // Crosshair indicator - FIXED positions (show during recording and failed state)
+    const showCrosshair = (recordingState === 'recording' || recordingState === 'failed') && isInRange;
     const crosshairLength = isCurrent ? '60px' : '30px';
     const crosshairOpacity = isCurrent ? 1 : 0.2;
     
@@ -693,13 +706,13 @@ export default function BreakRoomV2({ open, onClose }: Props) {
                 <div 
                   className="w-full h-full overflow-y-auto hide-scrollbar"
                 >
-                  {/* Top padding - 110px during recording to center, less in idle to show text */}
-                  <div style={{ height: recordingState === 'recording' ? '110px' : '20px', flexShrink: 0 }} />
+                  {/* Top padding - 110px to center first sentence in idle, center current sentence during recording */}
+                  <div style={{ height: '110px', flexShrink: 0 }} />
                   
                   {SENTENCE_DATA.map((sentenceData, idx) => renderSentence(sentenceData, idx))}
                   
-                  {/* Bottom padding - 110px during recording to center, less in idle */}
-                  <div style={{ height: recordingState === 'recording' ? '110px' : '20px', flexShrink: 0 }} />
+                  {/* Bottom padding - 110px to allow scrolling */}
+                  <div style={{ height: '110px', flexShrink: 0 }} />
                 </div>
               )}
             </div>
