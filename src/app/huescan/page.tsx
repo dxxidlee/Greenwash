@@ -313,9 +313,9 @@ export default function HueScan() {
     const bracketLength = 40;
     const sampleSize = 40; // Same as in analyzeFrame - this is what's actually scanned
     
-    // Corner brackets - GREEN #008F46
+    // Corner brackets - GREEN #008F46 - Same thickness as crosshair
     ctx.strokeStyle = 'rgba(0, 143, 70, 0.9)';
-    ctx.lineWidth = 2;
+    ctx.lineWidth = 5; // Match crosshair thickness
     ctx.lineCap = 'square';
     ctx.lineJoin = 'miter';
     
@@ -340,10 +340,10 @@ export default function HueScan() {
     ctx.lineTo(centerX + adjustedSize, centerY + adjustedSize - bracketLength);
     ctx.stroke();
     
-    // THICK GREEN CROSSHAIR - Solid, no dotted stroke
+    // GREEN CROSSHAIR - Sharp edges, solid stroke
     ctx.strokeStyle = 'rgba(0, 143, 70, 1)'; // Exact green #008F46
-    ctx.lineWidth = 5; // Much thicker
-    ctx.lineCap = 'round'; // Rounded ends for smoother look
+    ctx.lineWidth = 5;
+    ctx.lineCap = 'square'; // Sharp edges, not rounded
     const crossSize = 25;
     ctx.beginPath();
     ctx.moveTo(centerX - crossSize, centerY);
@@ -729,7 +729,7 @@ export default function HueScan() {
           </div>
 
           {/* Camera Control Buttons - Below X button on both mobile and desktop */}
-          <div className="absolute top-20 right-4 pointer-events-auto z-50 flex flex-col gap-4">
+          <div className="absolute top-20 right-4 pointer-events-auto z-50 flex flex-col gap-3">
             {/* Switch Camera - Mobile Only */}
             {isMobile && (
             <button
