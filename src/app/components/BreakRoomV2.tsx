@@ -346,6 +346,17 @@ export default function BreakRoomV2({ open, onClose }: Props) {
     const isCurrent = sentenceIdx === currentSentenceIdx;
     const isFuture = sentenceIdx > currentSentenceIdx;
     
+    // Only show sentences within range: current +/- 2
+    const distanceFromCurrent = Math.abs(sentenceIdx - currentSentenceIdx);
+    const isInRange = distanceFromCurrent <= 2;
+    
+    // Don't render sentences outside the range at all
+    if (!isInRange) {
+      return (
+        <div key={sentenceIdx} ref={(el) => { sentenceRefs.current[sentenceIdx] = el; }} style={{ display: 'none' }} />
+      );
+    }
+    
     return (
       <div
         key={sentenceIdx}
