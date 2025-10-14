@@ -153,15 +153,32 @@ export default function BreakRoomV2({ open, onClose }: Props) {
     return baseTime;
   };
 
-  const advanceWord = useCallback(() => {
-    const currentSentence = SENTENCE_DATA[currentSentenceIdx];
+  const stateRef = useRef({ 
+    sentenceIdx: 0, 
+    wordIdx: 0, 
+    failurePoint: null as {sentence: number, word: number} | null,
+    requiredAttempts: 1 
+  });
+  
+  useEffect(() => {
+    stateRef.current = { 
+      sentenceIdx: currentSentenceIdx, 
+      wordIdx: currentWordIdx, 
+      failurePoint,
+      requiredAttempts
+    };
+  }, [currentSentenceIdx, currentWordIdx, failurePoint, requiredAttempts]);
+  
+  const advanceWord = () => {
+    const { sentenceIdx, wordIdx, failurePoint: fp } = stateRef.current;
+    const currentSentence = SENTENCE_DATA[sentenceIdx];
     if (!currentSentence) return;
 
-    const nextWordIdx = currentWordIdx + 1;
+    const nextWordIdx = wordIdx + 1;
     
     if (nextWordIdx >= currentSentence.words.length) {
       // Move to next sentence
-      const nextSentenceIdx = currentSentenceIdx + 1;
+      const nextSentenceIdx = sentenceIdx + 1;
       
       if (nextSentenceIdx >= SENTENCE_DATA.length) {
         // Completed all sentences
@@ -170,12 +187,10 @@ export default function BreakRoomV2({ open, onClose }: Props) {
       }
       
       // Check if next position is the failure point
-      if (failurePoint && 
-          nextSentenceIdx === failurePoint.sentence && 
-          0 === failurePoint.word) {
+      if (fp && nextSentenceIdx === fp.sentence && 0 === fp.word) {
         setCurrentSentenceIdx(nextSentenceIdx);
         setCurrentWordIdx(0);
-        setTimeout(() => failSession(), 100); // Small delay to show the word before failing
+        setTimeout(() => failSession(), 100);
         return;
       }
       
@@ -188,11 +203,9 @@ export default function BreakRoomV2({ open, onClose }: Props) {
       wordTimerRef.current = setTimeout(advanceWord, duration);
     } else {
       // Check if next position is the failure point
-      if (failurePoint && 
-          currentSentenceIdx === failurePoint.sentence && 
-          nextWordIdx === failurePoint.word) {
+      if (fp && sentenceIdx === fp.sentence && nextWordIdx === fp.word) {
         setCurrentWordIdx(nextWordIdx);
-        setTimeout(() => failSession(), 100); // Small delay to show the word before failing
+        setTimeout(() => failSession(), 100);
         return;
       }
       
@@ -203,8 +216,7 @@ export default function BreakRoomV2({ open, onClose }: Props) {
       const duration = calculateWordDuration(nextWord, currentSentence.text);
       wordTimerRef.current = setTimeout(advanceWord, duration);
     }
-  // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [currentSentenceIdx, currentWordIdx, failurePoint]);
+  };
 
   const generateRandomFailurePoint = () => {
     // Calculate total words across all sentences (excluding first word)
@@ -242,13 +254,14 @@ export default function BreakRoomV2({ open, onClose }: Props) {
     return randomPoint;
   };
 
-  const failSession = useCallback(() => {
+  const failSession = () => {
     stopRecording();
     setRecordingState('failed');
     
     // Remember this failure point
-    if (failurePoint) {
-      setLastFailurePoint(failurePoint);
+    const currentFp = stateRef.current.failurePoint;
+    if (currentFp) {
+      setLastFailurePoint(currentFp);
     }
     
     // Reset after 2 seconds
@@ -258,26 +271,30 @@ export default function BreakRoomV2({ open, onClose }: Props) {
       setCurrentWordIdx(0);
       setFailurePoint(null); // Clear failure point for next attempt
     }, 2000);
-  }, [failurePoint]);
+  };
 
-  const completeRecitation = useCallback(() => {
-    const newAttemptCount = attemptCount + 1;
-    setAttemptCount(newAttemptCount);
-    
-    stopRecording();
-    
-    // Check if we've reached required attempts
-    if (newAttemptCount >= requiredAttempts) {
-      setRecordingState('success');
-      setShowExitButton(true);
-    } else {
-      // Loop back
-      setRecordingState('idle');
-      setCurrentSentenceIdx(0);
-      setCurrentWordIdx(0);
-      setFailurePoint(null); // Clear failure point for next loop
-    }
-  }, [attemptCount, requiredAttempts]);
+  const completeRecitation = () => {
+    setAttemptCount(prev => {
+      const newAttemptCount = prev + 1;
+      
+      stopRecording();
+      
+      // Check if we've reached required attempts
+      const required = stateRef.current.requiredAttempts;
+      if (newAttemptCount >= required) {
+        setRecordingState('success');
+        setShowExitButton(true);
+      } else {
+        // Loop back
+        setRecordingState('idle');
+        setCurrentSentenceIdx(0);
+        setCurrentWordIdx(0);
+        setFailurePoint(null); // Clear failure point for next loop
+      }
+      
+      return newAttemptCount;
+    });
+  };
 
   const startRecording = async () => {
     // Generate a random failure point for this recording session
