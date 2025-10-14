@@ -64,7 +64,7 @@ export default function BreakRoomV2({ open, onClose }: Props) {
     };
   }, [open]);
 
-  // Auto-scroll to center current sentence perfectly - BULLETPROOF VERSION
+  // Auto-scroll to center current sentence perfectly - FIXED
   useEffect(() => {
     if (recordingState === 'recording' && sentenceRefs.current[currentSentenceIdx]) {
       const element = sentenceRefs.current[currentSentenceIdx];
@@ -74,27 +74,23 @@ export default function BreakRoomV2({ open, onClose }: Props) {
       
       // Wait for layout to be complete
       const centerElement = () => {
-        // Get actual rendered positions
-        const containerRect = container.getBoundingClientRect();
-        const elementRect = element.getBoundingClientRect();
+        // Container is 400px tall, so center is at 200px
+        const containerCenterPosition = 200;
         
-        // Calculate where element currently is relative to container top
-        const currentElementTop = element.offsetTop;
-        const currentScrollTop = container.scrollTop;
+        // Get element's position and height
+        const elementTop = element.offsetTop;
+        const elementHeight = element.offsetHeight;
         
-        // Calculate perfect center position
-        const containerCenter = containerRect.height / 2;
-        const elementCenter = elementRect.height / 2;
+        // Calculate scroll position so element's center is at 200px from container top
+        // scrollTop should position element so that: (elementTop - scrollTop) + (elementHeight/2) = 200
+        // Therefore: scrollTop = elementTop + (elementHeight/2) - 200
+        const targetScrollTop = elementTop + (elementHeight / 2) - containerCenterPosition;
         
-        // The scroll position that puts the element's center at the container's center
-        const targetScrollTop = currentElementTop - containerCenter + elementCenter;
-        
-        console.log('Centering:', {
-          containerHeight: containerRect.height,
-          elementHeight: elementRect.height,
-          currentElementTop,
+        console.log('Centering calc:', {
+          elementTop,
+          elementHeight,
           targetScrollTop,
-          currentSentence: currentSentenceIdx
+          sentence: currentSentenceIdx
         });
         
         container.scrollTo({
@@ -641,13 +637,13 @@ export default function BreakRoomV2({ open, onClose }: Props) {
                       scrollBehavior: 'smooth'
                     }}
                   >
-                    {/* Top padding to create space for 2 sentences above when at start */}
-                    <div style={{ height: '200px' }} />
+                    {/* Top padding - exactly 200px to allow first sentence to center */}
+                    <div style={{ height: '200px', flexShrink: 0 }} />
                     
                     {SENTENCE_DATA.map((sentenceData, idx) => renderSentence(sentenceData, idx))}
                     
-                    {/* Bottom padding to create space for 2 sentences below when at end */}
-                    <div style={{ height: '200px' }} />
+                    {/* Bottom padding - exactly 200px to allow last sentence to center */}
+                    <div style={{ height: '200px', flexShrink: 0 }} />
                   </div>
                 </div>
               </div>
