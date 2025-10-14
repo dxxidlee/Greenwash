@@ -187,11 +187,23 @@ export default function HueScan() {
     const centerY = height / 2;
     const size = 140;
     const bracketLength = 40;
+    const sampleSize = 40; // Same as in analyzeFrame - this is what's actually scanned
     
     // Match color - cached
     const matchColor = match === 'perfect' ? 'rgba(0, 255, 100, 1)' : 
                        match === 'close' ? 'rgba(255, 200, 0, 1)' : 
                        'rgba(255, 100, 100, 0.8)';
+    
+    // SCANNING AREA INDICATOR - Shows exact pixels being analyzed
+    ctx.strokeStyle = 'rgba(255, 255, 255, 0.6)';
+    ctx.lineWidth = 2;
+    ctx.setLineDash([8, 8]); // Dashed line
+    ctx.strokeRect(centerX - sampleSize, centerY - sampleSize, sampleSize * 2, sampleSize * 2);
+    ctx.setLineDash([]); // Reset dash
+    
+    // Semi-transparent fill to show scanning area
+    ctx.fillStyle = 'rgba(255, 255, 255, 0.05)';
+    ctx.fillRect(centerX - sampleSize, centerY - sampleSize, sampleSize * 2, sampleSize * 2);
     
     // Optimized: Draw all brackets in one path
     ctx.strokeStyle = matchColor;
@@ -221,7 +233,8 @@ export default function HueScan() {
     ctx.lineTo(centerX + adjustedSize, centerY + adjustedSize - bracketLength);
     ctx.stroke();
     
-    // Optimized crosshair
+    // Optimized crosshair - always white
+    ctx.strokeStyle = 'rgba(255, 255, 255, 0.9)';
     ctx.lineWidth = 3;
     const crossSize = 20;
     ctx.beginPath();
@@ -231,8 +244,8 @@ export default function HueScan() {
     ctx.lineTo(centerX, centerY + crossSize);
     ctx.stroke();
     
-    // Center dot
-    ctx.fillStyle = matchColor;
+    // Center dot - always white
+    ctx.fillStyle = 'rgba(255, 255, 255, 0.9)';
     ctx.fillRect(centerX - 3, centerY - 3, 6, 6);
   }, [match]);
 
@@ -324,7 +337,7 @@ export default function HueScan() {
       // Throttle state updates to reduce re-renders (update every 100ms max)
       const now = performance.now();
       if (now - lastUpdateTimeRef.current > 100) {
-        setRgbValues({ r: avgR, g: avgG, b: avgB });
+      setRgbValues({ r: avgR, g: avgG, b: avgB });
         lastUpdateTimeRef.current = now;
       }
       
@@ -475,7 +488,7 @@ export default function HueScan() {
                   }}
                 >
                   {matchPercentage}%
-                </div>
+            </div>
                 <div 
                   className={`text-2xl font-bold tracking-wider ${
                     match === 'perfect' ? 'text-white' : 
@@ -484,15 +497,16 @@ export default function HueScan() {
                   }`}
                   style={{ 
                     WebkitTextStroke: '0',
-                    textShadow: 'none'
+                    textShadow: 'none',
+                    opacity: 1
                   }}
                 >
-                  {match === 'perfect' ? '✓ COMPLIANT' : 
-                   match === 'close' ? '! PARTIAL MATCH' : 
-                   '✗ NOT COMPLIANT'}
-                </div>
+                  {match === 'perfect' ? 'COMPLIANT' : 
+                   match === 'close' ? 'PARTIAL MATCH' : 
+                   'NOT COMPLIANT'}
+            </div>
                 {match === 'perfect' && (
-                  <div className="text-xs text-white/80 mt-2">
+                  <div className="text-xs text-white mt-2" style={{ opacity: 1 }}>
                     GREEN APPROVED: #008F46
               </div>
             )}
@@ -503,8 +517,8 @@ export default function HueScan() {
           {/* Top Left - Target Color */}
           <div className="absolute top-4 left-4">
             <div className="bg-[rgba(0,143,70,0.3)] backdrop-blur-sm rounded-2xl px-4 py-3 text-white text-sm tracking-wider">
-              <div className="flex items-center gap-2">
-                <span className="opacity-70">TARGET:</span>
+              <div className="flex items-center gap-2" style={{ opacity: 1 }}>
+                <span>TARGET:</span>
                 <span className="font-bold">#008F46</span>
               </div>
             </div>
@@ -521,8 +535,8 @@ export default function HueScan() {
               }}
             />
               {/* HEX Code */}
-              <div>
-                <div className="text-xs tracking-wider opacity-70 mb-1">DETECTED</div>
+              <div style={{ opacity: 1 }}>
+                <div className="text-xs tracking-wider mb-1">DETECTED</div>
                 <div className="text-xl font-bold tracking-wider">
                   #{rgbValues.r.toString(16).padStart(2, '0').toUpperCase()}
                   {rgbValues.g.toString(16).padStart(2, '0').toUpperCase()}
