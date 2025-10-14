@@ -8,6 +8,7 @@ import JournalModal from '../../components/JournalModal';
 import GreenwashQuiz from './GreenwashQuiz';
 import GreenwashManual from './GreenwashManual';
 import ProtocolQuickList from './ProtocolQuickList';
+import BreakRoomV2 from './BreakRoomV2';
 
 const DOT_LABELS = [
   'BreakRoom BRK-37',
@@ -26,6 +27,7 @@ export default function HomeHeroV2() {
   const [isJournalOpen, setIsJournalOpen] = useState(false);
   const [isQuizOpen, setIsQuizOpen] = useState(false);
   const [isManualOpen, setIsManualOpen] = useState(false);
+  const [isBreakRoomOpen, setIsBreakRoomOpen] = useState(false);
   const [currentTime, setCurrentTime] = useState('');
   const [showProfilePopup, setShowProfilePopup] = useState(false);
   const [isMobile, setIsMobile] = useState(false);
@@ -84,7 +86,7 @@ export default function HomeHeroV2() {
     
     // Navigate to internal routes for specific features
     if (label === 'BreakRoom BRK-37') {
-      window.location.href = '/breakroom';
+      setIsBreakRoomOpen(true);
     } else if (label === 'Protocol PRT-37') {
       setIsManualOpen(true);
     } else if (label === 'HueScan HUE-37') {
@@ -233,6 +235,7 @@ export default function HomeHeroV2() {
       )}
       
       {/* Modals */}
+      <BreakRoomV2 open={isBreakRoomOpen} onClose={() => setIsBreakRoomOpen(false)} />
       <GreenwashForms isOpen={isFormsOpen} onClose={() => setIsFormsOpen(false)} />
       <GreenwashFinder isOpen={isFilesOpen} onClose={() => setIsFilesOpen(false)} />
       <JournalModal 
