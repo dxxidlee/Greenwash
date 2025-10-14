@@ -202,9 +202,9 @@ export default function HueScan() {
     
     // Corner brackets - ALWAYS WHITE
     ctx.strokeStyle = 'rgba(255, 255, 255, 0.9)';
-    ctx.lineWidth = 4;
-    ctx.lineCap = 'round';
-    ctx.lineJoin = 'round';
+    ctx.lineWidth = 2;
+    ctx.lineCap = 'square';
+    ctx.lineJoin = 'miter';
     
     const adjustedSize = size; // No pulse animation
     
