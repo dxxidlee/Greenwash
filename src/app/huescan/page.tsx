@@ -22,6 +22,8 @@ export default function HueScan() {
   const lastUpdateTimeRef = useRef<number>(0);
   const frameCountRef = useRef<number>(0);
   const isPageVisible = useRef<boolean>(true);
+  const watchdogRef = useRef<NodeJS.Timeout | null>(null);
+  const lastFrameTimeRef = useRef<number>(Date.now());
 
   const targetColor = { r: 0, g: 143, b: 70 }; // #008f46
 
@@ -168,15 +170,17 @@ export default function HueScan() {
 
   // Separate overlay animation loop for smooth 60fps overlay
   const drawOverlay = useCallback(() => {
-    if (!isPageVisible.current) return; // Don't animate when page is hidden
+    if (!isPageVisible.current || !scanning) return; // Don't animate when page is hidden
     
-    overlayAnimationRef.current = requestAnimationFrame(drawOverlay);
-    
-    const canvas = overlayCanvasRef.current;
-    if (!canvas || canvas.width === 0 || canvas.height === 0) return;
-    
-    const ctx = canvas.getContext('2d', { alpha: true, desynchronized: true });
-    if (!ctx) return;
+    try {
+      overlayAnimationRef.current = requestAnimationFrame(drawOverlay);
+      lastFrameTimeRef.current = Date.now(); // Update heartbeat
+      
+      const canvas = overlayCanvasRef.current;
+      if (!canvas || canvas.width === 0 || canvas.height === 0) return;
+      
+      const ctx = canvas.getContext('2d', { alpha: true, desynchronized: true });
+      if (!ctx) return;
     
     const width = canvas.width;
     const height = canvas.height;
@@ -189,9 +193,11 @@ export default function HueScan() {
     const bracketLength = 40;
     const sampleSize = 40; // Same as in analyzeFrame - this is what's actually scanned
     
-    // SCANNING AREA INDICATOR - Shows exact pixels being analyzed
-    ctx.strokeStyle = 'rgba(255, 255, 255, 0.6)';
-    ctx.lineWidth = 2;
+    // SCANNING AREA INDICATOR - Shows exact pixels being analyzed - FULLY WHITE SHARP EDGES
+    ctx.strokeStyle = 'rgba(255, 255, 255, 1)'; // Fully opaque white
+    ctx.lineWidth = 3;
+    ctx.lineCap = 'square'; // Sharp edges
+    ctx.lineJoin = 'miter'; // Sharp corners
     ctx.setLineDash([8, 8]); // Dashed line
     ctx.strokeRect(centerX - sampleSize, centerY - sampleSize, sampleSize * 2, sampleSize * 2);
     ctx.setLineDash([]); // Reset dash
@@ -241,49 +247,55 @@ export default function HueScan() {
     // Center dot - always white
     ctx.fillStyle = 'rgba(255, 255, 255, 0.9)';
     ctx.fillRect(centerX - 3, centerY - 3, 6, 6);
-  }, [match]);
+    } catch (err) {
+      console.error('Overlay draw error:', err);
+      // Restart on next frame despite error
+      overlayAnimationRef.current = requestAnimationFrame(drawOverlay);
+    }
+  }, [scanning, match]);
 
   const analyzeFrame = useCallback(() => {
-    if (!isPageVisible.current) return; // Don't analyze when page is hidden
-    
-    // Always schedule next frame first for smooth animation
-    animationRef.current = requestAnimationFrame(analyzeFrame);
-    
-    if (!videoRef.current || !canvasRef.current || !scanning) {
-      return;
-    }
-
-    const video = videoRef.current;
-    const canvas = canvasRef.current;
-    
-    if (video.readyState !== video.HAVE_ENOUGH_DATA) {
-      return;
-    }
-    
-    // Throttle analysis to every 3rd frame for performance (still 20fps analysis)
-    frameCountRef.current++;
-    if (frameCountRef.current % 3 !== 0) {
-      return;
-    }
-
-    // Performance optimization: only update canvas size if it changed
-    if (canvas.width !== video.videoWidth || canvas.height !== video.videoHeight) {
-      canvas.width = video.videoWidth;
-      canvas.height = video.videoHeight;
-      
-      // Also update overlay canvas size once
-      if (overlayCanvasRef.current) {
-        overlayCanvasRef.current.width = video.videoWidth;
-        overlayCanvasRef.current.height = video.videoHeight;
-      }
-    }
-    
-    const ctx = canvas.getContext('2d', { willReadFrequently: true });
-    if (!ctx) {
-      return;
-    }
+    if (!isPageVisible.current || !scanning) return; // Don't analyze when page is hidden
     
     try {
+      // Always schedule next frame first for smooth animation
+      animationRef.current = requestAnimationFrame(analyzeFrame);
+      lastFrameTimeRef.current = Date.now(); // Update heartbeat
+      
+      if (!videoRef.current || !canvasRef.current) {
+        return;
+      }
+
+      const video = videoRef.current;
+      const canvas = canvasRef.current;
+      
+      if (video.readyState !== video.HAVE_ENOUGH_DATA) {
+        return;
+      }
+      
+      // Throttle analysis to every 3rd frame for performance (still 20fps analysis)
+      frameCountRef.current++;
+      if (frameCountRef.current % 3 !== 0) {
+        return;
+      }
+
+      // Performance optimization: only update canvas size if it changed
+      if (canvas.width !== video.videoWidth || canvas.height !== video.videoHeight) {
+        canvas.width = video.videoWidth;
+        canvas.height = video.videoHeight;
+        
+        // Also update overlay canvas size once
+        if (overlayCanvasRef.current) {
+          overlayCanvasRef.current.width = video.videoWidth;
+          overlayCanvasRef.current.height = video.videoHeight;
+        }
+      }
+      
+      const ctx = canvas.getContext('2d', { willReadFrequently: true });
+      if (!ctx) {
+        return;
+      }
+      
       ctx.drawImage(video, 0, 0);
       
       const centerX = canvas.width >> 1;
@@ -331,7 +343,7 @@ export default function HueScan() {
       // Throttle state updates to reduce re-renders (update every 100ms max)
       const now = performance.now();
       if (now - lastUpdateTimeRef.current > 100) {
-      setRgbValues({ r: avgR, g: avgG, b: avgB });
+        setRgbValues({ r: avgR, g: avgG, b: avgB });
         lastUpdateTimeRef.current = now;
       }
       
@@ -360,6 +372,8 @@ export default function HueScan() {
       }
     } catch (err) {
       console.error('Frame analysis error:', err);
+      // Restart on next frame despite error
+      animationRef.current = requestAnimationFrame(analyzeFrame);
     }
   }, [scanning, targetColor, match]);
 
@@ -369,6 +383,7 @@ export default function HueScan() {
       console.log('Starting analysis loop');
       frameCountRef.current = 0;
       lastUpdateTimeRef.current = 0;
+      lastFrameTimeRef.current = Date.now();
       
       // Delay start slightly to ensure camera is ready
       const startTimeout = setTimeout(() => {
@@ -376,8 +391,38 @@ export default function HueScan() {
         drawOverlay();
       }, 100);
       
+      // Watchdog to restart loops if they stop (check every 2 seconds)
+      watchdogRef.current = setInterval(() => {
+        const now = Date.now();
+        const timeSinceLastFrame = now - lastFrameTimeRef.current;
+        
+        // If no frame in 1 second and we're scanning, restart
+        if (timeSinceLastFrame > 1000 && scanning && isPageVisible.current) {
+          console.warn('Animation loops stopped, restarting...');
+          
+          // Cancel existing frames
+          if (animationRef.current) {
+            cancelAnimationFrame(animationRef.current);
+          }
+          if (overlayAnimationRef.current) {
+            cancelAnimationFrame(overlayAnimationRef.current);
+          }
+          
+          // Restart
+          frameCountRef.current = 0;
+          lastUpdateTimeRef.current = 0;
+          lastFrameTimeRef.current = now;
+          analyzeFrame();
+          drawOverlay();
+        }
+      }, 2000);
+      
       return () => {
         clearTimeout(startTimeout);
+        if (watchdogRef.current) {
+          clearInterval(watchdogRef.current);
+          watchdogRef.current = null;
+        }
         if (animationRef.current) {
           cancelAnimationFrame(animationRef.current);
           animationRef.current = null;
@@ -388,6 +433,10 @@ export default function HueScan() {
         }
       };
     } else {
+      if (watchdogRef.current) {
+        clearInterval(watchdogRef.current);
+        watchdogRef.current = null;
+      }
       if (animationRef.current) {
         cancelAnimationFrame(animationRef.current);
         animationRef.current = null;
@@ -448,21 +497,35 @@ export default function HueScan() {
         }}
       />
       
+      {/* HueScan Icon - Top Center */}
+      {!error && (
+        <div
+          style={{
+            position: 'fixed',
+            top: '16px',
+            left: '50%',
+            transform: 'translateX(-50%)',
+            zIndex: 200,
+            pointerEvents: 'none'
+          }}
+        >
+          <img 
+            src="/img/huescan-final.webp" 
+            alt="HueScan"
+            style={{
+              height: '48px',
+              width: 'auto',
+              display: 'block'
+            }}
+          />
+        </div>
+      )}
+      
       {/* HUD Overlay */}
       {!error && (
         <div className="absolute inset-0 pointer-events-none select-none">
-          {/* Top Left - Target Color */}
-          <div className="absolute top-4 left-4">
-            <div className="bg-[rgba(0,143,70,0.3)] backdrop-blur-sm rounded-2xl px-4 py-3 text-white text-sm">
-              <div className="flex items-center gap-2" style={{ opacity: 1 }}>
-                <span className="font-medium">Target:</span>
-                <span className="font-medium">#008F46</span>
-            </div>
-            </div>
-          </div>
-          
           {/* Bottom Left - Match Status */}
-          <div className="absolute bottom-32 left-4">
+          <div className="absolute bottom-32 left-4" style={{ width: '240px' }}>
             <div 
               className={`backdrop-blur-md rounded-2xl px-6 py-6 text-white transition-all duration-300 ${
                 match === 'perfect' 
@@ -479,19 +542,11 @@ export default function HueScan() {
                   : '0 0 20px rgba(255, 100, 100, 0.2)'
               }}
             >
-              <div style={{ opacity: 1 }}>
-                <div className={`text-4xl font-bold mb-2 ${
-                  match === 'perfect' ? 'text-green-300' : 
-                  match === 'close' ? 'text-yellow-300' : 
-                  'text-red-300'
-                }`}>
+              <div className="text-center">
+                <div className="text-4xl font-bold mb-2 text-white" style={{ opacity: 1 }}>
                   {matchPercentage}%
                 </div>
-                <div className={`text-lg font-medium ${
-                  match === 'perfect' ? 'text-white' : 
-                  match === 'close' ? 'text-yellow-100' : 
-                  'text-red-100'
-                }`}>
+                <div className="text-lg font-medium text-white" style={{ opacity: 1 }}>
                   {match === 'perfect' ? 'Compliant' : 
                    match === 'close' ? 'Partial Match' : 
                    'Not Compliant'}
@@ -501,7 +556,7 @@ export default function HueScan() {
           </div>
           
           {/* Bottom Left - Detected Color Info */}
-          <div className="absolute bottom-4 left-4">
+          <div className="absolute bottom-4 left-4" style={{ width: '240px' }}>
             <div className="bg-[rgba(0,143,70,0.3)] backdrop-blur-sm rounded-2xl p-4 text-white flex items-center gap-4">
               {/* Color Preview */}
               <div 
