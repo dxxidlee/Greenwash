@@ -515,7 +515,7 @@ export default function BreakRoomV2({ open, onClose }: Props) {
             fontFamily: 'PPNeueMontreal, sans-serif',
             color: 'white',
             textAlign: 'center',
-            lineHeight: '0.75',
+            lineHeight: isMobile ? '1.2' : '0.75',
             opacity: textOpacity,
             transition: 'opacity 0.5s ease-out',
             willChange: 'opacity',
