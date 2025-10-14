@@ -140,14 +140,14 @@ export default function BreakRoomV2({ open, onClose }: Props) {
 
   const calculateWordDuration = (word: string, sentence: string) => {
     // Base duration on character length (longer words take more time)
-    const baseTime = 150 + (word.length * 30); // 150-170 WPM baseline
+    const baseTime = 250 + (word.length * 50); // Slower, more deliberate pacing
     
     // Add pauses for punctuation
     if (word.includes(',') || word.includes(';')) {
-      return baseTime + 250;
+      return baseTime + 400;
     }
     if (word.includes('.') || word.includes('!') || word.includes('?')) {
-      return baseTime + 500;
+      return baseTime + 700;
     }
     
     return baseTime;
