@@ -64,33 +64,53 @@ export default function BreakRoomV2({ open, onClose }: Props) {
     };
   }, [open]);
 
-  // Auto-scroll to center current sentence perfectly
+  // Auto-scroll to center current sentence perfectly - BULLETPROOF VERSION
   useEffect(() => {
     if (recordingState === 'recording' && sentenceRefs.current[currentSentenceIdx]) {
       const element = sentenceRefs.current[currentSentenceIdx];
-      if (element && element.parentElement) {
-        const container = element.parentElement;
+      if (!element || !element.parentElement) return;
+      
+      const container = element.parentElement;
+      
+      // Wait for layout to be complete
+      const centerElement = () => {
+        // Get actual rendered positions
+        const containerRect = container.getBoundingClientRect();
+        const elementRect = element.getBoundingClientRect();
         
-        // Use requestAnimationFrame to ensure DOM is fully rendered
+        // Calculate where element currently is relative to container top
+        const currentElementTop = element.offsetTop;
+        const currentScrollTop = container.scrollTop;
+        
+        // Calculate perfect center position
+        const containerCenter = containerRect.height / 2;
+        const elementCenter = elementRect.height / 2;
+        
+        // The scroll position that puts the element's center at the container's center
+        const targetScrollTop = currentElementTop - containerCenter + elementCenter;
+        
+        console.log('Centering:', {
+          containerHeight: containerRect.height,
+          elementHeight: elementRect.height,
+          currentElementTop,
+          targetScrollTop,
+          currentSentence: currentSentenceIdx
+        });
+        
+        container.scrollTo({
+          top: targetScrollTop,
+          behavior: currentSentenceIdx === 0 ? 'auto' : 'smooth'
+        });
+      };
+      
+      // Triple RAF for absolute certainty
+      requestAnimationFrame(() => {
         requestAnimationFrame(() => {
           requestAnimationFrame(() => {
-            // Get the element's position relative to the scrollable container
-            const elementTop = element.offsetTop;
-            const elementHeight = element.offsetHeight;
-            
-            // Calculate the scroll position to center the element PERFECTLY
-            // We want element's center to align with container's center
-            const containerHeight = container.clientHeight;
-            const centerOffset = (containerHeight - elementHeight) / 2;
-            const scrollPosition = elementTop - centerOffset;
-            
-            container.scrollTo({
-              top: scrollPosition,
-              behavior: currentSentenceIdx === 0 ? 'auto' : 'smooth'
-            });
+            centerElement();
           });
         });
-      }
+      });
     }
   }, [currentSentenceIdx, recordingState]);
 
