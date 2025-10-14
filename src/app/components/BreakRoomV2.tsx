@@ -8,7 +8,7 @@ type Props = {
   onClose: () => void;
 };
 
-const RECITATION_TEXT = `I walk the corridor of agreement. Uniform green is public safety. Variance breeds decay; color is care. I am one pixel of the city, and I align to G-08. My memory does not outrank the plan. My preference does not outrank the protocol. I choose legibility over noise, coherence over style. I report deviation in the world and in myself. Where I waver, I correct. Where I question, I complete. The city is a single surface; I do not fracture it. I speak without tremor and keep the line unbroken. I return until my voice and the sentence are the same. I am seen. I am the same. The same is safe.`;
+const RECITATION_TEXT = `I WALK the corridor of agreement. Uniform green is public safety. Variance breeds decay; color is care. I am one pixel of the city, and I align to G-08. My memory does not outrank the plan. My preference does not outrank the protocol. I choose legibility over noise, coherence over style. I report deviation in the world and in myself. Where I waver, I correct. Where I question, I complete. The city is a single surface; I do not fracture it. I speak without tremor and keep the line unbroken. I return until my voice and the sentence are the same. I am seen. I am the same. The same is safe.`;
 
 // Parse text into sentences and words
 const SENTENCES = RECITATION_TEXT.match(/[^.!?]+[.!?]+/g)?.map(s => s.trim()) || [];
