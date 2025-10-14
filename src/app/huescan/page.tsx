@@ -670,13 +670,13 @@ export default function HueScan() {
       {/* HUD Overlay */}
       {!error && (
         <div className="absolute inset-0 pointer-events-none select-none">
-          {/* Top Left - Status & Detection Box */}
+          {/* Bottom Left - Status & Detection Box */}
           <div 
-            className="absolute top-4 left-4" 
+            className="absolute bottom-4 left-4" 
             style={{ 
               width: '299px',
               transform: isMobile ? 'scale(0.6)' : 'none',
-              transformOrigin: 'top left'
+              transformOrigin: 'bottom left'
             }}
           >
             <div 
