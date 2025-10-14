@@ -71,23 +71,25 @@ export default function BreakRoomV2({ open, onClose }: Props) {
       if (element && element.parentElement) {
         const container = element.parentElement;
         
-        // Small delay to ensure DOM is ready
-        setTimeout(() => {
-          // Get the element's position relative to the scrollable container
-          const elementTop = element.offsetTop;
-          const elementHeight = element.offsetHeight;
-          
-          // Calculate the scroll position to center the element
-          // Container height / 2 gives us the center point
-          // We want the element's center to be at the container's center
-          const containerHeight = container.clientHeight;
-          const scrollPosition = elementTop - (containerHeight / 2) + (elementHeight / 2);
-          
-          container.scrollTo({
-            top: scrollPosition,
-            behavior: currentSentenceIdx === 0 ? 'auto' : 'smooth' // Instant scroll for first sentence
+        // Use requestAnimationFrame to ensure DOM is fully rendered
+        requestAnimationFrame(() => {
+          requestAnimationFrame(() => {
+            // Get the element's position relative to the scrollable container
+            const elementTop = element.offsetTop;
+            const elementHeight = element.offsetHeight;
+            
+            // Calculate the scroll position to center the element PERFECTLY
+            // We want element's center to align with container's center
+            const containerHeight = container.clientHeight;
+            const centerOffset = (containerHeight - elementHeight) / 2;
+            const scrollPosition = elementTop - centerOffset;
+            
+            container.scrollTo({
+              top: scrollPosition,
+              behavior: currentSentenceIdx === 0 ? 'auto' : 'smooth'
+            });
           });
-        }, 50);
+        });
       }
     }
   }, [currentSentenceIdx, recordingState]);
