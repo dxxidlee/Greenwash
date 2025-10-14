@@ -658,10 +658,10 @@ export default function HueScan() {
       {/* HUD Overlay */}
       {!error && (
         <div className="absolute inset-0 pointer-events-none select-none">
-          {/* Bottom Left - Combined Status & Detection Box */}
-          <div className="absolute bottom-4 left-4" style={{ width: '280px' }}>
+          {/* Bottom Left - Status & Detection Box */}
+          <div className="absolute bottom-4 left-4" style={{ width: '340px' }}>
             <div 
-              className={`backdrop-blur-md rounded-2xl overflow-hidden transition-all duration-300 ${
+              className={`backdrop-blur-md rounded-2xl p-5 transition-all duration-300 ${
                 match === 'perfect' 
                   ? 'bg-[rgba(0,255,100,0.4)]' 
                   : match === 'close'
@@ -676,37 +676,38 @@ export default function HueScan() {
                   : '0 0 20px rgba(255, 100, 100, 0.2)'
               }}
             >
-              {/* Status Section - Top */}
-              <div className="px-6 py-5 text-center border-b border-white/20">
-                <div className="text-4xl font-bold mb-2 text-white" style={{ opacity: 1 }}>
-              {matchPercentage}%
-            </div>
-                <div className="text-lg font-medium text-white" style={{ opacity: 1 }}>
-                  {match === 'perfect' ? 'Compliant' : 
-                   match === 'close' ? 'Partial Match' : 
-                   'Not Compliant'}
-            </div>
-          </div>
-          
-              {/* Detected Color Section - Bottom */}
-              <div className="px-5 py-4 flex items-center gap-4">
-                {/* Color Preview */}
+              {/* Top Row: Percentage + Color Box + Detected Info */}
+              <div className="flex items-center gap-4 mb-3">
+                {/* Large Percentage */}
+                <div className="text-5xl font-bold text-white" style={{ opacity: 1 }}>
+                  {matchPercentage}%
+                </div>
+                
+                {/* Color Preview Box */}
                 <div 
-                  className="w-16 h-16 rounded-lg flex-shrink-0"
-              style={{ 
-                backgroundColor: `rgb(${rgbValues.r}, ${rgbValues.g}, ${rgbValues.b})` 
-              }}
-            />
-                {/* HEX Code */}
-                <div style={{ opacity: 1 }} className="text-white">
-                  <div className="text-sm font-medium mb-1">Detected</div>
-                  <div className="text-sm font-medium">
+                  className="w-12 h-12 rounded-lg flex-shrink-0"
+                  style={{ 
+                    backgroundColor: `rgb(${rgbValues.r}, ${rgbValues.g}, ${rgbValues.b})` 
+                  }}
+                />
+                
+                {/* Detected Label and Hex */}
+                <div className="flex flex-col text-white" style={{ opacity: 1 }}>
+                  <div className="text-sm font-medium">Detected</div>
+                  <div className="text-base font-medium">
                     #{rgbValues.r.toString(16).padStart(2, '0').toUpperCase()}
                     {rgbValues.g.toString(16).padStart(2, '0').toUpperCase()}
                     {rgbValues.b.toString(16).padStart(2, '0').toUpperCase()}
                   </div>
                 </div>
-          </div>
+              </div>
+              
+              {/* Bottom Row: Compliance Status */}
+              <div className="text-2xl font-medium text-white" style={{ opacity: 1 }}>
+                {match === 'perfect' ? 'Compliant' : 
+                 match === 'close' ? 'Partial Match' : 
+                 'Not Compliant'}
+              </div>
             </div>
           </div>
         </div>
