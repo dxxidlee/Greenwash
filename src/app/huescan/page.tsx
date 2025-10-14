@@ -728,21 +728,18 @@ export default function HueScan() {
             </a>
           </div>
 
-          {/* Camera Control Buttons - Mobile: Below X button, Desktop: Bottom center */}
-          <div className={`absolute pointer-events-auto z-50 flex gap-3 ${
-            isMobile ? 'top-20 right-4 flex-col' : 'bottom-4 left-1/2 transform -translate-x-1/2 flex-row'
-          }`}>
-            {/* Switch Camera - Mobile Only - Switches between rear and selfie camera */}
-            <button
-              onClick={isMobile ? switchCamera : undefined}
-              disabled={!isMobile}
-              className={`bg-[rgba(0,143,70,0.3)] backdrop-blur-sm text-white p-3 rounded-full transition-all ${
-                isMobile ? 'hover:bg-[rgba(0,143,70,0.4)] cursor-pointer' : 'opacity-30 cursor-not-allowed'
-              }`}
-              title={isMobile ? `Switch to ${facingMode === 'user' ? 'Rear' : 'Selfie'} Camera` : "Switch Camera (Mobile Only)"}
-            >
-              <RotateCcw size={20} />
-            </button>
+          {/* Camera Control Buttons - Below X button on both mobile and desktop */}
+          <div className="absolute top-20 right-4 pointer-events-auto z-50 flex flex-col gap-3">
+            {/* Switch Camera - Mobile Only */}
+            {isMobile && (
+              <button
+                onClick={switchCamera}
+                className="bg-[rgba(0,143,70,0.3)] backdrop-blur-sm text-white p-3 rounded-full hover:bg-[rgba(0,143,70,0.4)] transition-all"
+                title={`Switch to ${facingMode === 'user' ? 'Rear' : 'Selfie'} Camera`}
+              >
+                <RotateCcw size={20} />
+              </button>
+            )}
             {/* Flip Display - Works on all devices */}
             <button
               onClick={toggleFlip}
@@ -751,7 +748,7 @@ export default function HueScan() {
             >
               <Camera size={20} className={isFlipped ? 'scale-x-[-1]' : ''} />
             </button>
-      </div>
+          </div>
         </>
       )}
       
