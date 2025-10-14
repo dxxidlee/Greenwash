@@ -461,7 +461,7 @@ export default function BreakRoomV2({ open, onClose }: Props) {
           marginBottom: '2rem',
           paddingLeft: '2rem',
           paddingRight: '2rem',
-          transition: 'font-size 0.8s ease-in-out, opacity 0.8s ease-in-out, font-weight 0.8s ease-in-out',
+          transition: 'font-size 0.5s ease-out, opacity 0.5s ease-out, font-weight 0.5s ease-out',
           willChange: 'font-size, opacity, font-weight',
           whiteSpace: 'nowrap',
           overflow: 'visible'
@@ -483,7 +483,7 @@ export default function BreakRoomV2({ open, onClose }: Props) {
                 ${!isCurrent ? 'opacity-inherit' : ''}
               `}
               style={{
-                transition: 'opacity 0.6s ease-in-out, font-weight 0.6s ease-in-out'
+                transition: 'opacity 0.3s ease-out, font-weight 0.3s ease-out'
               }}
             >
               {word}{' '}
