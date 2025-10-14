@@ -160,6 +160,11 @@ export default function HomeHeroV2() {
               className="w-full h-full object-contain"
               draggable={false}
               onContextMenu={(e) => e.preventDefault()}
+              style={{
+                userSelect: 'none',
+                WebkitUserSelect: 'none',
+                WebkitTouchCallout: 'none'
+              }}
             />
           </div>
           
@@ -217,7 +222,12 @@ export default function HomeHeroV2() {
             className="object-contain"
             draggable={false}
             onContextMenu={(e) => e.preventDefault()}
-            style={{ height: isMobile ? '33.75vh' : '45vh' }}
+            style={{ 
+              height: isMobile ? '33.75vh' : '45vh',
+              userSelect: 'none',
+              WebkitUserSelect: 'none',
+              WebkitTouchCallout: 'none'
+            }}
           />
         </div>
 

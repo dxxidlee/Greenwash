@@ -143,13 +143,6 @@ export default function ProtocolQuickList() {
                   fontFamily: 'PPNeueMontreal, sans-serif',
                   lineHeight: '1.2'
                 }}
-                onFocus={(e) => {
-                  e.target.style.outline = '1px solid rgba(0, 143, 70, 0.6)';
-                  e.target.style.outlineOffset = '2px';
-                }}
-                onBlur={(e) => {
-                  e.target.style.outline = 'none';
-                }}
               >
                 {/* Number Column */}
                 <div className="text-[#008F46] font-medium mr-3 w-6 text-left">
@@ -179,11 +172,12 @@ export default function ProtocolQuickList() {
       {/* Protocol Popups - Styled exactly like profile dropdown, positioned above */}
       {activePopup && (
         <div 
-          className="fixed z-50 backdrop-blur-sm shadow-2xl rounded-lg p-4 min-w-[280px] pointer-events-none"
+          className="fixed z-50 backdrop-blur-sm shadow-2xl rounded-lg p-4 pointer-events-none"
           style={{ 
             backgroundColor: 'rgba(0, 143, 70, 0.3)',
-            bottom: 'calc(10px + 8.5em)', // Position above the protocol list (list height + gap)
-            left: '10px' // Same left position as protocol list
+            bottom: 'calc(10px + 8.5em + 32px)', // Position above the protocol list with 4x gap (8px * 4 = 32px)
+            left: '10px', // Same left position as protocol list
+            width: '320px' // Fixed width to match profile dropdown
           }}
         >
           {/* Section Title */}

@@ -190,7 +190,11 @@ const GreenwashFinder: React.FC<GreenwashFinderProps> = ({ isOpen, onClose }) =>
             style={{
               height: '48px',
               width: 'auto',
-              display: 'block'
+              display: 'block',
+              userSelect: 'none',
+              WebkitUserSelect: 'none',
+              WebkitTouchCallout: 'none',
+              pointerEvents: 'none'
             }}
           />
         </div>
@@ -405,7 +409,9 @@ const GreenwashFinder: React.FC<GreenwashFinderProps> = ({ isOpen, onClose }) =>
                             height: '100%',
                             objectFit: 'contain',
                             pointerEvents: 'none',
-                            userSelect: 'none'
+                            userSelect: 'none',
+                            WebkitUserSelect: 'none',
+                            WebkitTouchCallout: 'none'
                           }}
                         />
                       </div>

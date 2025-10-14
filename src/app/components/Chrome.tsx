@@ -38,7 +38,12 @@ export default function Chrome() {
           alt="Profile" 
           draggable={false}
           onContextMenu={(e) => e.preventDefault()}
-          className="h-14 w-auto object-contain shrink-0" 
+          className="h-14 w-auto object-contain shrink-0"
+          style={{
+            userSelect: 'none',
+            WebkitUserSelect: 'none',
+            WebkitTouchCallout: 'none'
+          }}
         />
         
         {/* Profile Dropdown */}
@@ -86,7 +91,13 @@ export default function Chrome() {
           alt="Greenwash logo with seal" 
           draggable={false}
           onContextMenu={(e) => e.preventDefault()}
-          className="h-16 md:h-16 sm:h-12 w-auto object-contain shrink-0 max-w-full" 
+          className="h-16 md:h-16 sm:h-12 w-auto object-contain shrink-0 max-w-full"
+          style={{
+            userSelect: 'none',
+            WebkitUserSelect: 'none',
+            WebkitTouchCallout: 'none',
+            pointerEvents: 'none'
+          }}
         />
       </div>
     </>

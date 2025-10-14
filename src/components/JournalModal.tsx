@@ -95,7 +95,11 @@ export default function JournalModal({ open, onClose, entries }: Props) {
             style={{
               height: '48px',
               width: 'auto',
-              display: 'block'
+              display: 'block',
+              userSelect: 'none',
+              WebkitUserSelect: 'none',
+              WebkitTouchCallout: 'none',
+              pointerEvents: 'none'
             }}
           />
         </div>

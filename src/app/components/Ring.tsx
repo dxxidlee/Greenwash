@@ -146,11 +146,13 @@ export default function Ring({ hoverIdx, setHoverIdx, onDotClick, containerRef, 
     };
   }, [rotationSpeed, prefersReducedMotion]);
 
-  // On hover, slow down instead of pausing to keep RAF smooth
+  // On hover, slow down instead of pausing to keep RAF smooth (desktop only)
   useEffect(() => {
     if (prefersReducedMotion) return;
     const BASE_SPEED = isMobile ? BASE_SPEED_MOBILE : BASE_SPEED_DESKTOP;
-    setRotationSpeed(hoverIdx !== null ? 0.003 : BASE_SPEED);
+    // On mobile, keep rotating at base speed even when touching
+    // On desktop, slow down on hover
+    setRotationSpeed(hoverIdx !== null && !isMobile ? 0.003 : BASE_SPEED);
   }, [hoverIdx, prefersReducedMotion, isMobile]);
 
   const handleSphereInteraction = (index: number) => ({
@@ -252,6 +254,12 @@ export default function Ring({ hoverIdx, setHoverIdx, onDotClick, containerRef, 
                   className="w-full h-full object-contain"
                   draggable={false}
                   onContextMenu={(e) => e.preventDefault()}
+                  style={{
+                    userSelect: 'none',
+                    WebkitUserSelect: 'none',
+                    WebkitTouchCallout: 'none',
+                    pointerEvents: 'none'
+                  }}
                 />
               ) : (
                 <div 

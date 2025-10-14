@@ -320,7 +320,11 @@ const GreenwashQuiz: React.FC<GreenwashQuizProps> = ({ isOpen, onClose }) => {
             style={{
               height: '48px',
               width: 'auto',
-              display: 'block'
+              display: 'block',
+              userSelect: 'none',
+              WebkitUserSelect: 'none',
+              WebkitTouchCallout: 'none',
+              pointerEvents: 'none'
             }}
           />
         </div>
