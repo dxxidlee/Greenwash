@@ -124,8 +124,11 @@ export default function Ring({ hoverIdx, setHoverIdx, onDotClick, containerRef, 
     };
   }, [prefersReducedMotion, isMobile]);
 
-  // Smooth animation loop
+  // Smooth animation loop (desktop only)
   useEffect(() => {
+    // Don't animate on mobile at all
+    if (isMobile) return;
+    
     const animate = () => {
       if (!prefersReducedMotion) {
         setRotation(prev => {
@@ -144,7 +147,7 @@ export default function Ring({ hoverIdx, setHoverIdx, onDotClick, containerRef, 
         cancelAnimationFrame(animationRef.current);
       }
     };
-  }, [rotationSpeed, prefersReducedMotion]);
+  }, [rotationSpeed, prefersReducedMotion, isMobile]);
 
   // On hover, slow down instead of pausing to keep RAF smooth (desktop only)
   useEffect(() => {

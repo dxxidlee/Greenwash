@@ -175,7 +175,7 @@ export default function ProtocolQuickList() {
           className="fixed z-50 backdrop-blur-sm shadow-2xl rounded-lg p-4 pointer-events-none"
           style={{ 
             backgroundColor: 'rgba(0, 143, 70, 0.3)',
-            bottom: 'calc(10px + 8.5em + 32px)', // Position above the protocol list with 4x gap (8px * 4 = 32px)
+            bottom: 'calc(10px + 8.5em + 8px)', // Position above the protocol list with 8px gap (same as profile dropdown mt-2)
             left: '10px', // Same left position as protocol list
             width: '320px' // Fixed width to match profile dropdown
           }}
