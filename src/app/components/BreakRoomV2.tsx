@@ -462,7 +462,9 @@ export default function BreakRoomV2({ open, onClose }: Props) {
           paddingLeft: '2rem',
           paddingRight: '2rem',
           transition: 'font-size 0.8s ease-in-out, opacity 0.8s ease-in-out, font-weight 0.8s ease-in-out',
-          willChange: 'font-size, opacity, font-weight'
+          willChange: 'font-size, opacity, font-weight',
+          whiteSpace: 'nowrap',
+          overflow: 'visible'
         }}
       >
         {sentenceData.words.map((word, wordIdx) => {
