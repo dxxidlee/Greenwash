@@ -433,7 +433,6 @@ export default function BreakRoomV2({ open, onClose }: Props) {
 
   const renderSentence = (sentenceData: typeof SENTENCE_DATA[0], sentenceIdx: number) => {
     const isCurrent = sentenceIdx === currentSentenceIdx;
-    const isFuture = sentenceIdx > currentSentenceIdx;
     
     // Only show sentences within range: current +/- 2
     const distanceFromCurrent = Math.abs(sentenceIdx - currentSentenceIdx);
@@ -451,8 +450,8 @@ export default function BreakRoomV2({ open, onClose }: Props) {
         key={sentenceIdx}
         ref={(el) => { sentenceRefs.current[sentenceIdx] = el; }}
         className={`
-          ${isCurrent ? 'text-2xl md:text-3xl opacity-100 font-medium' : 'text-lg md:text-xl opacity-40 font-normal'}
-          ${isFuture ? 'opacity-30' : ''}
+          text-2xl md:text-3xl font-medium
+          ${isCurrent ? 'opacity-100' : 'opacity-20'}
         `}
         style={{
           fontFamily: 'PPNeueMontreal, sans-serif',
@@ -461,8 +460,8 @@ export default function BreakRoomV2({ open, onClose }: Props) {
           marginBottom: '2rem',
           paddingLeft: '2rem',
           paddingRight: '2rem',
-          transition: 'font-size 0.5s ease-out, opacity 0.5s ease-out, font-weight 0.5s ease-out',
-          willChange: 'font-size, opacity, font-weight',
+          transition: 'opacity 0.5s ease-out',
+          willChange: 'opacity',
           whiteSpace: 'nowrap',
           overflow: 'visible'
         }}
