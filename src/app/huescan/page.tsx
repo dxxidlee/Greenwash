@@ -73,15 +73,17 @@ export default function HueScan() {
     try {
       setError(null);
       
+      // More specific constraints for mobile camera access
       const constraints = {
         video: {
-          facingMode: facingMode,
+          facingMode: { ideal: facingMode }, // Use ideal to ensure fallback works
           width: { ideal: 1920 },
           height: { ideal: 1080 },
           frameRate: { ideal: 60, min: 30 } // Request 60fps
         }
       };
 
+      console.log('Requesting camera with facingMode:', facingMode);
       const mediaStream = await navigator.mediaDevices.getUserMedia(constraints);
       setStream(mediaStream);
       
@@ -90,7 +92,7 @@ export default function HueScan() {
         
         // Optimize video element
         videoRef.current.onloadedmetadata = () => {
-          console.log('Camera loaded successfully');
+          console.log('Camera loaded successfully with facingMode:', facingMode);
           setScanning(true);
         };
         
@@ -583,20 +585,22 @@ export default function HueScan() {
       {!error && (
         <>
           <div className="absolute bottom-4 left-1/2 transform -translate-x-1/2 pointer-events-auto z-50 flex gap-3">
+            {/* Switch Camera - Mobile Only - Switches between rear and selfie camera */}
             <button
               onClick={isMobile ? switchCamera : undefined}
               disabled={!isMobile}
               className={`bg-[rgba(0,143,70,0.3)] backdrop-blur-sm text-white p-3 rounded-full transition-all ${
                 isMobile ? 'hover:bg-[rgba(0,143,70,0.4)] cursor-pointer' : 'opacity-30 cursor-not-allowed'
               }`}
-              title={isMobile ? "Switch Camera" : "Switch Camera (Mobile Only)"}
+              title={isMobile ? `Switch to ${facingMode === 'user' ? 'Rear' : 'Selfie'} Camera` : "Switch Camera (Mobile Only)"}
             >
               <RotateCcw size={20} />
             </button>
+            {/* Flip Display - Works on all devices */}
             <button
               onClick={toggleFlip}
               className="bg-[rgba(0,143,70,0.3)] backdrop-blur-sm text-white p-3 rounded-full hover:bg-[rgba(0,143,70,0.4)] transition-all"
-              title={isFlipped ? 'Unflip Camera' : 'Flip Camera'}
+              title={isFlipped ? 'Unflip Display' : 'Flip Display'}
             >
               <Camera size={20} className={isFlipped ? 'scale-x-[-1]' : ''} />
             </button>
