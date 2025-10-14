@@ -246,7 +246,7 @@ export default function HueScan() {
       const imageData = ctx.getImageData(0, 0, filterCanvas.width, filterCanvas.height);
       const data = imageData.data;
       
-      // Apply green highlighting filter
+      // Apply INVERTED green highlighting filter - white background, green objects visible
       for (let i = 0; i < data.length; i += 4) {
         const r = data[i];
         const g = data[i + 1];
@@ -257,21 +257,24 @@ export default function HueScan() {
         const greenStrength = isGreenish ? (g - Math.max(r, b)) / 255 : 0;
         
         if (greenStrength > 0.15) {
-          // Enhance green pixels - make them brighter and more vivid
-          const boost = 1.3 + greenStrength * 0.4;
-          data[i] = Math.min(255, r * 0.8); // Reduce red slightly
+          // Keep green pixels visible and slightly enhanced
+          const boost = 1.2 + greenStrength * 0.3;
+          data[i] = Math.min(255, r * 0.9); // Keep some red
           data[i + 1] = Math.min(255, g * boost); // Boost green
-          data[i + 2] = Math.min(255, b * 0.8); // Reduce blue slightly
+          data[i + 2] = Math.min(255, b * 0.9); // Keep some blue
         } else {
-          // Darken non-green pixels heavily
-          const darkness = 0.15; // Very dark, almost black
-          data[i] = r * darkness;
-          data[i + 1] = g * darkness * 1.1; // Slight green tint to shadows
-          data[i + 2] = b * darkness * 0.9;
+          // INVERT non-green pixels - make them white/bright
+          const brightness = 0.85; // Very bright, near white
+          const inverted = 255 - ((r + g + b) / 3); // Invert brightness
+          const whitened = inverted * brightness + (255 * (1 - brightness));
+          
+          data[i] = whitened;
+          data[i + 1] = whitened * 1.05; // Slight warm tint
+          data[i + 2] = whitened;
         }
         
-        // Add subtle film grain noise
-        const noise = (Math.random() - 0.5) * 15;
+        // Add subtle film grain noise for texture
+        const noise = (Math.random() - 0.5) * 20;
         data[i] = Math.max(0, Math.min(255, data[i] + noise));
         data[i + 1] = Math.max(0, Math.min(255, data[i + 1] + noise));
         data[i + 2] = Math.max(0, Math.min(255, data[i + 2] + noise));
