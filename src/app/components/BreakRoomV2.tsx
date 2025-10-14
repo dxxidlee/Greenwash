@@ -346,10 +346,6 @@ export default function BreakRoomV2({ open, onClose }: Props) {
     const isCurrent = sentenceIdx === currentSentenceIdx;
     const isFuture = sentenceIdx > currentSentenceIdx;
     
-    // Only show sentences within range: current +/- 2
-    const distanceFromCurrent = Math.abs(sentenceIdx - currentSentenceIdx);
-    const isVisible = distanceFromCurrent <= 2;
-    
     return (
       <div
         key={sentenceIdx}
@@ -358,7 +354,6 @@ export default function BreakRoomV2({ open, onClose }: Props) {
           transition-all duration-500 ease-out
           ${isCurrent ? 'text-2xl md:text-3xl opacity-100 font-medium' : 'text-lg md:text-xl opacity-40 font-normal'}
           ${isFuture ? 'opacity-30' : ''}
-          ${!isVisible ? 'opacity-0 invisible' : ''}
         `}
         style={{
           fontFamily: 'PPNeueMontreal, sans-serif',
@@ -529,14 +524,22 @@ export default function BreakRoomV2({ open, onClose }: Props) {
 
             {recordingState === 'recording' && (
               <div 
-                className="w-full h-full overflow-y-auto hide-scrollbar"
+                className="w-full relative"
                 style={{
-                  scrollBehavior: 'smooth',
-                  paddingTop: '50vh',
-                  paddingBottom: '50vh'
+                  height: '60vh',
+                  overflow: 'hidden'
                 }}
               >
-                {SENTENCE_DATA.map((sentenceData, idx) => renderSentence(sentenceData, idx))}
+                <div 
+                  className="w-full h-full overflow-y-auto hide-scrollbar"
+                  style={{
+                    scrollBehavior: 'smooth',
+                    paddingTop: '50vh',
+                    paddingBottom: '50vh'
+                  }}
+                >
+                  {SENTENCE_DATA.map((sentenceData, idx) => renderSentence(sentenceData, idx))}
+                </div>
               </div>
             )}
 
