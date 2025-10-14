@@ -224,8 +224,8 @@ export default function HueScan() {
     
     try {
       filterAnimationRef.current = requestAnimationFrame(applyGreenFilter);
-      
-      const video = videoRef.current;
+    
+    const video = videoRef.current;
       const filterCanvas = filterCanvasRef.current;
       
       if (!video || !filterCanvas || video.readyState !== video.HAVE_ENOUGH_DATA) return;
@@ -244,8 +244,8 @@ export default function HueScan() {
       
       // Get image data
       const imageData = ctx.getImageData(0, 0, filterCanvas.width, filterCanvas.height);
-      const data = imageData.data;
-      
+        const data = imageData.data;
+        
       // More lenient green detection for mobile compatibility
       const pixelStep = isMobile ? 8 : 4; // Process fewer pixels on mobile for performance
       
@@ -308,9 +308,9 @@ export default function HueScan() {
       overlayAnimationRef.current = requestAnimationFrame(drawOverlay);
       lastFrameTimeRef.current = Date.now(); // Update heartbeat
       
-      const canvas = overlayCanvasRef.current;
+    const canvas = overlayCanvasRef.current;
       if (!canvas || canvas.width === 0 || canvas.height === 0) return;
-      
+    
       const ctx = canvas.getContext('2d', { alpha: true, desynchronized: true });
     if (!ctx) return;
     
@@ -536,7 +536,7 @@ export default function HueScan() {
           lastUpdateTimeRef.current = 0;
           lastFrameTimeRef.current = now;
           analyzeFrame();
-          drawOverlay();
+      drawOverlay();
           applyGreenFilter();
         }
       }, 2000);
@@ -664,8 +664,8 @@ export default function HueScan() {
               display: 'block'
             }}
           />
-        </div>
-      )}
+              </div>
+            )}
       
       {/* HUD Overlay */}
       {!error && (
@@ -675,7 +675,7 @@ export default function HueScan() {
             className="absolute bottom-4 left-4" 
             style={{ 
               width: '299px',
-              transform: isMobile ? 'scale(0.5)' : 'none',
+              transform: isMobile ? 'scale(0.6)' : 'none',
               transformOrigin: 'bottom left'
             }}
           >
@@ -696,19 +696,19 @@ export default function HueScan() {
               }}
             >
               {/* Top Row: Percentage + Color Box + Detected Info */}
-              <div className="flex items-center gap-3 pb-3 mb-3 border-b-2 border-white mx-2">
+              <div className="flex items-center gap-3 pb-3 mb-3 border-b border-white mx-2">
                 {/* Large Percentage */}
                 <div className="text-5xl font-medium text-white" style={{ opacity: 1 }}>
-                  {matchPercentage}%
-                </div>
-                
+              {matchPercentage}%
+          </div>
+          
                 {/* Color Preview Box */}
                 <div 
                   className="w-12 h-12 rounded-lg flex-shrink-0"
-                  style={{ 
-                    backgroundColor: `rgb(${rgbValues.r}, ${rgbValues.g}, ${rgbValues.b})` 
-                  }}
-                />
+              style={{ 
+                backgroundColor: `rgb(${rgbValues.r}, ${rgbValues.g}, ${rgbValues.b})` 
+              }}
+            />
                 
                 {/* Detected Label and Hex */}
                 <div className="flex flex-col text-white" style={{ opacity: 1 }}>
@@ -719,14 +719,14 @@ export default function HueScan() {
                     {rgbValues.b.toString(16).padStart(2, '0').toUpperCase()}
                   </div>
                 </div>
-              </div>
-              
+          </div>
+          
               {/* Bottom Row: Compliance Status */}
               <div className="text-2xl font-medium text-white px-2" style={{ opacity: 1 }}>
                 {match === 'perfect' ? 'Compliant' : 
                  match === 'close' ? 'Partial Match' : 
                  'Not Compliant'}
-              </div>
+            </div>
             </div>
           </div>
         </div>
