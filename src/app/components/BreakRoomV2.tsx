@@ -460,9 +460,9 @@ export default function BreakRoomV2({ open, onClose }: Props) {
   const renderSentence = (sentenceData: typeof SENTENCE_DATA[0], sentenceIdx: number) => {
     const isCurrent = sentenceIdx === currentSentenceIdx && (recordingState === 'recording' || recordingState === 'failed');
     
-    // Only show sentences within range: current +/- 2 when recording or failed
+    // Only show sentences within range: current +/- 1 when recording or failed (3 sentences total)
     const distanceFromCurrent = Math.abs(sentenceIdx - currentSentenceIdx);
-    const isInRange = distanceFromCurrent <= 2;
+    const isInRange = distanceFromCurrent <= 1;
     
     // Don't render sentences outside the range when recording or failed
     if (!isInRange && (recordingState === 'recording' || recordingState === 'failed')) {
@@ -471,9 +471,9 @@ export default function BreakRoomV2({ open, onClose }: Props) {
       );
     }
     
-    // In idle/countdown state, show all text at low opacity
+    // In idle/countdown state, make text completely invisible
     const showAllText = recordingState === 'idle' || recordingState === 'countdown';
-    const textOpacity = showAllText ? 0.2 : (isCurrent ? 1 : 0.2);
+    const textOpacity = showAllText ? 0 : (isCurrent ? 1 : 0.2);
     
     // Crosshair indicator - FIXED positions (show during recording and failed state)
     const showCrosshair = (recordingState === 'recording' || recordingState === 'failed') && isInRange;
