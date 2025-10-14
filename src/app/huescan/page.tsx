@@ -677,9 +677,9 @@ export default function HueScan() {
               }}
             >
               {/* Top Row: Percentage + Color Box + Detected Info */}
-              <div className="flex items-center gap-4 mb-3">
+              <div className="flex items-center gap-4 pb-3 mb-3 border-b border-white/30 mx-2">
                 {/* Large Percentage */}
-                <div className="text-5xl font-bold text-white" style={{ opacity: 1 }}>
+                <div className="text-5xl font-medium text-white" style={{ opacity: 1 }}>
                   {matchPercentage}%
                 </div>
                 
@@ -703,7 +703,7 @@ export default function HueScan() {
               </div>
               
               {/* Bottom Row: Compliance Status */}
-              <div className="text-2xl font-medium text-white" style={{ opacity: 1 }}>
+              <div className="text-2xl font-medium text-white px-2" style={{ opacity: 1 }}>
                 {match === 'perfect' ? 'Compliant' : 
                  match === 'close' ? 'Partial Match' : 
                  'Not Compliant'}
