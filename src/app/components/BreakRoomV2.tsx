@@ -458,7 +458,7 @@ export default function BreakRoomV2({ open, onClose }: Props) {
           color: 'white',
           textAlign: 'center',
           lineHeight: '0.75',
-          marginBottom: '0.5rem',
+          marginBottom: '1.25rem',
           paddingLeft: '1.125rem',
           paddingRight: '1.125rem',
           transition: 'opacity 0.5s ease-out',
