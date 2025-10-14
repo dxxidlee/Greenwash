@@ -236,7 +236,7 @@ export default function HueScan() {
         filterCanvas.height = video.videoHeight;
       }
       
-      const ctx = filterCanvas.getContext('2d', { willReadFrequently: true });
+      const ctx = filterCanvas.getContext('2d', { willReadFrequently: true, alpha: false });
       if (!ctx) return;
       
       // Draw video frame
@@ -246,30 +246,33 @@ export default function HueScan() {
       const imageData = ctx.getImageData(0, 0, filterCanvas.width, filterCanvas.height);
       const data = imageData.data;
       
+      // More lenient green detection for mobile compatibility
+      const pixelStep = isMobile ? 8 : 4; // Process fewer pixels on mobile for performance
+      
       // Apply INVERTED green highlighting filter - white background, green objects visible
-      for (let i = 0; i < data.length; i += 4) {
+      for (let i = 0; i < data.length; i += pixelStep) {
         const r = data[i];
         const g = data[i + 1];
         const b = data[i + 2];
         
-        // Calculate how "green" this pixel is
-        const isGreenish = g > r && g > b && g > 60;
+        // More lenient green detection
+        const isGreenish = g > r && g > b && g > 50; // Lowered threshold from 60 to 50
         const greenStrength = isGreenish ? (g - Math.max(r, b)) / 255 : 0;
         
-        if (greenStrength > 0.15) {
+        if (greenStrength > 0.1) { // Lowered from 0.15 to 0.1 for more sensitivity
           // Keep green pixels visible and slightly enhanced
-          const boost = 1.2 + greenStrength * 0.3;
-          data[i] = Math.min(255, r * 0.9); // Keep some red
-          data[i + 1] = Math.min(255, g * boost); // Boost green
-          data[i + 2] = Math.min(255, b * 0.9); // Keep some blue
+          const boost = 1.3 + greenStrength * 0.4; // Stronger boost for visibility
+          data[i] = Math.min(255, r * 0.85);
+          data[i + 1] = Math.min(255, g * boost);
+          data[i + 2] = Math.min(255, b * 0.85);
         } else {
           // INVERT non-green pixels - make them white/bright
-          const brightness = 0.85; // Very bright, near white
-          const inverted = 255 - ((r + g + b) / 3); // Invert brightness
+          const brightness = 0.85;
+          const inverted = 255 - ((r + g + b) / 3);
           const whitened = inverted * brightness + (255 * (1 - brightness));
           
           data[i] = whitened;
-          data[i + 1] = whitened * 1.05; // Slight warm tint
+          data[i + 1] = whitened * 1.05;
           data[i + 2] = whitened;
         }
         
@@ -278,6 +281,15 @@ export default function HueScan() {
         data[i] = Math.max(0, Math.min(255, data[i] + noise));
         data[i + 1] = Math.max(0, Math.min(255, data[i + 1] + noise));
         data[i + 2] = Math.max(0, Math.min(255, data[i + 2] + noise));
+        
+        // Fill in skipped pixels on mobile for smoother look
+        if (isMobile && pixelStep === 8) {
+          for (let j = 4; j < pixelStep && i + j < data.length; j += 4) {
+            data[i + j] = data[i];
+            data[i + j + 1] = data[i + 1];
+            data[i + j + 2] = data[i + 2];
+          }
+        }
       }
       
       ctx.putImageData(imageData, 0, 0);
@@ -286,7 +298,7 @@ export default function HueScan() {
       console.error('Filter error:', err);
       filterAnimationRef.current = requestAnimationFrame(applyGreenFilter);
     }
-  }, [scanning]);
+  }, [scanning, isMobile]);
 
   // Separate overlay animation loop for smooth 60fps overlay
   const drawOverlay = useCallback(() => {
@@ -662,7 +674,7 @@ export default function HueScan() {
           <div 
             className="absolute bottom-4 left-4" 
             style={{ 
-              width: '272px',
+              width: '299px',
               transform: isMobile ? 'scale(0.5)' : 'none',
               transformOrigin: 'bottom left'
             }}
@@ -684,7 +696,7 @@ export default function HueScan() {
               }}
             >
               {/* Top Row: Percentage + Color Box + Detected Info */}
-              <div className="flex items-center gap-6 pb-3 mb-3 border-b-2 border-white/30 mx-2">
+              <div className="flex items-center gap-3 pb-3 mb-3 border-b-2 border-white mx-2">
                 {/* Large Percentage */}
                 <div className="text-5xl font-medium text-white" style={{ opacity: 1 }}>
                   {matchPercentage}%
