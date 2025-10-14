@@ -124,7 +124,7 @@ export default function HueScan() {
         
         // Fallback timeout
         setTimeout(() => {
-          setScanning(true);
+            setScanning(true);
         }, 500);
       }
     } catch (err) {
@@ -220,7 +220,7 @@ export default function HueScan() {
       if (!canvas || canvas.width === 0 || canvas.height === 0) return;
       
       const ctx = canvas.getContext('2d', { alpha: true, desynchronized: true });
-      if (!ctx) return;
+    if (!ctx) return;
     
     const width = canvas.width;
     const height = canvas.height;
@@ -306,8 +306,8 @@ export default function HueScan() {
         return;
       }
 
-      const video = videoRef.current;
-      const canvas = canvasRef.current;
+    const video = videoRef.current;
+    const canvas = canvasRef.current;
       
       if (video.readyState !== video.HAVE_ENOUGH_DATA) {
         return;
@@ -321,8 +321,8 @@ export default function HueScan() {
 
       // Performance optimization: only update canvas size if it changed
       if (canvas.width !== video.videoWidth || canvas.height !== video.videoHeight) {
-        canvas.width = video.videoWidth;
-        canvas.height = video.videoHeight;
+      canvas.width = video.videoWidth;
+      canvas.height = video.videoHeight;
         
         // Also update overlay canvas size once
         if (overlayCanvasRef.current) {
@@ -383,7 +383,7 @@ export default function HueScan() {
       // Throttle state updates to reduce re-renders (update every 100ms max)
       const now = performance.now();
       if (now - lastUpdateTimeRef.current > 100) {
-        setRgbValues({ r: avgR, g: avgG, b: avgB });
+      setRgbValues({ r: avgR, g: avgG, b: avgB });
         lastUpdateTimeRef.current = now;
       }
       
@@ -428,7 +428,7 @@ export default function HueScan() {
       // Delay start slightly to ensure camera is ready
       const startTimeout = setTimeout(() => {
         analyzeFrame();
-        drawOverlay();
+      drawOverlay();
       }, 100);
       
       // Watchdog to restart loops if they stop (check every 2 seconds)
@@ -584,13 +584,13 @@ export default function HueScan() {
             >
               <div className="text-center">
                 <div className="text-4xl font-bold mb-2 text-white" style={{ opacity: 1 }}>
-                  {matchPercentage}%
-                </div>
+              {matchPercentage}%
+            </div>
                 <div className="text-lg font-medium text-white" style={{ opacity: 1 }}>
                   {match === 'perfect' ? 'Compliant' : 
                    match === 'close' ? 'Partial Match' : 
                    'Not Compliant'}
-                </div>
+            </div>
               </div>
             </div>
           </div>
@@ -622,7 +622,23 @@ export default function HueScan() {
       {/* Controls */}
       {!error && (
         <>
-          <div className="absolute bottom-4 left-1/2 transform -translate-x-1/2 pointer-events-auto z-50 flex gap-3">
+          {/* Exit X Button - Top Right */}
+          <div className="absolute top-4 right-4 pointer-events-auto z-50">
+            <a
+              href="/"
+              aria-label="Close"
+              className="inline-flex items-center justify-center h-12 w-12 rounded-full shadow-[0_2px_12px_rgba(0,0,0,0.06)] bg-[rgba(0,143,70,0.3)] text-white hover:bg-[rgba(0,143,70,0.4)] transition-all duration-300 ease-out focus:outline-none focus:ring-2 focus:ring-white/30"
+            >
+              <svg viewBox="0 0 24 24" width="18" height="18" aria-hidden="true">
+                <path d="M6 6l12 12M18 6L6 18" stroke="currentColor" strokeWidth="2" strokeLinecap="round"/>
+              </svg>
+            </a>
+          </div>
+
+          {/* Camera Control Buttons - Mobile: Below X button, Desktop: Bottom center */}
+          <div className={`absolute pointer-events-auto z-50 flex gap-3 ${
+            isMobile ? 'top-20 right-4 flex-col' : 'bottom-4 left-1/2 transform -translate-x-1/2 flex-row'
+          }`}>
             {/* Switch Camera - Mobile Only - Switches between rear and selfie camera */}
             <button
               onClick={isMobile ? switchCamera : undefined}
@@ -642,19 +658,6 @@ export default function HueScan() {
             >
               <Camera size={20} className={isFlipped ? 'scale-x-[-1]' : ''} />
             </button>
-          </div>
-
-      {/* Exit X Button */}
-          <div className="absolute top-4 right-4 pointer-events-auto z-50">
-        <a
-          href="/"
-          aria-label="Close"
-          className="inline-flex items-center justify-center h-12 w-12 rounded-full shadow-[0_2px_12px_rgba(0,0,0,0.06)] bg-[rgba(0,143,70,0.3)] text-white hover:bg-[rgba(0,143,70,0.4)] transition-all duration-300 ease-out focus:outline-none focus:ring-2 focus:ring-white/30"
-        >
-          <svg viewBox="0 0 24 24" width="18" height="18" aria-hidden="true">
-            <path d="M6 6l12 12M18 6L6 18" stroke="currentColor" strokeWidth="2" strokeLinecap="round"/>
-          </svg>
-        </a>
       </div>
         </>
       )}
