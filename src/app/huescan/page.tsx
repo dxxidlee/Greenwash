@@ -659,7 +659,14 @@ export default function HueScan() {
       {!error && (
         <div className="absolute inset-0 pointer-events-none select-none">
           {/* Bottom Left - Status & Detection Box */}
-          <div className="absolute bottom-4 left-4" style={{ width: '340px' }}>
+          <div 
+            className="absolute bottom-4 left-4" 
+            style={{ 
+              width: '272px',
+              transform: isMobile ? 'scale(0.5)' : 'none',
+              transformOrigin: 'bottom left'
+            }}
+          >
             <div 
               className={`backdrop-blur-md rounded-2xl p-5 transition-all duration-300 ${
                 match === 'perfect' 
@@ -677,7 +684,7 @@ export default function HueScan() {
               }}
             >
               {/* Top Row: Percentage + Color Box + Detected Info */}
-              <div className="flex items-center gap-4 pb-3 mb-3 border-b border-white/30 mx-2">
+              <div className="flex items-center gap-6 pb-3 mb-3 border-b-2 border-white/30 mx-2">
                 {/* Large Percentage */}
                 <div className="text-5xl font-medium text-white" style={{ opacity: 1 }}>
                   {matchPercentage}%
