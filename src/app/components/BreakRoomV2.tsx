@@ -390,11 +390,6 @@ export default function BreakRoomV2({ open, onClose }: Props) {
                 ${isUpcoming ? 'opacity-50' : ''}
                 ${!isCurrent ? 'opacity-inherit' : ''}
               `}
-              style={{
-                textDecoration: isCurrentWord ? 'underline' : 'none',
-                textDecorationColor: isCurrentWord ? '#008F46' : 'transparent',
-                textUnderlineOffset: '4px'
-              }}
             >
               {word}{' '}
             </span>
