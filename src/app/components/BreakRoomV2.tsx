@@ -28,6 +28,8 @@ export default function BreakRoomV2({ open, onClose }: Props) {
   const [requiredAttempts, setRequiredAttempts] = useState(1);
   const [audioLevel, setAudioLevel] = useState(0);
   const [showExitButton, setShowExitButton] = useState(false);
+  const [failurePoint, setFailurePoint] = useState<{sentence: number, word: number} | null>(null);
+  const [lastFailurePoint, setLastFailurePoint] = useState<{sentence: number, word: number} | null>(null);
   
   const audioContextRef = useRef<AudioContext | null>(null);
   const analyserRef = useRef<AnalyserNode | null>(null);
@@ -155,6 +157,14 @@ export default function BreakRoomV2({ open, onClose }: Props) {
     const currentSentence = SENTENCE_DATA[currentSentenceIdx];
     if (!currentSentence) return;
 
+    // Check if we've reached the predetermined failure point
+    if (failurePoint && 
+        currentSentenceIdx === failurePoint.sentence && 
+        currentWordIdx === failurePoint.word) {
+      failSession();
+      return;
+    }
+
     const nextWordIdx = currentWordIdx + 1;
     
     if (nextWordIdx >= currentSentence.words.length) {
@@ -170,6 +180,14 @@ export default function BreakRoomV2({ open, onClose }: Props) {
       setCurrentSentenceIdx(nextSentenceIdx);
       setCurrentWordIdx(0);
       
+      // Check failure point after moving to next sentence
+      if (failurePoint && 
+          nextSentenceIdx === failurePoint.sentence && 
+          0 === failurePoint.word) {
+        failSession();
+        return;
+      }
+      
       // Schedule next word
       const nextWord = SENTENCE_DATA[nextSentenceIdx].words[0];
       const duration = calculateWordDuration(nextWord, SENTENCE_DATA[nextSentenceIdx].text);
@@ -178,33 +196,67 @@ export default function BreakRoomV2({ open, onClose }: Props) {
       // Move to next word in same sentence
       setCurrentWordIdx(nextWordIdx);
       
+      // Check failure point after moving to next word
+      if (failurePoint && 
+          currentSentenceIdx === failurePoint.sentence && 
+          nextWordIdx === failurePoint.word) {
+        failSession();
+        return;
+      }
+      
       const nextWord = currentSentence.words[nextWordIdx];
       const duration = calculateWordDuration(nextWord, currentSentence.text);
       wordTimerRef.current = setTimeout(advanceWord, duration);
     }
-    
-    // Random failure check (happens at any word)
-    checkRandomFailure();
   };
 
-  const checkRandomFailure = () => {
-    // 15% chance of random failure at any point
-    const shouldFail = Math.random() < 0.15;
+  const generateRandomFailurePoint = () => {
+    // Calculate total words across all sentences
+    let totalWords = 0;
+    const wordMap: Array<{sentence: number, word: number}> = [];
     
-    if (shouldFail) {
-      failSession();
-    }
+    SENTENCE_DATA.forEach((sentence, sIdx) => {
+      sentence.words.forEach((_, wIdx) => {
+        wordMap.push({sentence: sIdx, word: wIdx});
+        totalWords++;
+      });
+    });
+    
+    // Pick a random word position
+    let attempts = 0;
+    let randomPoint;
+    
+    do {
+      const randomIndex = Math.floor(Math.random() * totalWords);
+      randomPoint = wordMap[randomIndex];
+      attempts++;
+      
+      // Make sure it's not the same as last failure point
+      if (!lastFailurePoint || 
+          randomPoint.sentence !== lastFailurePoint.sentence || 
+          randomPoint.word !== lastFailurePoint.word) {
+        break;
+      }
+    } while (attempts < 10); // Safety limit
+    
+    return randomPoint;
   };
 
   const failSession = () => {
     stopRecording();
     setRecordingState('failed');
     
+    // Remember this failure point
+    if (failurePoint) {
+      setLastFailurePoint(failurePoint);
+    }
+    
     // Reset after 2 seconds
     setTimeout(() => {
       setRecordingState('idle');
       setCurrentSentenceIdx(0);
       setCurrentWordIdx(0);
+      setFailurePoint(null); // Clear failure point for next attempt
     }, 2000);
   };
 
@@ -223,10 +275,15 @@ export default function BreakRoomV2({ open, onClose }: Props) {
       setRecordingState('idle');
       setCurrentSentenceIdx(0);
       setCurrentWordIdx(0);
+      setFailurePoint(null); // Clear failure point for next loop
     }
   };
 
   const startRecording = async () => {
+    // Generate a random failure point for this recording session
+    const newFailurePoint = generateRandomFailurePoint();
+    setFailurePoint(newFailurePoint);
+    
     // Start countdown
     setRecordingState('countdown');
     setCountdown(3);
