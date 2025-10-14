@@ -95,7 +95,7 @@ export default function BreakRoomV2({ open, onClose }: Props) {
         
         container.scrollTo({
           top: targetScrollTop,
-          behavior: currentSentenceIdx === 0 ? 'auto' : 'smooth'
+          behavior: 'auto'
         });
       };
       
@@ -637,9 +637,6 @@ export default function BreakRoomV2({ open, onClose }: Props) {
                 >
                   <div 
                     className="w-full h-full overflow-y-auto hide-scrollbar"
-                    style={{
-                      scrollBehavior: 'smooth'
-                    }}
                   >
                     {/* Top padding - exactly 240px to allow first sentence to center */}
                     <div style={{ height: '240px', flexShrink: 0 }} />
