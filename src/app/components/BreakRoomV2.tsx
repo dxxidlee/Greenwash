@@ -718,7 +718,7 @@ export default function BreakRoomV2({ open, onClose }: Props) {
             </div>
 
             {/* Bottom Controls - Record button + Status box */}
-            <div className="flex items-center gap-4">
+            <div className="flex items-center" style={{ gap: '1.2rem' }}>
               {/* Record Button */}
               <button
                 onClick={recordingState === 'idle' ? startRecording : undefined}
