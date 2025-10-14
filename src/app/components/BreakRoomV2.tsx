@@ -153,17 +153,9 @@ export default function BreakRoomV2({ open, onClose }: Props) {
     return baseTime;
   };
 
-  const advanceWord = () => {
+  const advanceWord = useCallback(() => {
     const currentSentence = SENTENCE_DATA[currentSentenceIdx];
     if (!currentSentence) return;
-
-    // Check if we've reached the predetermined failure point
-    if (failurePoint && 
-        currentSentenceIdx === failurePoint.sentence && 
-        currentWordIdx === failurePoint.word) {
-      failSession();
-      return;
-    }
 
     const nextWordIdx = currentWordIdx + 1;
     
@@ -177,46 +169,53 @@ export default function BreakRoomV2({ open, onClose }: Props) {
         return;
       }
       
-      setCurrentSentenceIdx(nextSentenceIdx);
-      setCurrentWordIdx(0);
-      
-      // Check failure point after moving to next sentence
+      // Check if next position is the failure point
       if (failurePoint && 
           nextSentenceIdx === failurePoint.sentence && 
           0 === failurePoint.word) {
-        failSession();
+        setCurrentSentenceIdx(nextSentenceIdx);
+        setCurrentWordIdx(0);
+        setTimeout(() => failSession(), 100); // Small delay to show the word before failing
         return;
       }
+      
+      setCurrentSentenceIdx(nextSentenceIdx);
+      setCurrentWordIdx(0);
       
       // Schedule next word
       const nextWord = SENTENCE_DATA[nextSentenceIdx].words[0];
       const duration = calculateWordDuration(nextWord, SENTENCE_DATA[nextSentenceIdx].text);
       wordTimerRef.current = setTimeout(advanceWord, duration);
     } else {
-      // Move to next word in same sentence
-      setCurrentWordIdx(nextWordIdx);
-      
-      // Check failure point after moving to next word
+      // Check if next position is the failure point
       if (failurePoint && 
           currentSentenceIdx === failurePoint.sentence && 
           nextWordIdx === failurePoint.word) {
-        failSession();
+        setCurrentWordIdx(nextWordIdx);
+        setTimeout(() => failSession(), 100); // Small delay to show the word before failing
         return;
       }
+      
+      // Move to next word in same sentence
+      setCurrentWordIdx(nextWordIdx);
       
       const nextWord = currentSentence.words[nextWordIdx];
       const duration = calculateWordDuration(nextWord, currentSentence.text);
       wordTimerRef.current = setTimeout(advanceWord, duration);
     }
-  };
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [currentSentenceIdx, currentWordIdx, failurePoint]);
 
   const generateRandomFailurePoint = () => {
-    // Calculate total words across all sentences
+    // Calculate total words across all sentences (excluding first word)
     let totalWords = 0;
     const wordMap: Array<{sentence: number, word: number}> = [];
     
     SENTENCE_DATA.forEach((sentence, sIdx) => {
       sentence.words.forEach((_, wIdx) => {
+        // Skip the very first word to prevent immediate failure
+        if (sIdx === 0 && wIdx === 0) return;
+        
         wordMap.push({sentence: sIdx, word: wIdx});
         totalWords++;
       });
@@ -231,18 +230,19 @@ export default function BreakRoomV2({ open, onClose }: Props) {
       randomPoint = wordMap[randomIndex];
       attempts++;
       
-      // Make sure it's not the same as last failure point
-      if (!lastFailurePoint || 
+      // Make sure it's not the same as last failure point AND not the first word
+      if ((!lastFailurePoint || 
           randomPoint.sentence !== lastFailurePoint.sentence || 
-          randomPoint.word !== lastFailurePoint.word) {
+          randomPoint.word !== lastFailurePoint.word) &&
+          !(randomPoint.sentence === 0 && randomPoint.word === 0)) {
         break;
       }
-    } while (attempts < 10); // Safety limit
+    } while (attempts < 50); // Increased safety limit
     
     return randomPoint;
   };
 
-  const failSession = () => {
+  const failSession = useCallback(() => {
     stopRecording();
     setRecordingState('failed');
     
@@ -258,9 +258,9 @@ export default function BreakRoomV2({ open, onClose }: Props) {
       setCurrentWordIdx(0);
       setFailurePoint(null); // Clear failure point for next attempt
     }, 2000);
-  };
+  }, [failurePoint]);
 
-  const completeRecitation = () => {
+  const completeRecitation = useCallback(() => {
     const newAttemptCount = attemptCount + 1;
     setAttemptCount(newAttemptCount);
     
@@ -277,7 +277,7 @@ export default function BreakRoomV2({ open, onClose }: Props) {
       setCurrentWordIdx(0);
       setFailurePoint(null); // Clear failure point for next loop
     }
-  };
+  }, [attemptCount, requiredAttempts]);
 
   const startRecording = async () => {
     // Generate a random failure point for this recording session
