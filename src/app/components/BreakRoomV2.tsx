@@ -344,8 +344,11 @@ export default function BreakRoomV2({ open, onClose }: Props) {
 
   const renderSentence = (sentenceData: typeof SENTENCE_DATA[0], sentenceIdx: number) => {
     const isCurrent = sentenceIdx === currentSentenceIdx;
-    const isPast = sentenceIdx < currentSentenceIdx;
     const isFuture = sentenceIdx > currentSentenceIdx;
+    
+    // Only show sentences within range: current +/- 2
+    const distanceFromCurrent = Math.abs(sentenceIdx - currentSentenceIdx);
+    const isVisible = distanceFromCurrent <= 2;
     
     return (
       <div
@@ -355,6 +358,7 @@ export default function BreakRoomV2({ open, onClose }: Props) {
           transition-all duration-500 ease-out
           ${isCurrent ? 'text-2xl md:text-3xl opacity-100 font-medium' : 'text-lg md:text-xl opacity-40 font-normal'}
           ${isFuture ? 'opacity-30' : ''}
+          ${!isVisible ? 'opacity-0 invisible' : ''}
         `}
         style={{
           fontFamily: 'PPNeueMontreal, sans-serif',
