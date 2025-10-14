@@ -38,8 +38,25 @@ export default function BreakRoomV2({ open, onClose }: Props) {
   const wordTimerRef = useRef<NodeJS.Timeout | null>(null);
   const sentenceTimerRef = useRef<NodeJS.Timeout | null>(null);
   const sentenceRefs = useRef<(HTMLDivElement | null)[]>([]);
+  const backgroundAudioRef = useRef<HTMLAudioElement | null>(null);
 
   useLockBodyScroll(open);
+
+  // Initialize background audio
+  useEffect(() => {
+    if (open && !backgroundAudioRef.current) {
+      const audio = new Audio('/breakroom-sound.mp3');
+      audio.loop = true;
+      backgroundAudioRef.current = audio;
+    }
+    
+    return () => {
+      if (backgroundAudioRef.current) {
+        backgroundAudioRef.current.pause();
+        backgroundAudioRef.current.currentTime = 0;
+      }
+    };
+  }, [open]);
 
   // Auto-scroll to center current sentence
   useEffect(() => {
@@ -271,6 +288,12 @@ export default function BreakRoomV2({ open, onClose }: Props) {
     stopRecording();
     setRecordingState('failed');
     
+    // Stop background audio
+    if (backgroundAudioRef.current) {
+      backgroundAudioRef.current.pause();
+      backgroundAudioRef.current.currentTime = 0;
+    }
+    
     // Remember this failure point
     const currentFp = stateRef.current.failurePoint;
     if (currentFp) {
@@ -295,10 +318,19 @@ export default function BreakRoomV2({ open, onClose }: Props) {
       // Check if we've reached required attempts
       const required = stateRef.current.requiredAttempts;
       if (newAttemptCount >= required) {
+        // Stop background audio on success
+        if (backgroundAudioRef.current) {
+          backgroundAudioRef.current.pause();
+          backgroundAudioRef.current.currentTime = 0;
+        }
         setRecordingState('success');
         setShowExitButton(true);
       } else {
-        // Loop back
+        // Stop audio and loop back
+        if (backgroundAudioRef.current) {
+          backgroundAudioRef.current.pause();
+          backgroundAudioRef.current.currentTime = 0;
+        }
         setRecordingState('idle');
         setCurrentSentenceIdx(0);
         setCurrentWordIdx(0);
@@ -326,6 +358,12 @@ export default function BreakRoomV2({ open, onClose }: Props) {
           setRecordingState('recording');
           setCurrentSentenceIdx(0);
           setCurrentWordIdx(0);
+          
+          // Play background audio
+          if (backgroundAudioRef.current) {
+            backgroundAudioRef.current.currentTime = 0;
+            backgroundAudioRef.current.play().catch(err => console.error('Audio play error:', err));
+          }
           
           // Start audio capture
           startAudioCapture();
