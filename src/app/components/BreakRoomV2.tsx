@@ -462,7 +462,7 @@ export default function BreakRoomV2({ open, onClose }: Props) {
     const showAllText = recordingState === 'idle' || recordingState === 'countdown' || recordingState === 'failed';
     const textOpacity = showAllText ? 0.2 : (isCurrent ? 1 : 0.2);
     
-    // Crosshair indicator
+    // Crosshair indicator - FIXED positions
     const showCrosshair = recordingState === 'recording' && isInRange;
     const crosshairLength = isCurrent ? '60px' : '30px';
     const crosshairOpacity = isCurrent ? 1 : 0.2;
@@ -471,21 +471,26 @@ export default function BreakRoomV2({ open, onClose }: Props) {
       <div
         key={sentenceIdx}
         ref={(el) => { sentenceRefs.current[sentenceIdx] = el; }}
-        className="relative flex items-center justify-center gap-4"
+        className="relative"
         style={{
-          marginBottom: '1.25rem'
+          marginBottom: '1.25rem',
+          paddingLeft: '80px',
+          paddingRight: '80px'
         }}
       >
-        {/* Left crosshair */}
+        {/* Left crosshair - FIXED position */}
         {showCrosshair && (
           <div 
             style={{
+              position: 'absolute',
+              left: '16px',
+              top: '50%',
+              transform: 'translateY(-50%)',
               width: crosshairLength,
               height: '1px',
               backgroundColor: 'white',
               opacity: crosshairOpacity,
-              transition: 'all 0.3s ease-out',
-              flexShrink: 0
+              transition: 'opacity 0.3s ease-out, width 0.3s ease-out'
             }}
           />
         )}
@@ -498,8 +503,6 @@ export default function BreakRoomV2({ open, onClose }: Props) {
             color: 'white',
             textAlign: 'center',
             lineHeight: '0.75',
-            paddingLeft: showCrosshair ? '0' : '1.125rem',
-            paddingRight: showCrosshair ? '0' : '1.125rem',
             opacity: textOpacity,
             transition: 'opacity 0.5s ease-out',
             willChange: 'opacity',
@@ -532,16 +535,19 @@ export default function BreakRoomV2({ open, onClose }: Props) {
           })}
         </div>
         
-        {/* Right crosshair */}
+        {/* Right crosshair - FIXED position */}
         {showCrosshair && (
           <div 
             style={{
+              position: 'absolute',
+              right: '16px',
+              top: '50%',
+              transform: 'translateY(-50%)',
               width: crosshairLength,
               height: '1px',
               backgroundColor: 'white',
               opacity: crosshairOpacity,
-              transition: 'all 0.3s ease-out',
-              flexShrink: 0
+              transition: 'opacity 0.3s ease-out, width 0.3s ease-out'
             }}
           />
         )}
@@ -649,121 +655,134 @@ export default function BreakRoomV2({ open, onClose }: Props) {
           className={`
             relative z-10
             w-full h-screen
-            flex flex-col items-center justify-center gap-12
+            flex flex-col items-center justify-center
             ${isClosing ? 'animate-[fadeOutScaleDown_0.3s_ease-in_forwards]' : 'opacity-0 scale-98 translate-y-2 animate-[fadeInScaleUp_0.4s_ease-out_0.12s_forwards]'}
           `}
         >
-          {/* Main Text Box - Always visible */}
-          <div 
-            className="relative rounded-[40px] shadow-[0_2px_12px_rgba(0,0,0,0.06)] noise-surface px-8 py-10 sm:px-12 sm:py-12 md:px-16 md:py-14 mx-4 sm:mx-8 md:mx-16 transition-all duration-300"
-            style={{
-              width: '56rem',
-              maxWidth: '90vw',
-              height: '220px',
-              overflow: 'hidden',
-              backgroundColor: recordingState === 'failed' ? 'rgba(220, 38, 38, 0.3)' : 'rgba(0, 143, 70, 0.3)'
-            }}
-          >
-            {recordingState === 'success' ? (
-              <div className="w-full h-full flex items-center justify-center">
-                <div className="text-center space-y-4">
-                  <div 
-                    className="text-2xl font-medium text-white"
-                    style={{ fontFamily: 'PPNeueMontreal, sans-serif' }}
-                  >
-                    Alignment Confirmed
-                  </div>
-                  <div 
-                    className="text-lg text-white opacity-70"
-                    style={{ fontFamily: 'PPNeueMontreal, sans-serif' }}
-                  >
-                    Session complete, exit when ready.
-                  </div>
-                </div>
-              </div>
-            ) : (
-              <div 
-                className="w-full h-full overflow-y-auto hide-scrollbar"
-              >
-                {/* Top padding - exactly 110px to allow first sentence to center */}
-                <div style={{ height: '110px', flexShrink: 0 }} />
-                
-                {SENTENCE_DATA.map((sentenceData, idx) => renderSentence(sentenceData, idx))}
-                
-                {/* Bottom padding - exactly 110px to allow last sentence to center */}
-                <div style={{ height: '110px', flexShrink: 0 }} />
-              </div>
-            )}
-          </div>
-
-          {/* Bottom Controls - Record button + Status box */}
-          <div className="flex items-center gap-4">
-            {/* Record Button */}
-            <button
-              onClick={recordingState === 'idle' ? startRecording : undefined}
-              disabled={recordingState === 'recording' || recordingState === 'countdown'}
-              className="flex items-center justify-center transition-all duration-300"
+          {/* Center container for text box */}
+          <div className="flex flex-col items-center justify-center gap-8">
+            {/* Main Text Box - Always visible */}
+            <div 
+              className="relative rounded-[40px] shadow-[0_2px_12px_rgba(0,0,0,0.06)] noise-surface px-8 py-10 sm:px-12 sm:py-12 md:px-16 md:py-14 transition-all duration-300"
               style={{
-                width: '64px',
-                height: '64px',
-                borderRadius: recordingState === 'recording' ? '12px' : '50%',
-                backgroundColor: recordingState === 'failed' ? 'rgba(220, 38, 38, 0.3)' : 'rgba(0, 143, 70, 0.3)',
-                border: '2px solid',
-                borderColor: recordingState === 'failed' ? 'rgba(220, 38, 38, 0.5)' : 'rgba(0, 143, 70, 0.5)',
-                cursor: recordingState === 'idle' ? 'pointer' : 'default'
+                width: '56rem',
+                maxWidth: '90vw',
+                height: '220px',
+                overflow: 'hidden',
+                backgroundColor: recordingState === 'failed' ? 'rgba(220, 38, 38, 0.3)' : 'rgba(0, 143, 70, 0.3)'
               }}
             >
-              <div
-                className="rounded-full transition-all duration-300"
+              {recordingState === 'success' ? (
+                <div className="w-full h-full flex items-center justify-center">
+                  <div className="text-center space-y-4">
+                    <div 
+                      className="text-2xl font-medium text-white"
+                      style={{ fontFamily: 'PPNeueMontreal, sans-serif' }}
+                    >
+                      Alignment Confirmed
+                    </div>
+                    <div 
+                      className="text-lg text-white opacity-70"
+                      style={{ fontFamily: 'PPNeueMontreal, sans-serif' }}
+                    >
+                      Session complete, exit when ready.
+                    </div>
+                  </div>
+                </div>
+              ) : (
+                <div 
+                  className="w-full h-full overflow-y-auto hide-scrollbar"
+                >
+                  {/* Top padding - exactly 110px to allow first sentence to center */}
+                  <div style={{ height: '110px', flexShrink: 0 }} />
+                  
+                  {SENTENCE_DATA.map((sentenceData, idx) => renderSentence(sentenceData, idx))}
+                  
+                  {/* Bottom padding - exactly 110px to allow last sentence to center */}
+                  <div style={{ height: '110px', flexShrink: 0 }} />
+                </div>
+              )}
+            </div>
+
+            {/* Bottom Controls - Record button + Status box */}
+            <div className="flex items-center gap-4">
+              {/* Record Button */}
+              <button
+                onClick={recordingState === 'idle' ? startRecording : undefined}
+                disabled={recordingState === 'recording' || recordingState === 'countdown'}
+                className="flex items-center justify-center transition-all duration-300 rounded-full"
                 style={{
-                  width: recordingState === 'recording' ? '24px' : '32px',
-                  height: recordingState === 'recording' ? '24px' : '32px',
-                  backgroundColor: recordingState === 'failed' ? 'rgba(220, 38, 38, 0.8)' : 'rgba(0, 143, 70, 0.8)'
+                  width: '64px',
+                  height: '64px',
+                  backgroundColor: recordingState === 'failed' ? 'rgba(220, 38, 38, 0.3)' : 'rgba(0, 143, 70, 0.3)',
+                  cursor: recordingState === 'idle' ? 'pointer' : 'default',
+                  border: 'none',
+                  outline: 'none'
                 }}
-              />
-            </button>
+              >
+                <div
+                  className="transition-all duration-300"
+                  style={{
+                    width: recordingState === 'recording' ? '24px' : '32px',
+                    height: recordingState === 'recording' ? '24px' : '32px',
+                    borderRadius: recordingState === 'recording' ? '4px' : '50%',
+                    backgroundColor: 'white'
+                  }}
+                />
+              </button>
 
-            {/* Status Text Box */}
-            <div
-              onClick={recordingState === 'idle' ? startRecording : undefined}
-              className="rounded-[40px] px-8 py-4 transition-all duration-300 flex items-center justify-center"
-              style={{
-                minWidth: '280px',
-                backgroundColor: recordingState === 'failed' ? 'rgba(220, 38, 38, 0.3)' : 'rgba(0, 143, 70, 0.3)',
-                border: '1px solid',
-                borderColor: recordingState === 'failed' ? 'rgba(220, 38, 38, 0.5)' : 'rgba(0, 143, 70, 0.5)',
-                cursor: recordingState === 'idle' ? 'pointer' : 'default',
-                fontFamily: 'PPNeueMontreal, sans-serif',
-                color: 'white',
-                fontSize: '1.125rem',
-                fontWeight: 500
-              }}
-            >
-              {recordingState === 'idle' && 'Press to start recital'}
-              
-              {recordingState === 'countdown' && (
-                <span className="animate-pulse">Starting in {countdown}</span>
-              )}
-              
-              {recordingState === 'recording' && (
-                <div className="w-full flex items-center justify-center gap-1">
-                  {Array.from({ length: 40 }).map((_, i) => (
-                    <div
-                      key={i}
-                      className="w-1 rounded-full transition-all duration-100"
-                      style={{
-                        height: `${Math.max(4, audioLevel * 60 * (0.5 + Math.random() * 0.5))}px`,
-                        backgroundColor: 'white',
-                        opacity: audioLevel > 0.1 ? 0.8 : 0.3
-                      }}
-                    />
-                  ))}
-                </div>
-              )}
-              
-              {recordingState === 'failed' && 'Tone Drift Detected: Session Loop'}
-              
-              {recordingState === 'success' && 'Session Complete'}
+              {/* Status Text Box */}
+              <div
+                onClick={recordingState === 'idle' ? startRecording : undefined}
+                className="rounded-[40px] px-8 py-4 transition-all duration-300 flex items-center justify-center"
+                style={{
+                  width: '56rem',
+                  maxWidth: '90vw',
+                  height: '64px',
+                  backgroundColor: recordingState === 'failed' ? 'rgba(220, 38, 38, 0.3)' : 'rgba(0, 143, 70, 0.3)',
+                  cursor: recordingState === 'idle' ? 'pointer' : 'default',
+                  fontFamily: 'PPNeueMontreal, sans-serif',
+                  color: 'white',
+                  fontSize: '1.125rem',
+                  fontWeight: 500,
+                  border: 'none',
+                  outline: 'none'
+                }}
+              >
+                {recordingState === 'idle' && 'Press to start recital'}
+                
+                {recordingState === 'countdown' && (
+                  <span className="animate-pulse">Starting in {countdown}</span>
+                )}
+                
+                {recordingState === 'recording' && (
+                  <div className="w-full h-full flex items-center justify-center gap-1 px-4">
+                    {Array.from({ length: 60 }).map((_, i) => {
+                      // More dynamic height variation
+                      const baseHeight = audioLevel > 0.1 ? audioLevel * 100 : 10;
+                      const randomVariation = Math.sin(i * 0.5 + Date.now() / 200) * 30;
+                      const height = Math.max(4, Math.min(48, baseHeight + randomVariation));
+                      
+                      return (
+                        <div
+                          key={i}
+                          className="flex-1 rounded-full transition-all duration-100"
+                          style={{
+                            height: `${height}px`,
+                            maxHeight: '48px',
+                            backgroundColor: 'white',
+                            opacity: audioLevel > 0.1 ? 0.8 : 0.3
+                          }}
+                        />
+                      );
+                    })}
+                  </div>
+                )}
+                
+                {recordingState === 'failed' && 'Tone Drift Detected: Session Loop'}
+                
+                {recordingState === 'success' && 'Session Complete'}
+              </div>
             </div>
           </div>
         </div>
